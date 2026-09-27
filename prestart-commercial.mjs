@@ -22,6 +22,7 @@ app.post("/demo/vendor",async(req,res)=>{try{const url=String(req.body?.url||"")
 `;
 const target='app.listen(port,"0.0.0.0",()=>console.log("x402 service listening on "+port));';
 if(!source.includes(target))throw new Error("listen target not found");
-source=source.replace(target,insertion+"\\n"+target);
+source=source.replace(target,insertion+"
+"+target);
 fs.writeFileSync(file,source);
 console.log("Installed commercial Vendor Intelligence V3");
