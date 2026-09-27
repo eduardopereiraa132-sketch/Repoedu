@@ -38,3 +38,10 @@ An unpaid request to either paid endpoint returns HTTP 402 with x402 payment req
 ## Important revenue condition
 
 A listing, deployment or discovery record does not create revenue by itself. Revenue requires a real external funded x402 client to purchase requests.
+
+## Vendor Security Preflight
+
+POST https://repoedu-1.onrender.com/vendor-preflight
+Price: $0.025 USDC
+Input: {"url":"https://example.com","requirements":["HTTPS","HSTS","Content Security Policy"]}
+Purpose: a structured first-pass vendor-risk signal from public website controls. It is not a penetration test, vulnerability scan, certification, or legal opinion.
