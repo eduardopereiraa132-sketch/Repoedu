@@ -9,7 +9,7 @@ Returns clean webpage text, title, description and up to 100 links.
 ## Website Security Preflight
 POST https://repoedu-1.onrender.com/site-audit
 
-Price: $0.50 USDC
+Price: $0.01 USDC
 Network: Base Mainnet (eip155:8453)
 Payment: x402 v2 exact
 Payee: 0x031a713863890eb611776aadd48397873ed153ab
