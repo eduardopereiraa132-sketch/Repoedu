@@ -228,7 +228,7 @@ app.get("/.well-known/ai-plugin.json",(_req,res)=>res.json({
   schema_version:"v1",name_for_human:"Agent Security & Document Intelligence",name_for_model:"agent_security_document_intelligence",
   description_for_model:"Pay-per-call x402 APIs for website security preflight and structured business document analysis.",
   api:{type:"openapi",url:publicUrl+"/openapi.json"},auth:{type:"x402",network,asset:"USDC",price,payTo},
-  endpoints:{siteAudit:publicUrl+"/site-audit",analyze:publicUrl+"/analyze",x402:publicUrl+"/.well-known/x402",llms:publicUrl+"/llms.txt",skill:publicUrl+"/skill.md"}
+  endpoints:{webExtract:publicUrl+"/web-extract",siteAudit:publicUrl+"/site-audit",analyze:publicUrl+"/analyze",x402:publicUrl+"/.well-known/x402",llms:publicUrl+"/llms.txt",skill:publicUrl+"/skill.md"}
 }));
 app.get("/skill.md",(_req,res)=>res.type("text/markdown").send([
   "# Agent Security & Document Intelligence","","Pay-per-call x402 APIs for AI agents.","",
@@ -252,6 +252,7 @@ app.get("/sitemap.xml",(_req,res)=>res.type("application/xml").send('<?xml versi
 app.get("/openapi.json",(_req,res)=>res.json({
   openapi:"3.1.0",info:{title:"Agent Security & Document Intelligence",version:"2.0.0",description:"Pay-per-call x402 APIs for AI agents."},servers:[{url:publicUrl}],
   paths:{
+    "/web-extract":{post:{summary:"Webpage Extractor",requestBody:{required:true,content:{"application/json":{schema:webExtractInputSchema}}},responses:{"200":{description:"Clean webpage content",content:{"application/json":{schema:webExtractOutputSchema}}},"402":{description:"x402 payment required"}}}},
     "/site-audit":{post:{summary:"Website Security Preflight",requestBody:{required:true,content:{"application/json":{schema:siteAuditInputSchema}}},responses:{"200":{description:"Live public website security signals",content:{"application/json":{schema:siteAuditOutputSchema}}},"402":{description:"x402 payment required"}}}},
     "/analyze":{post:{summary:"Business Document Analyzer",requestBody:{required:true,content:{"application/json":{schema:inputSchema}}},responses:{"200":{description:"Structured document signals",content:{"application/json":{schema:outputSchema}}},"402":{description:"x402 payment required"}}}}
   }
