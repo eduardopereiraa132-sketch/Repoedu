@@ -42,3 +42,12 @@ All paid routes advertise x402 Bazaar metadata with machine-readable input/outpu
 USDC reaches the payee only after an external funded x402 client purchases a request. Deployment or listing does not itself create revenue.
 
 No private key, seed phrase or exchange credential is stored in the repository.
+
+## Commercial endpoints
+
+- **Webpage Extractor** — $0.005 USDC/call
+- **Website Security Preflight** — $0.01 USDC/call
+- **Business Document Analyzer** — $0.005 USDC/call
+- **Vendor Security Preflight** — $0.025 USDC/call
+
+All paid endpoints use x402 v2 exact on Base Mainnet (eip155:8453) and return machine-readable JSON. The vendor preflight is designed as a higher-value procurement/due-diligence primitive and is explicitly not a penetration test or certification.
