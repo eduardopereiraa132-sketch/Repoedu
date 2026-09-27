@@ -1,0 +1,23 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Business Document Analyzer",
+  "name_for_model": "business_document_analyzer",
+  "description_for_model": "Paid x402 API that extracts structured business-document signals for AI agents. Send document text and receive dates, monetary amounts, obligations, security signals, missing areas and risk flags.",
+  "api": {
+    "type": "openapi",
+    "url": "https://repoedu-1.onrender.com/openapi.json"
+  },
+  "auth": {
+    "type": "x402",
+    "network": "eip155:8453",
+    "asset": "USDC",
+    "price": "0.50",
+    "payTo": "0x031a713863890eb611776aadd48397873ed153ab"
+  },
+  "endpoints": {
+    "paid": "https://repoedu-1.onrender.com/analyze",
+    "x402": "https://repoedu-1.onrender.com/.well-known/x402",
+    "llms": "https://repoedu-1.onrender.com/llms.txt",
+    "skill": "https://repoedu-1.onrender.com/skill.md"
+  }
+}
