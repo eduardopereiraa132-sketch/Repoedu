@@ -1,0 +1,34 @@
+# Business Document Analyzer
+
+Paid, machine-readable business-document analysis API for AI agents.
+
+## Endpoint
+
+POST https://repoedu-1.onrender.com/analyze
+
+Payment: x402 v2, exact scheme, Base Mainnet (eip155:8453), USDC, $0.50 per request.
+
+Recipient:
+0x031a713863890eb611776aadd48397873ed153ab
+
+Input JSON:
+{"text":"string"}
+
+Output fields:
+service, wordCount, characterCount, dates, monetaryAmounts, obligations, securitySignals, missingAreas, riskFlags
+
+The endpoint advertises x402 Bazaar discovery metadata and a machine-readable input/output schema.
+
+## Public metadata
+
+GET https://repoedu-1.onrender.com/
+GET https://repoedu-1.onrender.com/health
+GET https://repoedu-1.onrender.com/openapi.json
+
+## Payment behavior
+
+An unpaid POST /analyze returns HTTP 402 with x402 payment requirements. A compatible x402 client should sign the requested USDC payment and retry the request.
+
+## Limitations
+
+Maximum input size is 50,000 characters. The current analysis is deterministic rule-based extraction; it does not call an external LLM.
