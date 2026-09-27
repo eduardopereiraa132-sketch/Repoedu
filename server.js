@@ -141,6 +141,63 @@ app.get("/health", (_req, res) =>
   })
 );
 
+
+app.get("/.well-known/x402", (_req, res) => {
+  res.json({
+    x402Version: 2,
+    service: "Business Document Analyzer",
+    description: "Paid machine-readable business-document analysis for AI agents.",
+    endpoints: [
+      {
+        method: "POST",
+        path: "/analyze",
+        url: publicUrl + "/analyze",
+        price: price,
+        network: network,
+        asset: "USDC",
+        payTo: payTo,
+        contentType: "application/json"
+      }
+    ],
+    discovery: {
+      protocol: "x402-bazaar",
+      resource: publicUrl + "/analyze"
+    },
+    docs: publicUrl + "/openapi.json",
+    llms: publicUrl + "/llms.txt"
+  });
+});
+
+app.get("/skill.md", (_req, res) => {
+  res.type("text/markdown").send(`# Business Document Analyzer
+
+## Purpose
+Extract structured business-document signals for downstream AI-agent workflows.
+
+## Paid endpoint
+POST ${publicUrl}/analyze
+
+Payment: x402 v2, exact scheme, Base Mainnet (eip155:8453), USDC, ${price} per request.
+Payee: ${payTo}
+
+## Input
+JSON object:
+{"text":"business document text"}
+
+## Output
+JSON fields:
+service, wordCount, characterCount, dates, monetaryAmounts, obligations, securitySignals, missingAreas, riskFlags
+
+## Limits
+Maximum input size: 50,000 characters.
+
+## Machine-readable docs
+- ${publicUrl}/openapi.json
+- ${publicUrl}/llms.txt
+- ${publicUrl}/.well-known/x402
+`);
+});
+
 app.get("/openapi.json", (_req, res) => {
   res.json({
     openapi: "3.1.0",
