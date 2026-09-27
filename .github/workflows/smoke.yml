@@ -27,14 +27,28 @@ jobs:
           done
           cat /tmp/x402-server.log
           exit 1
-      - name: Test local payment protection
+      - name: Test local payment protection and Bazaar metadata
         run: |
           set -e
           for path in /analyze /site-audit /web-extract; do
             if [ "$path" = "/analyze" ]; then body='{"text":"smoke test"}'; else body='{"url":"https://example.com"}'; fi
-            code=$(curl -sS -o /tmp/body -w "%{http_code}" -X POST "http://127.0.0.1:10000$path" -H "Content-Type: application/json" -d "$body")
+            headers=/tmp/headers
+            code=$(curl -sS -D "$headers" -o /tmp/body -w "%{http_code}" -X POST "http://127.0.0.1:10000$path" -H "Content-Type: application/json" -d "$body")
             echo "$path HTTP $code"
             test "$code" = "402"
+            value=$(grep -i '^payment-required:' "$headers" | sed 's/^[^:]*:[[:space:]]*//I' | tr -d '\r\n')
+            test -n "$value"
+            node -e '
+              const x=JSON.parse(Buffer.from(process.argv[1],"base64").toString("utf8"));
+              if(x.x402Version!==2) throw new Error("not x402 v2");
+              const a=x.accepts?.[0];
+              if(!a || a.network!=="eip155:8453" || a.scheme!=="exact" || a.payTo!=="0x031a713863890eb611776aadd48397873ed153ab") throw new Error("payment requirements mismatch");
+              const b=x.extensions?.bazaar?.info;
+              const s=x.extensions?.bazaar?.schema;
+              if(!b || b.input?.type!=="http" || b.input?.method!=="POST" || b.output?.type!=="json") throw new Error("invalid Bazaar info");
+              if(!s || typeof s!=="object" || !s.properties || !s.properties.input || !s.properties.output) throw new Error("invalid Bazaar extension schema");
+              if(!s.properties.input.properties || !s.properties.output.properties) throw new Error("Bazaar schema missing input/output schemas");
+            ' "$value"
           done
       - name: Verify advertised prices
         run: |
