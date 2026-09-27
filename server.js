@@ -58,7 +58,32 @@ const outputSchema = {
   ]
 };
 
+
+const siteAuditInputSchema={type:"object",properties:{url:{type:"string",description:"Public http or https website URL"}},required:["url"]};
+const siteAuditOutputSchema={type:"object",properties:{service:{type:"string"},url:{type:"string"},finalUrl:{type:"string"},status:{type:"integer"},contentType:{type:"string"},responseTimeMs:{type:"integer"},title:{type:"string"},https:{type:"boolean"},securityHeaders:{type:"object"},cookieSecurity:{type:"object"},exposedServerHeader:{type:"boolean"},robotsTxt:{type:"object"},securityTxt:{type:"object"},findings:{type:"array",items:{type:"string"}}},required:["service","url","finalUrl","status","contentType","responseTimeMs","title","https","securityHeaders","cookieSecurity","exposedServerHeader","robotsTxt","securityTxt","findings"]};
+
+function publicUrl(raw){try{const u=new URL(raw);const h=u.hostname.toLowerCase();if(!["http:","https:"].includes(u.protocol)||h==="localhost"||h.endsWith(".localhost")||h.endsWith(".local")||h==="0.0.0.0"||h==="::1"||/^127\\./.test(h)||/^10\\./.test(h)||/^192\\.168\\./.test(h)||/^169\\.254\\./.test(h))return null;const m=h.match(/^172\\.(\\d{1,3})\\./);if(m&&+m[1]>=16&&+m[1]<=31)return null;return u}catch{return null}}
+async function publicFetch(url){const c=new AbortController();const t=setTimeout(()=>c.abort(),8000);try{return await fetch(url,{signal:c.signal,redirect:"follow",headers:{"user-agent":"AgentSecurityPreflight/2.0"}})}finally{clearTimeout(t)}}
+async function auditSite(raw){
+ const first=publicUrl(raw);if(!first)throw new Error("url must be a public http or https URL");
+ const start=Date.now(),r=await publicFetch(first.toString()),finalUrl=r.url||first.toString(),h=r.headers,ct=h.get("content-type")||"",body=(await r.text()).slice(0,100000);
+ const sh={strictTransportSecurity:!!h.get("strict-transport-security"),contentSecurityPolicy:!!h.get("content-security-policy"),xContentTypeOptions:!!h.get("x-content-type-options"),xFrameOptions:!!h.get("x-frame-options"),referrerPolicy:!!h.get("referrer-policy"),permissionsPolicy:!!h.get("permissions-policy")};
+ const cookies=typeof h.getSetCookie==="function"?h.getSetCookie():[],cs={cookiesSeen:cookies.length,secure:cookies.filter(x=>/\\bsecure\\b/i.test(x)).length,httpOnly:cookies.filter(x=>/\\bhttponly\\b/i.test(x)).length,sameSite:cookies.filter(x=>/\\bsamesite=/i.test(x)).length};
+ const title=(body.match(/<title[^>]*>([\\s\\S]*?)<\\/title>/i)?.[1]||"").replace(/\\s+/g," ").trim().slice(0,300),base=new URL(finalUrl),origin=base.origin;
+ const [robots,securityTxt]=await Promise.all([publicFetch(origin+"/robots.txt").catch(()=>null),publicFetch(origin+"/.well-known/security.txt").catch(()=>null)]);
+ const findings=[];if(base.protocol==="https:"&&!sh.strictTransportSecurity)findings.push("Strict-Transport-Security not observed");if(!sh.contentSecurityPolicy)findings.push("Content-Security-Policy not observed");if(!sh.xContentTypeOptions)findings.push("X-Content-Type-Options not observed");if(!sh.referrerPolicy)findings.push("Referrer-Policy not observed");if(!sh.permissionsPolicy)findings.push("Permissions-Policy not observed");if(cookies.some(x=>!/secure/i.test(x)))findings.push("Cookie without Secure observed");if(cookies.some(x=>!/httponly/i.test(x)))findings.push("Cookie without HttpOnly observed");if(cookies.some(x=>!/samesite=/i.test(x)))findings.push("Cookie without SameSite observed");if(h.get("server"))findings.push("Server header exposed");if(!robots?.ok)findings.push("robots.txt not observed");if(!securityTxt?.ok)findings.push("security.txt not observed");
+ return {service:"Website Security Preflight",url:first.toString(),finalUrl,status:r.status,contentType:ct,responseTimeMs:Date.now()-start,title,https:base.protocol==="https:",securityHeaders:sh,cookieSecurity:cs,exposedServerHeader:!!h.get("server"),robotsTxt:{exists:!!robots?.ok,status:robots?.status||0},securityTxt:{exists:!!securityTxt?.ok,status:securityTxt?.status||0},findings:[...new Set(findings)]};
+}
+
 const routes = {
+  "POST /site-audit": {
+    accepts: { scheme:"exact", price, network, payTo },
+    resource: { url:publicUrl+"/site-audit", description:"Live public website security preflight for AI-agent vendor and compliance workflows.", mimeType:"application/json", serviceName:"Website Security Preflight", tags:["security","website","compliance","vendor-risk","audit"], iconUrl:publicUrl+"/icon.svg" },
+    description:"Paid live website security preflight. Send JSON {url:string}.",
+    mimeType:"application/json",
+    extensions:{...declareDiscoveryExtension({input:{url:"https://example.com"},inputSchema:siteAuditInputSchema,bodyType:"json",output:{example:{service:"Website Security Preflight",url:"https://example.com",finalUrl:"https://example.com/",status:200,contentType:"text/html",responseTimeMs:180,title:"Example Domain",https:true,securityHeaders:{strictTransportSecurity:true,contentSecurityPolicy:false,xContentTypeOptions:true,xFrameOptions:false,referrerPolicy:true,permissionsPolicy:false},cookieSecurity:{cookiesSeen:0,secure:0,httpOnly:0,sameSite:0},exposedServerHeader:false,robotsTxt:{exists:true,status:200},securityTxt:{exists:false,status:404},findings:["Content-Security-Policy not observed"]},schema:siteAuditOutputSchema}})}
+  },
+
   "POST /analyze": {
     accepts: {
       scheme: "exact",
@@ -328,6 +353,8 @@ function extract(text) {
     riskFlags
   };
 }
+
+app.post("/site-audit", async (req,res)=>{try{res.json(await auditSite(String(req.body?.url||"").trim()))}catch(e){res.status(400).json({error:e?.name==="AbortError"?"target timed out":e?.message||"unable to audit target"})}});
 
 app.post("/analyze", (req, res) => {
   const text = String(req.body?.text || "").trim();
