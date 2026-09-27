@@ -2,6 +2,12 @@
 
 Paid x402 APIs for AI agents on Base Mainnet.
 
+## Webpage Extractor
+POST https://repoedu-1.onrender.com/web-extract
+Price: $0.005 USDC
+Input: {"url":"https://example.com"}
+Purpose: fast clean webpage text, metadata and links for AI-agent research.
+
 ## Website Security Preflight
 POST https://repoedu-1.onrender.com/site-audit
 Price: $0.50 USDC
@@ -13,6 +19,9 @@ POST https://repoedu-1.onrender.com/analyze
 Price: $0.50 USDC
 Input: {"text":"string"}
 Purpose: deterministic structured extraction from business documents.
+
+## Service design
+Fast JSON responses, no API keys, no account setup, x402 payment per call, Base Mainnet USDC.
 
 ## Payment
 x402 v2, exact scheme, eip155:8453, USDC.
