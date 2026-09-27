@@ -28,12 +28,17 @@ jobs:
       - name: Check unpaid payment responses
         run: |
           set -e
-          for path in /analyze /site-audit; do
-            if [ "$path" = "/analyze" ]; then body='{"text":"discovery preflight"}'; else body='{"url":"https://example.com"}'; fi
+          for path in /analyze /site-audit /web-extract /vendor-preflight; do
+            if [ "$path" = "/analyze" ]; then body='{"text":"discovery preflight"}'; elif [ "$path" = "/vendor-preflight" ]; then body='{"url":"https://example.com","requirements":["HTTPS","HSTS"]}'; elif [ "$path" = "/web-extract" ]; then body='{"url":"https://example.com"}'; else body='{"url":"https://example.com"}'; fi
             code=$(curl -sS -o /tmp/body -w "%{http_code}" -X POST "http://127.0.0.1:10000$path" -H "Content-Type: application/json" -d "$body")
             echo "$path HTTP $code"
             test "$code" = "402"
           done
+      - name: Verify vendor route is advertised
+        run: |
+          set -e
+          curl -fsS http://127.0.0.1:10000/.well-known/x402 >/tmp/x402.json
+          node -e 'const x=require("fs").readFileSync("/tmp/x402.json","utf8"); if(!x.includes("/vendor-preflight")) throw new Error("vendor-preflight missing from x402 metadata")'
       - name: Check public metadata
         run: |
           set -e
