@@ -207,6 +207,7 @@ const routes={
 };
 app.use(paymentMiddleware(routes,x402Server));
 
+app.post("/web-extract",async(req,res)=>{try{res.json(await extractWebpage(String(req.body?.url||"").trim()));}catch(e){res.status(400).json({error:e?.name==="AbortError"?"target timed out":e?.message||"unable to extract webpage"});}});
 app.get("/icon.svg",(_req,res)=>res.type("image/svg+xml").send('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="24" fill="#111827"/><path d="M35 25h58v16H51v17h35v15H51v30H35z" fill="#fff"/><path d="M72 73h21v30H72z" fill="#60a5fa"/></svg>'));
 
 app.get("/",(_req,res)=>{
