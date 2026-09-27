@@ -1,0 +1,29 @@
+name: x402 smoke test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Test public service
+        env:
+          API_URL: https://repoedu-1.onrender.com/analyze
+        run: node test-payment.js
+      - name: Test public metadata
+        run: |
+          node - <<'NODE'
+          const base = "https://repoedu-1.onrender.com";
+          for (const path of ["/", "/health", "/openapi.json"]) {
+            const r = await fetch(base + path);
+            if (!r.ok) throw new Error(path + " returned HTTP " + r.status);
+            console.log(path, r.status);
+          }
+          NODE
