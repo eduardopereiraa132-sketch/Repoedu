@@ -49,9 +49,9 @@ const outputSchema = {
 };
 const siteAuditInputSchema={type:"object",properties:{url:{type:"string",description:"Public http or https website URL."}},required:["url"]};
 const webExtractInputSchema={type:"object",properties:{url:{type:"string",description:"Public http or https webpage URL."}},required:["url"]};
-const webExtractOutputSchema={properties:{service:{type:"string"},url:{type:"string"},finalUrl:{type:"string"},status:{type:"integer"},contentType:{type:"string"},title:{type:"string"},description:{type:"string"},canonical:{type:"string"},language:{type:"string"},openGraph:{type:"object"},headings:{type:"array",items:{type:"string"}},text:{type:"string"},links:{type:"array",items:{type:"object"}},wordCount:{type:"integer"},truncated:{type:"boolean"},responseTimeMs:{type:"integer"},cacheHit:{type:"boolean"}},required:["service","url","finalUrl","status","contentType","title","description","canonical","language","openGraph","headings","text","links","wordCount","truncated","responseTimeMs","cacheHit"]};
+const webExtractOutputSchema={type:"object",properties:{service:{type:"string"},url:{type:"string"},finalUrl:{type:"string"},status:{type:"integer"},contentType:{type:"string"},title:{type:"string"},description:{type:"string"},canonical:{type:"string"},language:{type:"string"},openGraph:{type:"object"},headings:{type:"array",items:{type:"string"}},text:{type:"string"},links:{type:"array",items:{type:"object"}},wordCount:{type:"integer"},truncated:{type:"boolean"},responseTimeMs:{type:"integer"},cacheHit:{type:"boolean"}},required:["service","url","finalUrl","status","contentType","title","description","canonical","language","openGraph","headings","text","links","wordCount","truncated","responseTimeMs","cacheHit"]};
 const siteAuditOutputSchema={
-  properties:{
+  type:"object",properties:{
     service:{type:"string"},url:{type:"string"},finalUrl:{type:"string"},status:{type:"integer"},
     contentType:{type:"string"},responseTimeMs:{type:"integer"},title:{type:"string"},https:{type:"boolean"},
     securityHeaders:{type:"object"},cookieSecurity:{type:"object"},exposedServerHeader:{type:"boolean"},
@@ -216,7 +216,7 @@ const routes={
     description:"Paid webpage extraction. Send JSON {url:string}. Returns clean text and links for downstream agent reasoning.",mimeType:"application/json",
     extensions:{...declareDiscoveryExtension({
       input:{url:"https://example.com"},inputSchema:webExtractInputSchema,bodyType:"json",
-      output:{example:{service:"Webpage Extractor",url:"https://example.com",finalUrl:"https://example.com/",status:200,contentType:"text/html",title:"Example Domain",description:"Example Domain",canonical:"",language:"en",openGraph:{title:"",description:"",image:""},headings:[],text:"Example Domain This domain is for use in illustrative examples.",links:[],wordCount:10,truncated:false,responseTimeMs:120,cacheHit:false},schema:{properties:webExtractOutputSchema.properties,required:webExtractOutputSchema.required}}
+      output:{example:{service:"Webpage Extractor",url:"https://example.com",finalUrl:"https://example.com/",status:200,contentType:"text/html",title:"Example Domain",description:"Example Domain",canonical:"",language:"en",openGraph:{title:"",description:"",image:""},headings:[],text:"Example Domain This domain is for use in illustrative examples.",links:[],wordCount:10,truncated:false,responseTimeMs:120,cacheHit:false},schema:webExtractOutputSchema}
     })}
   },
   "POST /site-audit":{
@@ -225,7 +225,7 @@ const routes={
     description:"Paid live website security preflight. Send JSON {url:string}.",mimeType:"application/json",
     extensions:{...declareDiscoveryExtension({
       input:{url:"https://example.com"},inputSchema:siteAuditInputSchema,bodyType:"json",
-      output:{example:{service:"Website Security Preflight",url:"https://example.com",finalUrl:"https://example.com/",status:200,contentType:"text/html",responseTimeMs:180,title:"Example Domain",https:true,securityHeaders:{strictTransportSecurity:true,contentSecurityPolicy:false,xContentTypeOptions:true,xFrameOptions:false,referrerPolicy:true,permissionsPolicy:false},cookieSecurity:{cookiesSeen:0,secure:0,httpOnly:0,sameSite:0},exposedServerHeader:false,robotsTxt:{exists:true,status:200},securityTxt:{exists:false,status:404},findings:["Content-Security-Policy not observed"]},schema:{properties:siteAuditOutputSchema.properties,required:siteAuditOutputSchema.required}}
+      output:{example:{service:"Website Security Preflight",url:"https://example.com",finalUrl:"https://example.com/",status:200,contentType:"text/html",responseTimeMs:180,title:"Example Domain",https:true,securityHeaders:{strictTransportSecurity:true,contentSecurityPolicy:false,xContentTypeOptions:true,xFrameOptions:false,referrerPolicy:true,permissionsPolicy:false},cookieSecurity:{cookiesSeen:0,secure:0,httpOnly:0,sameSite:0},exposedServerHeader:false,robotsTxt:{exists:true,status:200},securityTxt:{exists:false,status:404},findings:["Content-Security-Policy not observed"]},schema:siteAuditOutputSchema}
     })}
   },
   "POST /analyze":{
@@ -234,7 +234,7 @@ const routes={
     description:"Paid business-document analysis. Send JSON {text:string}. Response is structured for machine consumption.",mimeType:"application/json",
     extensions:{...declareDiscoveryExtension({
       input:{text:"Supplier must provide incident notification within 24 hours. Contract expires on 30/11/2026."},inputSchema,bodyType:"json",
-      output:{example:{service:"Business Document Analyzer",wordCount:13,characterCount:105,dates:["30/11/2026","24 hours"],monetaryAmounts:[],obligations:["Supplier must provide incident notification within 24 hours."],securitySignals:["incident notification"],missingAreas:["access control","data retention"],riskFlags:["deadline/obligation detected"]},schema:{properties:outputSchema.properties,required:outputSchema.required}}
+      output:{example:{service:"Business Document Analyzer",wordCount:13,characterCount:105,dates:["30/11/2026","24 hours"],monetaryAmounts:[],obligations:["Supplier must provide incident notification within 24 hours."],securitySignals:["incident notification"],missingAreas:["access control","data retention"],riskFlags:["deadline/obligation detected"]},schema:outputSchema}
     })}
   }
 };
