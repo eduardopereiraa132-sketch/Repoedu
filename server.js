@@ -17,6 +17,9 @@ const sitePrice = process.env.SITE_PRICE || "$0.01";
 const documentPrice = process.env.DOCUMENT_PRICE || price;
 const facilitatorUrl = process.env.FACILITATOR_URL || "https://facilitator.xpay.sh";
 const publicUrl = (process.env.PUBLIC_URL || "https://repoedu-1.onrender.com").replace(/\/$/, "");
+const version = "2.1.0";
+const CACHE_TTL_MS = 120000;
+const extractionCache = new Map();
 
 const facilitatorClient = new HTTPFacilitatorClient({ url: facilitatorUrl });
 const x402Server = new x402ResourceServer(facilitatorClient)
@@ -49,6 +52,7 @@ const siteAuditOutputSchema={
   required:["service","url","finalUrl","status","contentType","responseTimeMs","title","https","securityHeaders","cookieSecurity","exposedServerHeader","robotsTxt","securityTxt","findings"]
 };
 
+function isPrivateIPv6(ip){const v=ip.toLowerCase().replace(/^\[|\]$/g,"");return v==="::"||v==="::1"||v.startsWith("fc")||v.startsWith("fd")||v.startsWith("fe8")||v.startsWith("fe9")||v.startsWith("fea")||v.startsWith("feb")||v.startsWith("ff");}
 function isPrivateIPv4(ip){
   const p=ip.split(".").map(Number);
   return p.length===4&&(p[0]===10||p[0]===127||p[0]===0||(p[0]===169&&p[1]===254)||(p[0]===172&&p[1]>=16&&p[1]<=31)||(p[0]===192&&p[1]===168));
@@ -71,7 +75,7 @@ async function resolvePublicHost(url){
   if(net.isIP(host))return !isPrivateIPv4(host);
   const addresses=await dns.lookup(host,{all:true,verbatim:true});
   if(!addresses.length)return false;
-  return addresses.every(({address,family})=>(family===4&&!isPrivateIPv4(address))||family===6);
+  return addresses.every(({address,family})=>(family===4&&!isPrivateIPv4(address))||(family===6&&!isPrivateIPv6(address)));
 }
 async function fetchPublic(rawUrl,maxRedirects=4){
   let current=validatePublicUrl(rawUrl);
@@ -178,7 +182,7 @@ async function auditSite(raw){
 
 const routes={
   "POST /web-extract":{
-    accepts:{scheme:"exact",price,network,payTo},
+    accepts:{scheme:"exact",price:sitePrice,network,payTo},
     resource:{url:publicUrl+"/web-extract",description:"Fast machine-readable webpage extraction for AI agents: title, description, clean text and links from a public URL.",mimeType:"application/json",serviceName:"Webpage Extractor",tags:["web","extraction","scraping","research","content"],iconUrl:publicUrl+"/icon.svg"},
     description:"Paid webpage extraction. Send JSON {url:string}. Returns clean text and links for downstream agent reasoning.",mimeType:"application/json",
     extensions:{...declareDiscoveryExtension({
@@ -187,7 +191,7 @@ const routes={
     })}
   },
   "POST /site-audit":{
-    accepts:{scheme:"exact",price,network,payTo},
+    accepts:{scheme:"exact",price:documentPrice,network,payTo},
     resource:{url:publicUrl+"/site-audit",description:"Live public website security preflight for AI-agent vendor and compliance workflows.",mimeType:"application/json",serviceName:"Website Security Preflight",tags:["security","website","compliance","vendor-risk","audit"],iconUrl:publicUrl+"/icon.svg"},
     description:"Paid live website security preflight. Send JSON {url:string}.",mimeType:"application/json",
     extensions:{...declareDiscoveryExtension({
@@ -214,14 +218,14 @@ app.get("/",(_req,res)=>{
   const html='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent Security & Document Intelligence</title><meta name="description" content="Pay-per-call x402 APIs for AI agents: website security preflight and business document analysis."><link rel="icon" href="/icon.svg"></head><body style="font-family:system-ui,sans-serif;max-width:900px;margin:60px auto;padding:0 24px;color:#111827"><h1>Agent Security & Document Intelligence</h1><p>Machine-readable, pay-per-call APIs for AI agents and automation. x402 + USDC on Base Mainnet.</p><div style="display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))"><section style="border:1px solid #ddd;border-radius:16px;padding:22px"><h2>Website Security Preflight</h2><p>Fresh public-site signals for vendor-risk and compliance workflows.</p><code>POST /site-audit</code><p><strong>'+price+' USDC/request</strong></p><a href="/openapi.json">OpenAPI</a> · <a href="/skill.md">Agent skill</a></section><section style="border:1px solid #ddd;border-radius:16px;padding:22px"><h2>Business Document Analyzer</h2><p>Structured dates, obligations, money, security signals and gaps.</p><code>POST /analyze</code><p><strong>'+price+' USDC/request</strong></p><a href="/openapi.json">OpenAPI</a> · <a href="/llms.txt">LLMs.txt</a></section></div><h2>Payment</h2><p>Network: '+network+'<br>Payee: <code>'+payTo+'</code><br>Protocol: x402 v2 exact</p><p><a href="/.well-known/x402">x402 metadata</a> · <a href="/health">health</a></p></body></html>';
   res.type("html").send(html);
 });
-app.get("/health",(_req,res)=>res.json({ok:true,service:"agent-security-document-intelligence",network,price,facilitator:facilitatorUrl}));
+app.get("/health",(_req,res)=>res.json({ok:true,service:"agent-security-document-intelligence",version,network,prices:{webExtract:price,siteAudit:sitePrice,documentAnalyzer:documentPrice},facilitator:facilitatorUrl,cacheEntries:extractionCache.size}));
 app.get("/.well-known/x402",(_req,res)=>res.json({
-  x402Version:2,service:"Agent Security & Document Intelligence",
+  x402Version:2,service:"Agent Security & Document Intelligence",version,
   endpoints:[
-    {method:"POST",path:"/site-audit",url:publicUrl+"/site-audit",price,network,asset:"USDC",payTo,contentType:"application/json"},
-    {method:"POST",path:"/analyze",url:publicUrl+"/analyze",price,network,asset:"USDC",payTo,contentType:"application/json"}
+    {method:"POST",path:"/site-audit",url:publicUrl+"/site-audit",price:sitePrice,network,asset:"USDC",payTo,contentType:"application/json"},
+    {method:"POST",path:"/analyze",url:publicUrl+"/analyze",price:documentPrice,network,asset:"USDC",payTo,contentType:"application/json"}
   ],
-  discovery:{protocol:"x402-bazaar",resources:[publicUrl+"/site-audit",publicUrl+"/analyze"]},
+  discovery:{protocol:"x402-bazaar",resources:[publicUrl+"/web-extract",publicUrl+"/site-audit",publicUrl+"/analyze"]},
   docs:publicUrl+"/openapi.json",llms:publicUrl+"/llms.txt",skill:publicUrl+"/skill.md"
 }));
 app.get("/.well-known/ai-plugin.json",(_req,res)=>res.json({
@@ -250,7 +254,7 @@ app.get("/robots.txt",(_req,res)=>res.type("text/plain").send("User-agent: *\nAl
 app.get("/sitemap.xml",(_req,res)=>res.type("application/xml").send('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>'+publicUrl+'/</loc></url><url><loc>'+publicUrl+'/openapi.json</loc></url><url><loc>'+publicUrl+'/skill.md</loc></url><url><loc>'+publicUrl+'/llms.txt</loc></url><url><loc>'+publicUrl+'/.well-known/x402</loc></url></urlset>'));
 
 app.get("/openapi.json",(_req,res)=>res.json({
-  openapi:"3.1.0",info:{title:"Agent Security & Document Intelligence",version:"2.0.0",description:"Pay-per-call x402 APIs for AI agents."},servers:[{url:publicUrl}],
+  openapi:"3.1.0",info:{title:"Agent Security & Document Intelligence",version,description:"Low-cost pay-per-call x402 APIs for AI agents on Base Mainnet."},servers:[{url:publicUrl}],
   paths:{
     "/web-extract":{post:{summary:"Webpage Extractor",requestBody:{required:true,content:{"application/json":{schema:webExtractInputSchema}}},responses:{"200":{description:"Clean webpage content",content:{"application/json":{schema:webExtractOutputSchema}}},"402":{description:"x402 payment required"}}}},
     "/site-audit":{post:{summary:"Website Security Preflight",requestBody:{required:true,content:{"application/json":{schema:siteAuditInputSchema}}},responses:{"200":{description:"Live public website security signals",content:{"application/json":{schema:siteAuditOutputSchema}}},"402":{description:"x402 payment required"}}}},
