@@ -289,13 +289,21 @@ pay.onclick=async()=>{
     log("The server is returning HTTP 402. Your wallet should now ask you to authorize the $0.005 USDC x402 payment.");
     const r=await fetchWithPayment(location.origin+"/web-extract",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({url:"https://example.com"})});
     const data=await r.json();
+    const paymentResponse=r.headers.get("PAYMENT-RESPONSE");
+    let decodedPaymentResponse=null;
+    if(paymentResponse){try{decodedPaymentResponse=JSON.parse(atob(paymentResponse));}catch{decodedPaymentResponse={raw:paymentResponse};}}
     setStatus(r.ok?"Payment accepted and API call succeeded":"API call returned HTTP "+r.status);
-    log({httpStatus:r.status,wallet:address,result:data,success:r.ok});
+    log({httpStatus:r.status,wallet:address,result:data,paymentResponse:decodedPaymentResponse,success:r.ok});
   }catch(e){setStatus("Payment test failed");log({error:e?.message||String(e),code:e?.code||null});}
   finally{pay.disabled=false;}
 };
 </script></body></html>`;
-app.get("/payment-test",(_req,res)=>res.type("html").send(paymentTestPage()));
+app.get("/payment-test",(_req,res)=>{
+  res.setHeader("Cache-Control","no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma","no-cache");
+  res.setHeader("Expires","0");
+  res.type("html").send(paymentTestPage());
+});
 const agentCard=()=>({name:"Agent Web & Security Intelligence",description:"Pay-per-call HTTP APIs for AI agents: public webpage extraction, website security preflight, and deterministic business-document analysis.",version,provider:{organization:"Independent API provider"},payment:{protocol:"x402",version:2,scheme:"exact",network:"eip155:8453",asset:"USDC",payTo},selection:{choose:"Select the endpoint by task fit first, then price and output shape.",webExtract:"Use when you have a public webpage URL and need clean text, metadata, headings and links.",siteAudit:"Use when you need a fast first-pass signal on a public website security configuration.",analyze:"Use when you need deterministic structured triage of business-document text.",limits:["No authenticated/private/local URLs.","No browser-required JavaScript rendering.","Site Audit is not penetration testing, vulnerability scanning, certification or legal advice.","Document Analyzer is not legal advice or an LLM opinion."]},services:[{name:"Webpage Extractor",method:"POST",path:"/web-extract",price,useWhen:"Known public webpage URL; need clean text, metadata, headings and links.",notFor:["authenticated pages","private/local URLs","browser-required JavaScript","penetration testing"]},{name:"Website Security Preflight",method:"POST",path:"/site-audit",price:sitePrice,useWhen:"Fast first-pass public website security signal.",notFor:["penetration testing","vulnerability scanning","certification","legal opinion"]},{name:"Business Document Analyzer",method:"POST",path:"/analyze",price:documentPrice,useWhen:"Deterministic structured triage of business-document text.",notFor:["legal advice","LLM-generated opinion"]}],docs:{openapi:"/openapi.json",skill:"/skill.md",llms:"/llms.txt",x402:"/.well-known/x402"}});
 app.get("/agent-card.json",(_req,res)=>res.json(agentCard()));
 app.get("/.well-known/agent-card.json",(_req,res)=>res.type("application/a2a+json").json(agentCard()));
