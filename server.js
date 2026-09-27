@@ -9,6 +9,14 @@ import { bazaarResourceServerExtension, declareDiscoveryExtension } from "@x402/
 const app = express();
 app.disable("x-powered-by");
 app.use(express.json({ limit: "2mb" }));
+app.use((req,res,next)=>{
+  res.setHeader("X-Content-Type-Options","nosniff");
+  res.setHeader("X-Frame-Options","DENY");
+  res.setHeader("Referrer-Policy","no-referrer");
+  res.setHeader("Permissions-Policy","camera=(), microphone=(), geolocation=()");
+  res.setHeader("Strict-Transport-Security","max-age=31536000; includeSubDomains");
+  next();
+});
 
 const payTo = process.env.PAY_TO || "0x031a713863890eb611776aadd48397873ed153ab";
 const network = process.env.NETWORK || "eip155:8453";
@@ -55,7 +63,15 @@ const siteAuditOutputSchema={
 function isPrivateIPv6(ip){const v=ip.toLowerCase().replace(/^\[|\]$/g,"");return v==="::"||v==="::1"||v.startsWith("fc")||v.startsWith("fd")||v.startsWith("fe8")||v.startsWith("fe9")||v.startsWith("fea")||v.startsWith("feb")||v.startsWith("ff");}
 function isPrivateIPv4(ip){
   const p=ip.split(".").map(Number);
-  return p.length===4&&(p[0]===10||p[0]===127||p[0]===0||(p[0]===169&&p[1]===254)||(p[0]===172&&p[1]>=16&&p[1]<=31)||(p[0]===192&&p[1]===168));
+  if(p.length!==4||p.some(n=>!Number.isInteger(n)||n<0||n>255))return true;
+  const [a,b,c]=p;
+  return a===0||a===10||a===127||a>=224||
+    (a===100&&b>=64&&b<=127)||
+    (a===169&&b===254)||
+    (a===172&&b>=16&&b<=31)||
+    (a===192&&(b===0||b===2||b===168))||
+    (a===198&&(b===18||b===19||b===51))||
+    (a===203&&b===0&&c===113);
 }
 function validatePublicUrl(raw){
   try{
