@@ -136,7 +136,8 @@ async function readLimitedText(response,maxBytes=100000){
 }
 function htmlToText(html){
   return html.replace(/<(script|style|noscript|template|svg)[^>]*>[\s\S]*?<\/\1>/gi," ")
-    .replace(/<\/(p|div|section|article|li|h[1-6]|tr|td|main|header|footer)>/gi,"\n")
+    .replace(/<\/(p|div|section|article|li|h[1-6]|tr|td|main|header|footer)>/gi,"
+")
     .replace(/<[^>]+>/g," ")
     .replace(/&nbsp;/gi," ").replace(/&amp;/gi,"&").replace(/&lt;/gi,"<").replace(/&gt;/gi,">").replace(/&quot;/gi,'\"').replace(/&#39;/gi,"'")
     .replace(/\s+/g," ").trim();
@@ -391,7 +392,8 @@ app.get("/skill.md",(_req,res)=>res.type("text/markdown").send([
   'Input: {"url":"https://example.com","requirements":["HTTPS","HSTS"]}',"Returns a structured first-pass vendor-risk signal from public website controls; not a penetration test or certification.","",
   "## Discovery","- "+publicUrl+"/.well-known/x402","- "+publicUrl+"/.well-known/ai-plugin.json","- "+publicUrl+"/openapi.json","- "+publicUrl+"/llms.txt","",
   "Unpaid POST requests return HTTP 402 with x402 payment requirements."
-].join("\n")));
+].join("
+")));
 app.get("/llms.txt",(_req,res)=>res.type("text/plain").send([
   "# Agent Web & Security Intelligence","","Paid x402 APIs for AI agents on Base Mainnet.","",
   "## Webpage Extractor","POST "+publicUrl+"/web-extract","Price: "+price+" USDC",'Input: {"url":"https://example.com"}',"Purpose: clean webpage text, metadata, headings and links for downstream agent workflows.","",
@@ -400,8 +402,12 @@ app.get("/llms.txt",(_req,res)=>res.type("text/plain").send([
   "## Vendor Security Preflight","POST "+publicUrl+"/vendor-preflight","Price: "+vendorPrice+" USDC",'Input: {"url":"https://example.com","requirements":["HTTPS","HSTS"]}',"Purpose: public-site vendor-risk preflight for procurement and due diligence.","",
   "## Payment","x402 v2, exact scheme, eip155:8453, USDC.","Payee: "+payTo,"",
   "## Discovery",publicUrl+"/.well-known/x402",publicUrl+"/.well-known/ai-plugin.json",publicUrl+"/openapi.json",publicUrl+"/skill.md"
-].join("\n")));
-app.get("/robots.txt",(_req,res)=>res.type("text/plain").send("User-agent: *\nAllow: /\nSitemap: "+publicUrl+"/sitemap.xml\n"));
+].join("
+")));
+app.get("/robots.txt",(_req,res)=>res.type("text/plain").send("User-agent: *
+Allow: /
+Sitemap: "+publicUrl+"/sitemap.xml
+"));
 app.get("/sitemap.xml",(_req,res)=>res.type("application/xml").send('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>'+publicUrl+'/</loc></url><url><loc>'+publicUrl+'/openapi.json</loc></url><url><loc>'+publicUrl+'/skill.md</loc></url><url><loc>'+publicUrl+'/llms.txt</loc></url><url><loc>'+publicUrl+'/.well-known/x402</loc></url></urlset>'));
 
 app.get("/openapi.json",(_req,res)=>res.json({
@@ -448,6 +454,7 @@ const commercialPage=()=>'<html><head><meta charset="utf-8"><meta name="viewport
 app.get("/assessment",(_req,res)=>res.type("html").send(fs.readFileSync(new URL("./assessment-page.html",import.meta.url),"utf8")));
 app.post("/assessment",async(req,res)=>{try{const x=req.body||{};const vendorUrl=String(x.vendorUrl||"").trim();const evidence=String(x.evidence||"").trim();if(evidence.length<20)return res.status(400).json({error:"Provide at least 20 characters of evidence."});if(evidence.length>100000)return res.status(413).json({error:"Evidence exceeds the 100,000 character limit."});const result=assessEvidence({vendorName:String(x.vendorName||"").slice(0,160),vendorUrl:vendorUrl.slice(0,1000),evidence,notes:String(x.notes||"").slice(0,10000)});result._evidence=evidence;const assessmentId=await saveAssessment(result);delete result._evidence;res.json({...result,assessmentId,storage:storageConfigured()});}catch(e){console.error("ASSESSMENT_ERROR",e);res.status(400).json({error:e?.message||"unable to assess evidence"});}});
 
+app.post("/assessment/report",async(req,res)=>{try{const x=req.body||{};if(!x.result||typeof x.result!=="object")return res.status(400).send("Assessment result required");res.type("html").send(renderReport(x.result,x.assessmentId||""));}catch(e){res.status(400).send("Unable to render report");}});
 app.get("/assessment/report/:id",async(req,res)=>{try{const row=await getAssessment(String(req.params.id||""));if(!row)return res.status(404).send("Assessment not found");res.type("html").send(renderReport(row.result,row.id));}catch(e){res.status(500).send("Unable to load report");}});
 app.post("/assessment/lead",async(req,res)=>{try{const x=req.body||{};const email=String(x.email||"").trim().toLowerCase();if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))return res.status(400).json({error:"Valid email required"});const id=await saveLead({name:String(x.name||"").slice(0,120),email,company:String(x.company||"").slice(0,160),role:String(x.role||"").slice(0,120),source:"assessment",assessmentId:String(x.assessmentId||"").slice(0,80),metadata:{}});if(process.env.LEAD_WEBHOOK_URL)fetch(process.env.LEAD_WEBHOOK_URL,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({name:x.name,email,company:x.company,role:x.role,assessmentId:x.assessmentId,source:"assessment"})}).catch(()=>{});res.json({ok:true,id});}catch(e){res.status(500).json({error:"Unable to save lead"});}});
 app.get("/health/storage",async(_req,res)=>{try{const r=await initStorage();res.json(r);}catch(e){res.status(503).json({enabled:false,error:"database unavailable"});}});
