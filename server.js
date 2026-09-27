@@ -136,8 +136,7 @@ async function readLimitedText(response,maxBytes=100000){
 }
 function htmlToText(html){
   return html.replace(/<(script|style|noscript|template|svg)[^>]*>[\s\S]*?<\/\1>/gi," ")
-    .replace(/<\/(p|div|section|article|li|h[1-6]|tr|td|main|header|footer)>/gi,"
-")
+    .replace(/<\/(p|div|section|article|li|h[1-6]|tr|td|main|header|footer)>/gi,"\n")
     .replace(/<[^>]+>/g," ")
     .replace(/&nbsp;/gi," ").replace(/&amp;/gi,"&").replace(/&lt;/gi,"<").replace(/&gt;/gi,">").replace(/&quot;/gi,'\"').replace(/&#39;/gi,"'")
     .replace(/\s+/g," ").trim();
@@ -392,8 +391,7 @@ app.get("/skill.md",(_req,res)=>res.type("text/markdown").send([
   'Input: {"url":"https://example.com","requirements":["HTTPS","HSTS"]}',"Returns a structured first-pass vendor-risk signal from public website controls; not a penetration test or certification.","",
   "## Discovery","- "+publicUrl+"/.well-known/x402","- "+publicUrl+"/.well-known/ai-plugin.json","- "+publicUrl+"/openapi.json","- "+publicUrl+"/llms.txt","",
   "Unpaid POST requests return HTTP 402 with x402 payment requirements."
-].join("
-")));
+].join("\n")));
 app.get("/llms.txt",(_req,res)=>res.type("text/plain").send([
   "# Agent Web & Security Intelligence","","Paid x402 APIs for AI agents on Base Mainnet.","",
   "## Webpage Extractor","POST "+publicUrl+"/web-extract","Price: "+price+" USDC",'Input: {"url":"https://example.com"}',"Purpose: clean webpage text, metadata, headings and links for downstream agent workflows.","",
@@ -402,12 +400,8 @@ app.get("/llms.txt",(_req,res)=>res.type("text/plain").send([
   "## Vendor Security Preflight","POST "+publicUrl+"/vendor-preflight","Price: "+vendorPrice+" USDC",'Input: {"url":"https://example.com","requirements":["HTTPS","HSTS"]}',"Purpose: public-site vendor-risk preflight for procurement and due diligence.","",
   "## Payment","x402 v2, exact scheme, eip155:8453, USDC.","Payee: "+payTo,"",
   "## Discovery",publicUrl+"/.well-known/x402",publicUrl+"/.well-known/ai-plugin.json",publicUrl+"/openapi.json",publicUrl+"/skill.md"
-].join("
-")));
-app.get("/robots.txt",(_req,res)=>res.type("text/plain").send("User-agent: *
-Allow: /
-Sitemap: "+publicUrl+"/sitemap.xml
-"));
+].join("\n")));
+app.get("/robots.txt",(_req,res)=>res.type("text/plain").send("User-agent: *\nAllow: /\nSitemap: "+publicUrl+"/sitemap.xml\n"));
 app.get("/sitemap.xml",(_req,res)=>res.type("application/xml").send('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>'+publicUrl+'/</loc></url><url><loc>'+publicUrl+'/openapi.json</loc></url><url><loc>'+publicUrl+'/skill.md</loc></url><url><loc>'+publicUrl+'/llms.txt</loc></url><url><loc>'+publicUrl+'/.well-known/x402</loc></url></urlset>'));
 
 app.get("/openapi.json",(_req,res)=>res.json({
