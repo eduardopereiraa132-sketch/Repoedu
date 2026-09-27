@@ -20,6 +20,12 @@ Price: $0.005 USDC
 Input: {"text":"string"}
 Purpose: deterministic structured extraction from business documents.
 
+## Vendor Security Preflight
+POST https://repoedu-1.onrender.com/vendor-preflight
+Price: $0.025 USDC
+Input: {"url":"https://example.com","requirements":["HTTPS","HSTS"]}
+Purpose: structured public-site vendor-risk preflight for procurement and due diligence. Not a penetration test.
+
 ## Service design
 Fast JSON responses, no API keys, no account setup, x402 payment per call, Base Mainnet USDC.
 
