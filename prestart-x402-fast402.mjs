@@ -32,7 +32,7 @@ function fast402(req,res,next){
   const path=req.path;
   const cfg=routes[path];
   if(!cfg) return next();
-  if(req.get("PAYMENT-SIGNATURE")) return next();
+  if(req.get("PAYMENT-SIGNATURE")||req.get("X-PAYMENT")) return next();
   const accepts=cfg.accepts;
   const priceValue=typeof accepts.price==="string"?accepts.price:price;
   const resource=cfg.resource||{};
