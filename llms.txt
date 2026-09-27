@@ -1,22 +1,22 @@
-# Agent Security & Document Intelligence
+# Agent Web & Security Intelligence
 
-Paid x402 APIs for AI agents on Base Mainnet.
+Low-cost paid x402 APIs for AI agents on Base Mainnet.
 
 ## Webpage Extractor
 POST https://repoedu-1.onrender.com/web-extract
 Price: $0.005 USDC
 Input: {"url":"https://example.com"}
-Purpose: fast clean webpage text, metadata and links for AI-agent research.
+Purpose: fast clean webpage text, title, description and links for AI-agent research.
 
 ## Website Security Preflight
 POST https://repoedu-1.onrender.com/site-audit
-Price: $0.50 USDC
+Price: $0.01 USDC
 Input: {"url":"https://example.com"}
 Purpose: live public website security preflight.
 
 ## Business Document Analyzer
 POST https://repoedu-1.onrender.com/analyze
-Price: $0.50 USDC
+Price: $0.005 USDC
 Input: {"text":"string"}
 Purpose: deterministic structured extraction from business documents.
 
@@ -28,4 +28,7 @@ x402 v2, exact scheme, eip155:8453, USDC.
 Payee: 0x031a713863890eb611776aadd48397873ed153ab
 
 ## Discovery
-Both routes advertise x402 Bazaar metadata and machine-readable schemas.
+https://repoedu-1.onrender.com/.well-known/x402
+https://repoedu-1.onrender.com/.well-known/ai-plugin.json
+https://repoedu-1.onrender.com/openapi.json
+https://repoedu-1.onrender.com/skill.md
