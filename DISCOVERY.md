@@ -1,12 +1,21 @@
 # Agent Discovery
 
-## Service
-Business Document Analyzer
+## Service 1: Website Security Preflight
 
-## Live paid endpoint
+Live paid endpoint:
+POST https://repoedu-1.onrender.com/site-audit
+
+Purpose: live public website security signals for vendor-risk, compliance and automation workflows.
+
+## Service 2: Business Document Analyzer
+
+Live paid endpoint:
 POST https://repoedu-1.onrender.com/analyze
 
+Purpose: deterministic structured extraction from business-document text.
+
 ## Payment
+
 - Protocol: x402 v2
 - Scheme: exact
 - Network: Base Mainnet (eip155:8453)
@@ -14,24 +23,18 @@ POST https://repoedu-1.onrender.com/analyze
 - Price: 0.50 USD per request
 - Payee: 0x031a713863890eb611776aadd48397873ed153ab
 
-## Capability
-Given business-document text, return deterministic structured signals:
-- dates
-- monetary amounts
-- obligations
-- security signals
-- missing areas
-- risk flags
-- word and character counts
-
 ## Machine-readable discovery
+
 - https://repoedu-1.onrender.com/.well-known/x402
+- https://repoedu-1.onrender.com/.well-known/ai-plugin.json
 - https://repoedu-1.onrender.com/openapi.json
 - https://repoedu-1.onrender.com/llms.txt
 - https://repoedu-1.onrender.com/skill.md
 
-## Agent instruction
-Probe the endpoint. An unpaid request returns HTTP 402 with x402 payment requirements. A compatible x402 client can sign the exact USDC payment on Base and retry the request with the payment payload.
+## Agent behavior
 
-## Discovery note
-The official x402 Bazaar is a machine-readable discovery layer for x402-compatible HTTP endpoints. Its documentation says sellers expose the Bazaar extension on their paid route and compatible facilitators can catalog those resources.
+An unpaid request to either paid endpoint returns HTTP 402 with x402 payment requirements. A compatible x402 client can sign the exact USDC payment on Base and retry the request with the payment payload.
+
+## Important revenue condition
+
+A listing, deployment or discovery record does not create revenue by itself. Revenue requires a real external funded x402 client to purchase requests.
