@@ -241,6 +241,7 @@ const routes={
 app.use(paymentMiddleware(routes,x402Server));
 
 app.post("/web-extract",async(req,res)=>{try{res.json(await extractWebpage(String(req.body?.url||"").trim()));}catch(e){res.status(400).json({error:e?.name==="AbortError"?"target timed out":e?.message||"unable to extract webpage"});}});
+app.get("/agent-card.json",(_req,res)=>res.json({name:"Agent Web & Security Intelligence",description:"Pay-per-call HTTP APIs for AI agents: public webpage extraction, website security preflight, and deterministic business-document analysis.",payment:{protocol:"x402",version:2,scheme:"exact",network:"eip155:8453",asset:"USDC",payTo},services:[{name:"Webpage Extractor",method:"POST",path:"/web-extract",price},{name:"Website Security Preflight",method:"POST",path:"/site-audit",price:sitePrice},{name:"Business Document Analyzer",method:"POST",path:"/analyze",price:documentPrice}],docs:{openapi:"/openapi.json",skill:"/skill.md",llms:"/llms.txt",x402:"/.well-known/x402"}}));
 app.get("/icon.svg",(_req,res)=>res.type("image/svg+xml").send('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="24" fill="#111827"/><path d="M35 25h58v16H51v17h35v15H51v30H35z" fill="#fff"/><path d="M72 73h21v30H72z" fill="#60a5fa"/></svg>'));
 
 app.get("/",(_req,res)=>{
