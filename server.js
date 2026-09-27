@@ -177,6 +177,15 @@ async function auditSite(raw){
 }
 
 const routes={
+  "POST /web-extract":{
+    accepts:{scheme:"exact",price,network,payTo},
+    resource:{url:publicUrl+"/web-extract",description:"Fast machine-readable webpage extraction for AI agents: title, description, clean text and links from a public URL.",mimeType:"application/json",serviceName:"Webpage Extractor",tags:["web","extraction","scraping","research","content"],iconUrl:publicUrl+"/icon.svg"},
+    description:"Paid webpage extraction. Send JSON {url:string}. Returns clean text and links for downstream agent reasoning.",mimeType:"application/json",
+    extensions:{...declareDiscoveryExtension({
+      input:{url:"https://example.com"},inputSchema:webExtractInputSchema,bodyType:"json",
+      output:{example:{service:"Webpage Extractor",url:"https://example.com",finalUrl:"https://example.com/",status:200,contentType:"text/html",title:"Example Domain",description:"Example Domain",text:"Example Domain This domain is for use in illustrative examples.",links:[],wordCount:10,truncated:false},schema:webExtractOutputSchema}
+    })}
+  },
   "POST /site-audit":{
     accepts:{scheme:"exact",price,network,payTo},
     resource:{url:publicUrl+"/site-audit",description:"Live public website security preflight for AI-agent vendor and compliance workflows.",mimeType:"application/json",serviceName:"Website Security Preflight",tags:["security","website","compliance","vendor-risk","audit"],iconUrl:publicUrl+"/icon.svg"},
