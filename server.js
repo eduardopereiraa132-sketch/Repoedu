@@ -41,7 +41,7 @@ const outputSchema = {
 };
 const siteAuditInputSchema={type:"object",properties:{url:{type:"string",description:"Public http or https website URL."}},required:["url"]};
 const webExtractInputSchema={type:"object",properties:{url:{type:"string",description:"Public http or https webpage URL."}},required:["url"]};
-const webExtractOutputSchema={type:"object",properties:{service:{type:"string"},url:{type:"string"},finalUrl:{type:"string"},status:{type:"integer"},contentType:{type:"string"},title:{type:"string"},description:{type:"string"},text:{type:"string"},links:{type:"array",items:{type:"object"}},wordCount:{type:"integer"},truncated:{type:"boolean"}},required:["service","url","finalUrl","status","contentType","title","description","text","links","wordCount","truncated"]};
+const webExtractOutputSchema={type:"object",properties:{service:{type:"string"},url:{type:"string"},finalUrl:{type:"string"},status:{type:"integer"},contentType:{type:"string"},title:{type:"string"},description:{type:"string"},canonical:{type:"string"},language:{type:"string"},openGraph:{type:"object"},headings:{type:"array",items:{type:"string"}},text:{type:"string"},links:{type:"array",items:{type:"object"}},wordCount:{type:"integer"},truncated:{type:"boolean"},responseTimeMs:{type:"integer"},cacheHit:{type:"boolean"}},required:["service","url","finalUrl","status","contentType","title","description","canonical","language","openGraph","headings","text","links","wordCount","truncated","responseTimeMs","cacheHit"]};
 const siteAuditOutputSchema={
   type:"object",properties:{
     service:{type:"string"},url:{type:"string"},finalUrl:{type:"string"},status:{type:"integer"},
@@ -126,15 +126,28 @@ function extractLinks(html,baseUrl){
 }
 async function extractWebpage(raw){
   const first=validatePublicUrl(raw);if(!first)throw new Error("url must be a public http or https URL");
-  const response=await fetchPublic(first.toString());const finalUrl=response.url||first.toString();
+  const key=first.toString(),now=Date.now(),cached=extractionCache.get(key);
+  if(cached&&cached.expiresAt>now)return {...cached.value,responseTimeMs:0,cacheHit:true};
+  if(cached)extractionCache.delete(key);
+  const started=Date.now(),response=await fetchPublic(key),finalUrl=response.url||key;
   if(!validatePublicUrl(finalUrl))throw new Error("final URL is not public");
   const contentType=response.headers.get("content-type")||"";
   if(!contentType.toLowerCase().includes("text/html"))throw new Error("target is not an HTML page");
   const html=await readLimitedText(response,180000);
   const title=(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]||"").replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim().slice(0,300);
   const description=(html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i)?.[1]||html.match(/<meta[^>]+content=["']([^"']*)["'][^>]+name=["']description["']/i)?.[1]||"").trim().slice(0,500);
-  const rawText=htmlToText(html);const maxText=30000;const text=rawText.slice(0,maxText);
-  return {service:"Webpage Extractor",url:first.toString(),finalUrl,status:response.status,contentType,title,description,text,links:extractLinks(html,finalUrl),wordCount:text.split(/\s+/).filter(Boolean).length,truncated:rawText.length>maxText};
+  const canonicalRaw=html.match(/<link[^>]+rel=["'][^"']*canonical[^"']*["'][^>]+href=["']([^"']+)["']/i)?.[1]||html.match(/<link[^>]+href=["']([^"']+)["'][^>]+rel=["'][^"']*canonical[^"']*["']/i)?.[1]||"";
+  let canonical="";try{canonical=canonicalRaw?new URL(canonicalRaw,finalUrl).toString():"";}catch{}
+  const language=(html.match(/<html[^>]+lang=["']([^"']+)["']/i)?.[1]||"").slice(0,20);
+  const og=(name)=>html.match(new RegExp("<meta[^>]+property=[\"']"+name+"[\"'][^>]+content=[\"']([^\"']*)[\"']","i"))?.[1]||html.match(new RegExp("<meta[^>]+content=[\"']([^\"']*)[\"'][^>]+property=[\"']"+name+"[\"']","i"))?.[1]||"";
+  const openGraph={title:og("og:title").slice(0,300),description:og("og:description").slice(0,500),image:og("og:image").slice(0,1000)};
+  const headings=[];const hr=/<h[1-6]\b[^>]*>([\s\S]*?)<\/h[1-6]>/gi;let hm;
+  while((hm=hr.exec(html))&&headings.length<50){const h=htmlToText(hm[1]).slice(0,300);if(h)headings.push(h);}
+  const rawText=htmlToText(html),maxText=30000,text=rawText.slice(0,maxText);
+  const value={service:"Webpage Extractor",url:key,finalUrl,status:response.status,contentType,title,description,canonical,language,openGraph,headings,text,links:extractLinks(html,finalUrl),wordCount:text.split(/\s+/).filter(Boolean).length,truncated:rawText.length>maxText};
+  extractionCache.set(key,{value,expiresAt:now+CACHE_TTL_MS});
+  while(extractionCache.size>500)extractionCache.delete(extractionCache.keys().next().value);
+  return {...value,responseTimeMs:Date.now()-started,cacheHit:false};
 }
 async function auditSite(raw){
   const first=validatePublicUrl(raw);
@@ -187,11 +200,11 @@ const routes={
     description:"Paid webpage extraction. Send JSON {url:string}. Returns clean text and links for downstream agent reasoning.",mimeType:"application/json",
     extensions:{...declareDiscoveryExtension({
       input:{url:"https://example.com"},inputSchema:webExtractInputSchema,bodyType:"json",
-      output:{example:{service:"Webpage Extractor",url:"https://example.com",finalUrl:"https://example.com/",status:200,contentType:"text/html",title:"Example Domain",description:"Example Domain",text:"Example Domain This domain is for use in illustrative examples.",links:[],wordCount:10,truncated:false},schema:webExtractOutputSchema}
+      output:{example:{service:"Webpage Extractor",url:"https://example.com",finalUrl:"https://example.com/",status:200,contentType:"text/html",title:"Example Domain",description:"Example Domain",canonical:"",language:"en",openGraph:{title:"",description:"",image:""},headings:[],text:"Example Domain This domain is for use in illustrative examples.",links:[],wordCount:10,truncated:false,responseTimeMs:120,cacheHit:false},schema:webExtractOutputSchema}
     })}
   },
   "POST /site-audit":{
-    accepts:{scheme:"exact",price:documentPrice,network,payTo},
+    accepts:{scheme:"exact",price:sitePrice,network,payTo},
     resource:{url:publicUrl+"/site-audit",description:"Live public website security preflight for AI-agent vendor and compliance workflows.",mimeType:"application/json",serviceName:"Website Security Preflight",tags:["security","website","compliance","vendor-risk","audit"],iconUrl:publicUrl+"/icon.svg"},
     description:"Paid live website security preflight. Send JSON {url:string}.",mimeType:"application/json",
     extensions:{...declareDiscoveryExtension({
@@ -200,7 +213,7 @@ const routes={
     })}
   },
   "POST /analyze":{
-    accepts:{scheme:"exact",price,network,payTo},
+    accepts:{scheme:"exact",price:documentPrice,network,payTo},
     resource:{url:publicUrl+"/analyze",description:"Analyze business documents for obligations, dates, monetary amounts, security signals, missing control areas and risk flags.",mimeType:"application/json",serviceName:"Business Document Analyzer",tags:["documents","compliance","contracts","security","risk"],iconUrl:publicUrl+"/icon.svg"},
     description:"Paid business-document analysis. Send JSON {text:string}. Response is structured for machine consumption.",mimeType:"application/json",
     extensions:{...declareDiscoveryExtension({
