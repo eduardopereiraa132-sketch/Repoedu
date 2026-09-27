@@ -69,7 +69,7 @@ const routes = {
     resource: {
       url: publicUrl + "/analyze",
       description:
-        "Analyze a business document and extract obligations, dates, monetary amounts, security signals, missing areas and risk flags. Returns deterministic structured JSON suitable for downstream AI-agent workflows.",
+        "Analyze business documents for contracts, compliance gaps, obligations, dates, monetary amounts, security signals and risk flags. Returns deterministic structured JSON for AI-agent workflows.",
       mimeType: "application/json",
       serviceName: "Business Document Analyzer",
       tags: ["documents", "compliance", "contracts", "security", "risk"]
@@ -106,6 +106,10 @@ const routes = {
 };
 
 app.use(paymentMiddleware(routes, x402Server));
+
+app.get("/icon.svg", (_req, res) => {
+  res.type("image/svg+xml").send(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="24" fill="#111827"/><path d="M35 25h58v16H51v17h35v15H51v30H35z" fill="#fff"/><path d="M72 73h21v30H72z" fill="#60a5fa"/></svg>`);
+});
 
 app.get("/", (_req, res) => {
   res.json({
