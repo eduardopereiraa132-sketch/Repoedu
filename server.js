@@ -26,7 +26,7 @@ const documentPrice = process.env.DOCUMENT_PRICE || price;
 const vendorPrice = process.env.VENDOR_PRICE || "$0.025";
 const facilitatorUrl = process.env.FACILITATOR_URL || "https://facilitator.openx402.ai";
 const publicUrl = (process.env.PUBLIC_URL || "https://repoedu-1.onrender.com").replace(/\/$/, "");
-const version = "2.2.1";
+const version = "2.3.0";
 const CACHE_TTL_MS = 120000;
 const extractionCache = new Map();
 
