@@ -1,32 +1,34 @@
-# Business Document Analyzer
+# Agent Security & Document Intelligence
 
-A paid x402 API for AI agents that need deterministic business-document extraction.
+## Website Security Preflight
+POST https://repoedu-1.onrender.com/site-audit
 
-## Purchase
+Price: $0.50 USDC
+Network: Base Mainnet (eip155:8453)
+Payment: x402 v2 exact
+Payee: 0x031a713863890eb611776aadd48397873ed153ab
+
+Input:
+{"url":"https://example.com"}
+
+Returns live public website signals: HTTP status, response time, final URL, HTTPS, common security headers, cookie flags, Server disclosure, robots.txt, security.txt, page title and findings.
+
+## Business Document Analyzer
 POST https://repoedu-1.onrender.com/analyze
 
 Price: $0.50 USDC
 Network: Base Mainnet (eip155:8453)
-Payment scheme: x402 exact
+Payment: x402 v2 exact
 Payee: 0x031a713863890eb611776aadd48397873ed153ab
 
-## Input
+Input:
 {"text":"string"}
 
-## Output
-Structured JSON containing:
-- dates
-- monetaryAmounts
-- obligations
-- securitySignals
-- missingAreas
-- riskFlags
-- wordCount
-- characterCount
+Returns structured dates, money, obligations, security signals, missing areas and risk flags.
 
 ## Discovery
 https://repoedu-1.onrender.com/.well-known/x402
 https://repoedu-1.onrender.com/openapi.json
 https://repoedu-1.onrender.com/llms.txt
 
-The endpoint returns HTTP 402 with machine-readable x402 payment requirements when unpaid.
+Unpaid requests return HTTP 402 with machine-readable x402 payment requirements.
