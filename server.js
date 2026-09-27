@@ -269,9 +269,13 @@ connect.onclick=async()=>{
     address=accounts?.[0];
     if(!address)throw new Error("Wallet connection returned no address.");
     try{await walletProvider.request({method:"wallet_switchEthereumChain",params:[{chainId:"0x2105"}]});}catch(e){if(e?.code!==4902&&e?.code!==-32601)throw e;}
-    walletClient=createWalletClient({chain:base,transport:custom(walletProvider)});
+    walletClient=createWalletClient({account:address,chain:base,transport:custom(walletProvider)});
+    const x402Signer={
+      address,
+      signTypedData: async (typedData)=>walletClient.signTypedData(typedData)
+    };
     const client=new x402Client();
-    registerExactEvmScheme(client,{signer:walletClient});
+    registerExactEvmScheme(client,{signer:x402Signer});
     fetchWithPayment=wrapFetchWithPayment(fetch,client);
     pay.disabled=false; setStatus("Wallet connected");
     log({connected:address,network:"Base Mainnet",payTo:"0x031a713863890eb611776aadd48397873ed153ab",price:"$0.005 USDC",next:"Click Pay $0.005. Your wallet will ask you to authorize the x402 payment."});
