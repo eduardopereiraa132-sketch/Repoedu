@@ -74,10 +74,11 @@ jobs:
           check_402 /web-extract '{"url":"https://example.com"}' web
           check_402 /site-audit '{"url":"https://example.com"}' audit
           check_402 /analyze '{"text":"Supplier must notify incidents within 24 hours."}' analyze
+          check_402 /vendor-preflight '{"url":"https://example.com","requirements":["HTTPS","HSTS"]}' vendor
           node -e '
             const fs=require("fs");
             const expected="0x031a713863890eb611776aadd48397873ed153ab";
-            for(const name of ["web","audit","analyze"]){
+            for(const name of ["web","audit","analyze","vendor"]){
               const x=JSON.parse(fs.readFileSync("/tmp/decoded-"+name+".json","utf8"));
               const a=x.accepts?.[0], b=x.extensions?.bazaar?.info, s=x.extensions?.bazaar?.schema;
               if(x.x402Version!==2) throw new Error(name+": not x402 v2");
