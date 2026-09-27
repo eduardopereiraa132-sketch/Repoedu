@@ -22,7 +22,7 @@ jobs:
       - name: Check public metadata
         run: |
           set -e
-          for path in / /health /.well-known/x402 /openapi.json /skill.md /llms.txt /icon.svg; do
+          for path in / /health /.well-known/x402 /.well-known/ai-plugin.json /openapi.json /skill.md /llms.txt /robots.txt /sitemap.xml /icon.svg; do
             code=$(curl -sS -o /tmp/body -w "%{http_code}" "https://repoedu-1.onrender.com$path")
             echo "$path HTTP $code"
             test "$code" = "200"
