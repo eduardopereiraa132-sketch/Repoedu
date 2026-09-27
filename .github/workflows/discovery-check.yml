@@ -9,27 +9,21 @@ jobs:
   discovery:
     runs-on: ubuntu-latest
     steps:
-      - name: Check live x402 endpoint
+      - name: Check unpaid payment responses
         run: |
           set -e
-          code=$(curl -sS -o /tmp/body -w "%{http_code}" -X POST https://repoedu-1.onrender.com/analyze             -H "Content-Type: application/json"             -d '{"text":"discovery preflight"}')
-          echo "HTTP $code"
-          test "$code" = "402"
+          for path in /analyze /site-audit; do
+            if [ "$path" = "/analyze" ]; then body='{"text":"discovery preflight"}'; else body='{"url":"https://example.com"}'; fi
+            code=$(curl -sS -o /tmp/body -w "%{http_code}" -X POST "https://repoedu-1.onrender.com$path" -H "Content-Type: application/json" -d "$body")
+            echo "$path HTTP $code"
+            test "$code" = "402"
+          done
 
-      - name: Validate Ontario listing payload
+      - name: Check public metadata
         run: |
           set -e
-          curl -sS -X POST https://ontarioprotocol.com/api/x402/list-service/validate             -H "Content-Type: application/json"             -d '{
-              "name":"Business Document Analyzer",
-              "description":"Paid machine-readable business-document analysis for AI agents.",
-              "buyer_query":"extract structured business-document signals for an autonomous AI agent",
-              "category":"data",
-              "endpoint":"https://repoedu-1.onrender.com/analyze",
-              "method":"POST",
-              "price_usdc":"0.50",
-              "network":"base",
-              "owner_url":"https://repoedu-1.onrender.com",
-              "owner_contact":"eduardopereiraa132@gmail.com",
-              "tags":["x402","ai-agent","business-documents","document-analysis","base","usdc"]
-            }' > /tmp/validation.json
-          cat /tmp/validation.json
+          for path in / /health /.well-known/x402 /openapi.json /skill.md /llms.txt /icon.svg; do
+            code=$(curl -sS -o /tmp/body -w "%{http_code}" "https://repoedu-1.onrender.com$path")
+            echo "$path HTTP $code"
+            test "$code" = "200"
+          done
