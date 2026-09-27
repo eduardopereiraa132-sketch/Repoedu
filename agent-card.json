@@ -68,7 +68,7 @@
     "x402": "/.well-known/x402",
     "discovery": "/.well-known/x402-discovery"
   },
-  "version": "2.2.1",
+  "version": "2.3.0",
   "discovery": {
     "bazaar": "x402 Bazaar metadata is declared on every paid endpoint; catalog inclusion depends on a compatible facilitator and a real paid request.",
     "wellKnown": "/.well-known/x402-discovery is an additional proposal-format discovery document."
