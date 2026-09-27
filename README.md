@@ -1,53 +1,43 @@
-# Agent Web & Security Intelligence
+# Vendor Intelligence Agent
 
-Live x402 service for AI agents and automation.
+AI-assisted vendor due-diligence workflow for procurement, security and compliance teams.
 
-Base URL: https://repoedu-1.onrender.com
+**Base API:** https://repoedu-1.onrender.com
 
-## Paid APIs
+## Commercial product
 
-### Webpage Extractor
-POST /web-extract
+The project is moving from low-value pay-per-call primitives toward a higher-value B2B workflow. The product combines public vendor security signals, business-document analysis and structured risk triage into a repeatable vendor review.
 
-Price: US$0.005/request. Payment: USDC on Base Mainnet (eip155:8453).
-Input: {"url":"https://example.com"}
-Returns clean webpage text, title, description and links.
+See:
+- `PRODUCT.md` — product, workflow and commercial model
+- `LANDING_COPY.md` — customer-facing positioning
+- `OUTREACH.md` — pilot sales and qualification script
 
-### Website Security Preflight
-POST /site-audit
+## Existing machine-facing primitives
 
-Price: US$0.01/request. Payment: USDC on Base Mainnet (eip155:8453).
-Input: {"url":"https://example.com"}
-Returns fresh public-site signals: HTTPS, common security headers, cookie flags, server disclosure, robots.txt, security.txt, title, status and response time. Redirects are revalidated to avoid local/private targets.
+- **Webpage Extractor** — US$0.005 USDC/call
+- **Website Security Preflight** — US$0.01 USDC/call
+- **Business Document Analyzer** — US$0.005 USDC/call
+- **Vendor Security Preflight** — US$0.025 USDC/call
 
-### Business Document Analyzer
-POST /analyze
+These remain infrastructure for agents and for the higher-value commercial workflow. x402 uses USDC on Base Mainnet (`eip155:8453`).
 
-Price: US$0.005/request. Payment: USDC on Base Mainnet (eip155:8453).
-Input: {"text":"..."}
-Returns structured dates, monetary amounts, obligations, security signals, missing areas and risk flags.
+## Initial pilot hypothesis
 
-## Machine-readable discovery
+**US$2,500 implementation + US$500/month** for a focused pilot using a customer's real vendor-review workflow.
 
-- https://repoedu-1.onrender.com/.well-known/x402
-- https://repoedu-1.onrender.com/.well-known/ai-plugin.json
-- https://repoedu-1.onrender.com/openapi.json
-- https://repoedu-1.onrender.com/llms.txt
-- https://repoedu-1.onrender.com/skill.md
+The pilot is intended to validate measurable time savings and human-review reduction before expanding to a larger annual contract.
 
-All paid routes advertise x402 Bazaar metadata with machine-readable input/output schemas.
+Commercial pricing is a hypothesis to validate, not a guaranteed market price.
 
-## Revenue
+## Scope and limitations
 
-USDC reaches the payee only after an external funded x402 client purchases a request. Deployment or listing does not itself create revenue.
+The product is not a penetration test, certification or legal opinion. It reports observable signals and supplied-document evidence and keeps material procurement/security decisions under human approval.
 
-No private key, seed phrase or exchange credential is stored in the repository.
+## Revenue principle
 
-## Commercial endpoints
+Do not optimize primarily for API-call count. Optimize for annual customer value: the customer pays for the completed vendor-review workflow, while x402 remains a machine-to-machine payment mechanism underneath.
 
-- **Webpage Extractor** — $0.005 USDC/call
-- **Website Security Preflight** — $0.01 USDC/call
-- **Business Document Analyzer** — $0.005 USDC/call
-- **Vendor Security Preflight** — $0.025 USDC/call
+## Deployment
 
-All paid endpoints use x402 v2 exact on Base Mainnet (eip155:8453) and return machine-readable JSON. The vendor preflight is designed as a higher-value procurement/due-diligence primitive and is explicitly not a penetration test or certification.
+Render is configured as a Node web service with automatic deployment on commit. The current deployment configuration uses the free plan, so production economics and uptime should be validated before selling a paid SLA.
