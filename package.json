@@ -1,1 +1,1 @@
-{"name":"x402-business-agent","version":"1.0.0","private":true,"type":"module","scripts":{"start":"node server.js"},"dependencies":{"express":"latest"}}
+{"name":"x402-business-agent","version":"1.0.0","private":true,"type":"module","scripts":{"start":"node server.js"},"dependencies":{"@x402/core":"latest","@x402/evm":"latest","@x402/express":"latest","express":"latest"}}
