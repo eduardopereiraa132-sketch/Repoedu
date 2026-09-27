@@ -107,6 +107,31 @@ async function readLimitedText(response,maxBytes=100000){
   }
   return (await response.text()).slice(0,maxBytes);
 }
+function htmlToText(html){
+  return html.replace(/<(script|style|noscript|template|svg)[^>]*>[\\s\\S]*?<\\/\\1>/gi," ")
+    .replace(/<\\/(p|div|section|article|li|h[1-6]|tr|td|main|header|footer)>/gi,"\\n")
+    .replace(/<[^>]+>/g," ")
+    .replace(/&nbsp;/gi," ").replace(/&amp;/gi,"&").replace(/&lt;/gi,"<").replace(/&gt;/gi,">").replace(/&quot;/gi,'\"').replace(/&#39;/gi,"'")
+    .replace(/\\s+/g," ").trim();
+}
+function extractLinks(html,baseUrl){
+  const out=[];const seen=new Set();const re=/<a\\b[^>]*href=["']([^"']+)["'][^>]*>([\\s\\S]*?)<\\/a>/gi;let m;
+  while((m=re.exec(html))&&out.length<100){
+    try{const href=new URL(m[1],baseUrl);if(!["http:","https:"].includes(href.protocol))continue;const url=href.toString();if(seen.has(url))continue;seen.add(url);out.push({url,text:htmlToText(m[2]).slice(0,160)});}catch{}
+  } return out;
+}
+async function extractWebpage(raw){
+  const first=validatePublicUrl(raw);if(!first)throw new Error("url must be a public http or https URL");
+  const response=await fetchPublic(first.toString());const finalUrl=response.url||first.toString();
+  if(!validatePublicUrl(finalUrl))throw new Error("final URL is not public");
+  const contentType=response.headers.get("content-type")||"";
+  if(!contentType.toLowerCase().includes("text/html"))throw new Error("target is not an HTML page");
+  const html=await readLimitedText(response,180000);
+  const title=(html.match(/<title[^>]*>([\\s\\S]*?)<\\/title>/i)?.[1]||"").replace(/<[^>]+>/g," ").replace(/\\s+/g," ").trim().slice(0,300);
+  const description=(html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i)?.[1]||html.match(/<meta[^>]+content=["']([^"']*)["'][^>]+name=["']description["']/i)?.[1]||"").trim().slice(0,500);
+  const rawText=htmlToText(html);const maxText=30000;const text=rawText.slice(0,maxText);
+  return {service:"Webpage Extractor",url:first.toString(),finalUrl,status:response.status,contentType,title,description,text,links:extractLinks(html,finalUrl),wordCount:text.split(/\\s+/).filter(Boolean).length,truncated:rawText.length>maxText};
+}
 async function auditSite(raw){
   const first=validatePublicUrl(raw);
   if(!first)throw new Error("url must be a public http or https URL");
