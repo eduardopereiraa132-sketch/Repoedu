@@ -23,6 +23,7 @@ const network = process.env.NETWORK || "eip155:8453";
 const price = process.env.PRICE || "$0.005";
 const sitePrice = process.env.SITE_PRICE || "$0.01";
 const documentPrice = process.env.DOCUMENT_PRICE || price;
+const vendorPrice = process.env.VENDOR_PRICE || "$0.025";
 const facilitatorUrl = process.env.FACILITATOR_URL || "https://facilitator.openx402.ai";
 const publicUrl = (process.env.PUBLIC_URL || "https://repoedu-1.onrender.com").replace(/\/$/, "");
 const version = "2.2.1";
@@ -50,6 +51,8 @@ const outputSchema = {
 const siteAuditInputSchema={type:"object",properties:{url:{type:"string",description:"Public http or https website URL."}},required:["url"]};
 const webExtractInputSchema={type:"object",properties:{url:{type:"string",description:"Public http or https webpage URL."}},required:["url"]};
 const webExtractOutputSchema={type:"object",properties:{service:{type:"string"},url:{type:"string"},finalUrl:{type:"string"},status:{type:"integer"},contentType:{type:"string"},title:{type:"string"},description:{type:"string"},canonical:{type:"string"},language:{type:"string"},openGraph:{type:"object"},headings:{type:"array",items:{type:"string"}},text:{type:"string"},links:{type:"array",items:{type:"object"}},wordCount:{type:"integer"},truncated:{type:"boolean"},responseTimeMs:{type:"integer"},cacheHit:{type:"boolean"}},required:["service","url","finalUrl","status","contentType","title","description","canonical","language","openGraph","headings","text","links","wordCount","truncated","responseTimeMs","cacheHit"]};
+const vendorPreflightInputSchema={type:"object",properties:{url:{type:"string",description:"Public vendor website URL."},requirements:{type:"array",items:{type:"string"},description:"Optional security requirements to check against public-site signals."}},required:["url"]};
+const vendorPreflightOutputSchema={type:"object",properties:{service:{type:"string"},url:{type:"string"},status:{type:"integer"},https:{type:"boolean"},riskLevel:{type:"string"},checks:{type:"array",items:{type:"object"}},gaps:{type:"array",items:{type:"string"}},summary:{type:"string"},limitations:{type:"array",items:{type:"string"}}},required:["service","url","status","https","riskLevel","checks","gaps","summary","limitations"]};
 const siteAuditOutputSchema={
   type:"object",properties:{
     service:{type:"string"},url:{type:"string"},finalUrl:{type:"string"},status:{type:"integer"},
@@ -209,6 +212,41 @@ async function auditSite(raw){
   };
 }
 
+async function vendorPreflight(rawUrl,requirements=[]){
+  const audit=await auditSite(rawUrl);
+  const reqs=Array.isArray(requirements)?requirements.filter(x=>typeof x==="string"&&x.trim()).slice(0,20):[];
+  const checks=[
+    {id:"https",label:"HTTPS",passed:audit.https,detail:audit.https?"HTTPS is enabled":"HTTPS is not enabled"},
+    {id:"hsts",label:"HSTS",passed:audit.securityHeaders.strictTransportSecurity,detail:audit.securityHeaders.strictTransportSecurity?"HSTS observed":"HSTS not observed"},
+    {id:"csp",label:"Content Security Policy",passed:audit.securityHeaders.contentSecurityPolicy,detail:audit.securityHeaders.contentSecurityPolicy?"CSP observed":"CSP not observed"},
+    {id:"xcto",label:"X-Content-Type-Options",passed:audit.securityHeaders.xContentTypeOptions,detail:audit.securityHeaders.xContentTypeOptions?"Header observed":"Header not observed"},
+    {id:"frame",label:"Clickjacking protection",passed:audit.securityHeaders.xFrameOptions,detail:audit.securityHeaders.xFrameOptions?"X-Frame-Options observed":"X-Frame-Options not observed"},
+    {id:"referrer",label:"Referrer Policy",passed:audit.securityHeaders.referrerPolicy,detail:audit.securityHeaders.referrerPolicy?"Header observed":"Header not observed"},
+    {id:"permissions",label:"Permissions Policy",passed:audit.securityHeaders.permissionsPolicy,detail:audit.securityHeaders.permissionsPolicy?"Header observed":"Header not observed"},
+    {id:"securityTxt",label:"security.txt",passed:audit.securityTxt.exists,detail:audit.securityTxt.exists?"security.txt observed":"security.txt not observed"},
+    {id:"robots",label:"robots.txt",passed:audit.robotsTxt.exists,detail:audit.robotsTxt.exists?"robots.txt observed":"robots.txt not observed"},
+    {id:"server",label:"Server disclosure",passed:!audit.exposedServerHeader,detail:!audit.exposedServerHeader?"Server header not exposed":"Server header exposed"}
+  ];
+  for(const req of reqs){
+    const r=req.toLowerCase(); let match=null;
+    if(/https|tls/.test(r)) match=checks.find(x=>x.id==="https");
+    else if(/hsts|strict transport/.test(r)) match=checks.find(x=>x.id==="hsts");
+    else if(/content.?security.?policy|csp/.test(r)) match=checks.find(x=>x.id==="csp");
+    else if(/clickjack|x-frame/.test(r)) match=checks.find(x=>x.id==="frame");
+    else if(/referrer/.test(r)) match=checks.find(x=>x.id==="referrer");
+    else if(/permission/.test(r)) match=checks.find(x=>x.id==="permissions");
+    else if(/security.?txt/.test(r)) match=checks.find(x=>x.id==="securityTxt");
+    if(match) match.requirement=req;
+    else checks.push({id:"requirement",label:req,passed:false,detail:"Requirement cannot be verified by this public-site preflight"});
+  }
+  const gaps=checks.filter(x=>x.passed===false).map(x=>x.label);
+  const core=checks.filter(x=>["https","hsts","csp","xcto","frame","referrer","permissions"].includes(x.id));
+  const failedCore=core.filter(x=>!x.passed).length;
+  const riskLevel=!audit.https||failedCore>=5?"high":failedCore>=3?"medium":failedCore>=1?"low":"informational";
+  const summary=`Public-site preflight found ${gaps.length} unmet or unverifiable checks; this is a first-pass signal, not a penetration test.`;
+  return {service:"Vendor Security Preflight",url:audit.finalUrl,status:audit.status,https:audit.https,riskLevel,checks,gaps:[...new Set(gaps)],summary,limitations:["Only publicly observable HTTP/site signals are checked.","No authenticated testing, source-code review, vulnerability scanning, exploitation, certification or legal opinion.","A missing header or file is a signal, not proof of a vulnerability."]};
+}
+
 const routes={
   "POST /web-extract":{
     accepts:{scheme:"exact",price,network,payTo},
@@ -218,6 +256,12 @@ const routes={
       input:{url:"https://example.com"},inputSchema:webExtractInputSchema,bodyType:"json",
       output:{example:{service:"Webpage Extractor",url:"https://example.com",finalUrl:"https://example.com/",status:200,contentType:"text/html",title:"Example Domain",description:"Example Domain",canonical:"",language:"en",openGraph:{title:"",description:"",image:""},headings:[],text:"Example Domain This domain is for use in illustrative examples.",links:[],wordCount:10,truncated:false,responseTimeMs:120,cacheHit:false},schema:webExtractOutputSchema}
     })}
+  },
+  "POST /vendor-preflight":{
+    accepts:{scheme:"exact",price:vendorPrice,network,payTo},
+    resource:{url:publicUrl+"/vendor-preflight",description:"Agent-ready vendor security preflight combining public website controls into a structured procurement/risk signal.",mimeType:"application/json",serviceName:"Vendor Security Preflight",tags:["security","vendor-risk","procurement","compliance","due-diligence"],iconUrl:publicUrl+"/icon.svg"},
+    description:"Paid vendor security preflight. Send JSON {url:string,requirements?:string[]}. Not a penetration test or certification.",mimeType:"application/json",
+    extensions:{...declareDiscoveryExtension({input:{url:"https://example.com",requirements:["HTTPS","HSTS","Content Security Policy"]},inputSchema:vendorPreflightInputSchema,bodyType:"json",output:{example:{service:"Vendor Security Preflight",url:"https://example.com/",status:200,https:true,riskLevel:"low",checks:[{id:"https",label:"HTTPS",passed:true,detail:"HTTPS is enabled"}],gaps:["Content Security Policy"],summary:"Public-site preflight found 1 unmet or unverifiable checks; this is a first-pass signal, not a penetration test.",limitations:["Only publicly observable HTTP/site signals are checked."]},schema:vendorPreflightOutputSchema}})}
   },
   "POST /site-audit":{
     accepts:{scheme:"exact",price:sitePrice,network,payTo},
@@ -315,13 +359,14 @@ app.get("/",(_req,res)=>{
   const html='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent Web & Security Intelligence</title><meta name="description" content="Low-cost pay-per-call x402 APIs for AI agents: webpage extraction, website security preflight and business document analysis."><link rel="icon" href="/icon.svg"></head><body style="font-family:system-ui,sans-serif;max-width:900px;margin:60px auto;padding:0 24px;color:#111827"><h1>Agent Web & Security Intelligence</h1><p>Machine-readable, pay-per-call APIs for AI agents and automation. x402 + USDC on Base Mainnet.</p><div style="display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))"><section style="border:1px solid #ddd;border-radius:16px;padding:22px"><h2>Webpage Extractor</h2><p>Clean machine-readable page text, metadata, headings and links.</p><code>POST /web-extract</code><p><strong>'+price+' USDC/request</strong></p><a href="/openapi.json">OpenAPI</a> · <a href="/skill.md">Agent skill</a></section><section style="border:1px solid #ddd;border-radius:16px;padding:22px"><h2>Website Security Preflight</h2><p>Fresh public-site signals for vendor-risk and compliance workflows.</p><code>POST /site-audit</code><p><strong>'+sitePrice+' USDC/request</strong></p><a href="/openapi.json">OpenAPI</a> · <a href="/skill.md">Agent skill</a></section><section style="border:1px solid #ddd;border-radius:16px;padding:22px"><h2>Business Document Analyzer</h2><p>Structured dates, obligations, money, security signals and gaps.</p><code>POST /analyze</code><p><strong>'+documentPrice+' USDC/request</strong></p><a href="/openapi.json">OpenAPI</a> · <a href="/llms.txt">LLMs.txt</a></section></div><h2>Payment</h2><p>Network: '+network+'<br>Payee: <code>'+payTo+'</code><br>Protocol: x402 v2 exact</p><p><a href="/.well-known/x402">x402 metadata</a> · <a href="/health">health</a></p></body></html>';
   res.type("html").send(html);
 });
-app.get("/health",(_req,res)=>res.json({ok:true,service:"agent-web-security-intelligence",version,network,prices:{webExtract:price,siteAudit:sitePrice,documentAnalyzer:documentPrice},facilitator:facilitatorUrl,cacheEntries:extractionCache.size}));
+app.get("/health",(_req,res)=>res.json({ok:true,service:"agent-web-security-intelligence",version,network,prices:{webExtract:price,siteAudit:sitePrice,documentAnalyzer:documentPrice,vendorPreflight:vendorPrice},facilitator:facilitatorUrl,cacheEntries:extractionCache.size}));
 app.get("/.well-known/x402",(_req,res)=>res.json({
   x402Version:2,service:"Agent Web & Security Intelligence",version,
   endpoints:[
     {method:"POST",path:"/web-extract",url:publicUrl+"/web-extract",price,network,asset:"USDC",payTo,contentType:"application/json"},
     {method:"POST",path:"/site-audit",url:publicUrl+"/site-audit",price:sitePrice,network,asset:"USDC",payTo,contentType:"application/json"},
-    {method:"POST",path:"/analyze",url:publicUrl+"/analyze",price:documentPrice,network,asset:"USDC",payTo,contentType:"application/json"}
+    {method:"POST",path:"/analyze",url:publicUrl+"/analyze",price:documentPrice,network,asset:"USDC",payTo,contentType:"application/json"},
+    {method:"POST",path:"/vendor-preflight",url:publicUrl+"/vendor-preflight",price:vendorPrice,network,asset:"USDC",payTo,contentType:"application/json"}
   ],
   discovery:{protocol:"x402-bazaar",resources:[publicUrl+"/web-extract",publicUrl+"/site-audit",publicUrl+"/analyze"]},
   docs:publicUrl+"/openapi.json",llms:publicUrl+"/llms.txt",skill:publicUrl+"/skill.md"
@@ -330,7 +375,7 @@ app.get("/.well-known/ai-plugin.json",(_req,res)=>res.json({
   schema_version:"v1",name_for_human:"Agent Web & Security Intelligence",name_for_model:"agent_web_security_intelligence",
   description_for_model:"Low-cost pay-per-call x402 APIs for webpage extraction, website security preflight and structured business document analysis.",
   api:{type:"openapi",url:publicUrl+"/openapi.json"},auth:{type:"x402",network,asset:"USDC",price,payTo},
-  endpoints:{webExtract:publicUrl+"/web-extract",siteAudit:publicUrl+"/site-audit",analyze:publicUrl+"/analyze",x402:publicUrl+"/.well-known/x402",llms:publicUrl+"/llms.txt",skill:publicUrl+"/skill.md"}
+  endpoints:{webExtract:publicUrl+"/web-extract",siteAudit:publicUrl+"/site-audit",analyze:publicUrl+"/analyze",vendorPreflight:publicUrl+"/vendor-preflight",x402:publicUrl+"/.well-known/x402",llms:publicUrl+"/llms.txt",skill:publicUrl+"/skill.md"}
 }));
 app.get("/skill.md",(_req,res)=>res.type("text/markdown").send([
   "# Agent Web & Security Intelligence","","Pay-per-call x402 APIs for AI agents.","",
@@ -379,6 +424,7 @@ function extract(text){
   if(/penalt(y|ies)|penalidad|multa|indemniz/i.test(text))riskFlags.push("penalty or indemnity language detected");
   return {service:"Business Document Analyzer",wordCount:text.split(/\s+/).filter(Boolean).length,characterCount:text.length,dates,monetaryAmounts,obligations,securitySignals,missingAreas,riskFlags};
 }
+app.post("/vendor-preflight",async(req,res)=>{try{const url=String(req.body?.url||"").trim();if(!url)return res.status(400).json({error:"Provide JSON {url:string,requirements?:string[]}"});res.json(await vendorPreflight(url,req.body?.requirements));}catch(e){res.status(e?.name==="AbortError"?504:400).json({error:e?.name==="AbortError"?"target timed out":e?.message||"unable to preflight vendor"});}});
 app.post("/site-audit",async(req,res)=>{try{res.json(await auditSite(String(req.body?.url||"").trim()));}catch(e){res.status(e?.name==="AbortError"?504:400).json({error:e?.name==="AbortError"?"target timed out":e?.message||"unable to audit target"});}});
 app.post("/analyze",(req,res)=>{
   const text=String(req.body?.text||"").trim();
