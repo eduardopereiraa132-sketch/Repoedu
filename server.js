@@ -17,7 +17,7 @@ const sitePrice = process.env.SITE_PRICE || "$0.01";
 const documentPrice = process.env.DOCUMENT_PRICE || price;
 const facilitatorUrl = process.env.FACILITATOR_URL || "https://facilitator.xpay.sh";
 const publicUrl = (process.env.PUBLIC_URL || "https://repoedu-1.onrender.com").replace(/\/$/, "");
-const version = "2.1.0";
+const version = "2.2.0";
 const CACHE_TTL_MS = 120000;
 const extractionCache = new Map();
 
@@ -222,6 +222,7 @@ app.get("/health",(_req,res)=>res.json({ok:true,service:"agent-security-document
 app.get("/.well-known/x402",(_req,res)=>res.json({
   x402Version:2,service:"Agent Security & Document Intelligence",version,
   endpoints:[
+    {method:"POST",path:"/web-extract",url:publicUrl+"/web-extract",price:sitePrice,network,asset:"USDC",payTo,contentType:"application/json"},
     {method:"POST",path:"/site-audit",url:publicUrl+"/site-audit",price:sitePrice,network,asset:"USDC",payTo,contentType:"application/json"},
     {method:"POST",path:"/analyze",url:publicUrl+"/analyze",price:documentPrice,network,asset:"USDC",payTo,contentType:"application/json"}
   ],
