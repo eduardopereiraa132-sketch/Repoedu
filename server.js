@@ -13,7 +13,7 @@ app.use(express.json({ limit: "2mb" }));
 const payTo = process.env.PAY_TO || "0x031a713863890eb611776aadd48397873ed153ab";
 const network = process.env.NETWORK || "eip155:8453";
 const price = process.env.PRICE || "$0.50";
-const facilitatorUrl = process.env.FACILITATOR_URL || "https://facilitator.payai.network";
+const facilitatorUrl = process.env.FACILITATOR_URL || "https://x402.org/facilitator";
 const publicUrl = process.env.PUBLIC_URL || "https://repoedu-1.onrender.com";
 
 const facilitatorClient = new HTTPFacilitatorClient({ url: facilitatorUrl });
