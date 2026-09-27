@@ -1,11 +1,63 @@
 {
-  "name":"Agent Web & Security Intelligence",
-  "description":"Pay-per-call HTTP APIs for AI agents: public webpage extraction, website security preflight, and deterministic business-document analysis.",
-  "payment":{"protocol":"x402","version":2,"scheme":"exact","network":"eip155:8453","asset":"USDC","payTo":"0x031a713863890eb611776aadd48397873ed153ab"},
-  "services":[
-    {"name":"Webpage Extractor","method":"POST","path":"/web-extract","price":"$0.005","useWhen":"You already have a public webpage URL and need clean text, metadata, headings and links.","notFor":["authenticated pages","private/local URLs","browser-required JavaScript","penetration testing"]},
-    {"name":"Website Security Preflight","method":"POST","path":"/site-audit","price":"$0.01","useWhen":"You need a fast first-pass security signal for a public website.","notFor":["penetration testing","vulnerability scanning","certification","legal opinion"]},
-    {"name":"Business Document Analyzer","method":"POST","path":"/analyze","price":"$0.005","useWhen":"You need deterministic structured triage of business-document text.","notFor":["legal advice","LLM-generated opinion"]}
+  "name": "Agent Web & Security Intelligence",
+  "description": "Pay-per-call HTTP APIs for AI agents: public webpage extraction, website security preflight, and deterministic business-document analysis.",
+  "payment": {
+    "protocol": "x402",
+    "version": 2,
+    "scheme": "exact",
+    "network": "eip155:8453",
+    "asset": "USDC",
+    "payTo": "0x031a713863890eb611776aadd48397873ed153ab"
+  },
+  "services": [
+    {
+      "name": "Webpage Extractor",
+      "method": "POST",
+      "path": "/web-extract",
+      "price": "$0.005",
+      "useWhen": "You already have a public webpage URL and need clean text, metadata, headings and links.",
+      "notFor": [
+        "authenticated pages",
+        "private/local URLs",
+        "browser-required JavaScript",
+        "penetration testing"
+      ]
+    },
+    {
+      "name": "Website Security Preflight",
+      "method": "POST",
+      "path": "/site-audit",
+      "price": "$0.01",
+      "useWhen": "You need a fast first-pass security signal for a public website.",
+      "notFor": [
+        "penetration testing",
+        "vulnerability scanning",
+        "certification",
+        "legal opinion"
+      ]
+    },
+    {
+      "name": "Business Document Analyzer",
+      "method": "POST",
+      "path": "/analyze",
+      "price": "$0.005",
+      "useWhen": "You need deterministic structured triage of business-document text.",
+      "notFor": [
+        "legal advice",
+        "LLM-generated opinion"
+      ]
+    }
   ],
-  "docs":{"openapi":"/openapi.json","skill":"/skill.md","llms":"/llms.txt","x402":"/.well-known/x402"}
+  "docs": {
+    "openapi": "/openapi.json",
+    "skill": "/skill.md",
+    "llms": "/llms.txt",
+    "x402": "/.well-known/x402",
+    "discovery": "/.well-known/x402-discovery"
+  },
+  "version": "2.2.1",
+  "discovery": {
+    "bazaar": "x402 Bazaar metadata is declared on every paid endpoint; catalog inclusion depends on a compatible facilitator and a real paid request.",
+    "wellKnown": "/.well-known/x402-discovery is an additional proposal-format discovery document."
+  }
 }
