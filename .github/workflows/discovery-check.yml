@@ -9,19 +9,6 @@ jobs:
   discovery:
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for Render rollout
-        run: |
-          set -e
-          for i in {1..12}; do
-            code=$(curl -sS -o /tmp/root -w "%{http_code}" https://repoedu-1.onrender.com/)
-            echo "rollout probe $i: HTTP $code"
-            if [ "$code" = "200" ] && grep -q "Agent Security & Document Intelligence" /tmp/root; then
-              echo "new deployment detected"
-              exit 0
-            fi
-            sleep 10
-          done
-          exit 1
       - name: Check unpaid payment responses
         run: |
           set -e
