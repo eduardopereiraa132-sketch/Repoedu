@@ -276,6 +276,7 @@ app.get("/skill.md",(_req,res)=>res.type("text/markdown").send([
 ].join("\n")));
 app.get("/llms.txt",(_req,res)=>res.type("text/plain").send([
   "# Agent Web & Security Intelligence","","Paid x402 APIs for AI agents on Base Mainnet.","",
+  "## Webpage Extractor","POST "+publicUrl+"/web-extract","Price: "+price+" USDC",'Input: {"url":"https://example.com"}',"Purpose: clean webpage text, metadata, headings and links for downstream agent workflows.","",
   "## Website Security Preflight","POST "+publicUrl+"/site-audit","Price: "+sitePrice+" USDC",'Input: {"url":"https://example.com"}',"Purpose: live public website security preflight.","",
   "## Business Document Analyzer","POST "+publicUrl+"/analyze","Price: "+documentPrice+" USDC",'Input: {"text":"string"}',"Purpose: deterministic structured extraction from business documents.","",
   "## Payment","x402 v2, exact scheme, eip155:8453, USDC.","Payee: "+payTo,"",
