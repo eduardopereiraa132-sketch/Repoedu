@@ -30,7 +30,7 @@ jobs:
       - name: Test local payment protection
         run: |
           set -e
-          for path in /analyze /site-audit; do
+          for path in /analyze /site-audit /web-extract; do
             if [ "$path" = "/analyze" ]; then body='{"text":"smoke test"}'; else body='{"url":"https://example.com"}'; fi
             code=$(curl -sS -o /tmp/body -w "%{http_code}" -X POST "http://127.0.0.1:10000$path" -H "Content-Type: application/json" -d "$body")
             echo "$path HTTP $code"
