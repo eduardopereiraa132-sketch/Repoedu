@@ -1,5 +1,11 @@
 # Agent Security & Document Intelligence
 
+## Webpage Extractor
+POST https://repoedu-1.onrender.com/web-extract
+Price: $0.005 USDC. Network: Base Mainnet (eip155:8453). Payee: 0x031a713863890eb611776aadd48397873ed153ab
+Input: {"url":"https://example.com"}
+Returns clean webpage text, title, description and up to 100 links.
+
 ## Website Security Preflight
 POST https://repoedu-1.onrender.com/site-audit
 
