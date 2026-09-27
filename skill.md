@@ -24,6 +24,15 @@ Payee: 0x031a713863890eb611776aadd48397873ed153ab
 Input: {"text":"string"}
 Returns structured dates, money, obligations, security signals, missing areas and risk flags.
 
+## Vendor Security Preflight
+POST https://repoedu-1.onrender.com/vendor-preflight
+Price: $0.025 USDC
+Network: Base Mainnet (eip155:8453)
+Payment: x402 v2 exact
+Payee: 0x031a713863890eb611776aadd48397873ed153ab
+Input: {"url":"https://example.com","requirements":["HTTPS","HSTS","Content Security Policy"]}
+Returns a structured first-pass vendor-risk signal from public website controls. It is not a penetration test, vulnerability scan, certification or legal opinion.
+
 ## Discovery
 https://repoedu-1.onrender.com/.well-known/x402
 https://repoedu-1.onrender.com/openapi.json
