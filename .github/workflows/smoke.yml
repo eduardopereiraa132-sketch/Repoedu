@@ -21,9 +21,14 @@ jobs:
         run: |
           node - <<'NODE'
           const base = "https://repoedu-1.onrender.com";
-          for (const path of ["/", "/health", "/openapi.json"]) {
+          for (const path of ["/", "/health", "/.well-known/x402", "/openapi.json", "/skill.md", "/llms.txt", "/icon.svg"]) {
             const r = await fetch(base + path);
             if (!r.ok) throw new Error(path + " returned HTTP " + r.status);
+            console.log(path, r.status);
+          }
+          for (const [path, body] of [["/analyze", {text:"smoke test"}], ["/site-audit", {url:"https://example.com"}]]) {
+            const r = await fetch(base + path, {method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
+            if (r.status !== 402) throw new Error(path + " expected 402, got " + r.status);
             console.log(path, r.status);
           }
           NODE
