@@ -37,6 +37,19 @@
       ]
     },
     {
+      "name": "Vendor Security Preflight",
+      "method": "POST",
+      "path": "/vendor-preflight",
+      "price": "$0.025",
+      "useWhen": "You need a fast first-pass vendor-risk signal from a public website before deeper review.",
+      "notFor": [
+        "penetration testing",
+        "vulnerability scanning",
+        "certification",
+        "legal opinion"
+      ]
+    },
+    {
       "name": "Business Document Analyzer",
       "method": "POST",
       "path": "/analyze",
