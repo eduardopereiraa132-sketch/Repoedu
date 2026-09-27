@@ -220,7 +220,7 @@ const routes={
     })}
   },
   "POST /site-audit":{
-    accepts:{scheme:"exact",price,network,payTo},
+    accepts:{scheme:"exact",price:sitePrice,network,payTo},
     resource:{url:publicUrl+"/site-audit",description:"Live public website security preflight for AI-agent vendor and compliance workflows.",mimeType:"application/json",serviceName:"Website Security Preflight",tags:["security","website","compliance","vendor-risk","audit"],iconUrl:publicUrl+"/icon.svg"},
     description:"Paid live website security preflight. Send JSON {url:string}.",mimeType:"application/json",
     extensions:{...declareDiscoveryExtension({
@@ -268,14 +268,14 @@ app.get("/skill.md",(_req,res)=>res.type("text/markdown").send([
   "# Agent Web & Security Intelligence","","Pay-per-call x402 APIs for AI agents.","",
   "## Website Security Preflight","POST "+publicUrl+"/site-audit","Price: "+sitePrice+" USDC. Network: Base Mainnet (eip155:8453). Payee: "+payTo,
   'Input: {"url":"https://example.com"}',"Returns live public-site signals: status, final URL, response time, HTTPS, security headers, cookie flags, Server disclosure, robots.txt, security.txt, title and findings.","",
-  "## Business Document Analyzer","POST "+publicUrl+"/analyze","Price: "+sitePrice+" USDC. Network: Base Mainnet (eip155:8453). Payee: "+payTo,
+  "## Business Document Analyzer","POST "+publicUrl+"/analyze","Price: "+documentPrice+" USDC. Network: Base Mainnet (eip155:8453). Payee: "+payTo,
   'Input: {"text":"business document text"}',"Returns structured dates, monetary amounts, obligations, security signals, missing areas and risk flags.","",
   "## Discovery","- "+publicUrl+"/.well-known/x402","- "+publicUrl+"/.well-known/ai-plugin.json","- "+publicUrl+"/openapi.json","- "+publicUrl+"/llms.txt","",
   "Unpaid POST requests return HTTP 402 with x402 payment requirements."
 ].join("\n")));
 app.get("/llms.txt",(_req,res)=>res.type("text/plain").send([
   "# Agent Web & Security Intelligence","","Paid x402 APIs for AI agents on Base Mainnet.","",
-  "## Website Security Preflight","POST "+publicUrl+"/site-audit","Price: "+documentPrice+" USDC",'Input: {"url":"https://example.com"}',"Purpose: live public website security preflight.","",
+  "## Website Security Preflight","POST "+publicUrl+"/site-audit","Price: "+sitePrice+" USDC",'Input: {"url":"https://example.com"}',"Purpose: live public website security preflight.","",
   "## Business Document Analyzer","POST "+publicUrl+"/analyze","Price: "+documentPrice+" USDC",'Input: {"text":"string"}',"Purpose: deterministic structured extraction from business documents.","",
   "## Payment","x402 v2, exact scheme, eip155:8453, USDC.","Payee: "+payTo,"",
   "## Discovery",publicUrl+"/.well-known/x402",publicUrl+"/.well-known/ai-plugin.json",publicUrl+"/openapi.json",publicUrl+"/skill.md"
