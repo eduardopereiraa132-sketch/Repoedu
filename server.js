@@ -12,7 +12,9 @@ app.use(express.json({ limit: "2mb" }));
 
 const payTo = process.env.PAY_TO || "0x031a713863890eb611776aadd48397873ed153ab";
 const network = process.env.NETWORK || "eip155:8453";
-const price = process.env.PRICE || "$0.50";
+const price = process.env.PRICE || "$0.005";
+const sitePrice = process.env.SITE_PRICE || "$0.01";
+const documentPrice = process.env.DOCUMENT_PRICE || price;
 const facilitatorUrl = process.env.FACILITATOR_URL || "https://facilitator.xpay.sh";
 const publicUrl = (process.env.PUBLIC_URL || "https://repoedu-1.onrender.com").replace(/\/$/, "");
 
