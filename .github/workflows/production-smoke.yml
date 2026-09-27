@@ -30,21 +30,32 @@ jobs:
             echo "$path HTTP $code"
             test "$code" = "200"
           done
-      - name: Verify production x402 402 response
+      - name: Verify production x402 402 responses
         run: |
           set -e
-          headers=/tmp/headers
-          body='{"url":"https://example.com"}'
-          code=$(curl -sS --max-time 30 -D "$headers" -o /tmp/body -w "%{http_code}" -X POST "https://repoedu-1.onrender.com/web-extract" -H "Content-Type: application/json" -d "$body")
-          echo "/web-extract HTTP $code"
-          test "$code" = "402"
-          value=$(grep -i '^payment-required:' "$headers" | sed 's/^[^:]*:[[:space:]]*//I' | tr -d '\r\n')
-          test -n "$value"
+          check_402() {
+            path="$1"
+            body="$2"
+            headers="/tmp/headers-$3"
+            code=$(curl -sS --max-time 30 -D "$headers" -o "/tmp/body-$3" -w "%{http_code}" -X POST "https://repoedu-1.onrender.com$path" -H "Content-Type: application/json" -d "$body")
+            echo "$path HTTP $code"
+            test "$code" = "402"
+            value=$(grep -i '^payment-required:' "$headers" | sed 's/^[^:]*:[[:space:]]*//I' | tr -d '\r\n')
+            test -n "$value"
+            echo "$value" | base64 -d >/tmp/decoded-$3.json
+          }
+          check_402 /web-extract '{"url":"https://example.com"}' web
+          check_402 /site-audit '{"url":"https://example.com"}' audit
+          check_402 /analyze '{"text":"Supplier must notify incidents within 24 hours."}' analyze
           node -e '
-            const x=JSON.parse(Buffer.from(process.argv[1],"base64").toString("utf8"));
-            const a=x.accepts?.[0], b=x.extensions?.bazaar?.info, s=x.extensions?.bazaar?.schema;
-            if(x.x402Version!==2) throw new Error("not x402 v2");
-            if(!a || a.network!=="eip155:8453" || a.scheme!=="exact" || a.payTo!=="0x031a713863890eb611776aadd48397873ed153ab") throw new Error("payment requirements mismatch");
-            if(!b || b.input?.type!=="http" || b.input?.method!=="POST" || b.output?.type!=="json") throw new Error("invalid Bazaar info");
-            if(!s?.properties?.input || !s?.properties?.output) throw new Error("invalid Bazaar schema");
-          ' "$value"
+            const fs=require("fs");
+            const expected="0x031a713863890eb611776aadd48397873ed153ab";
+            for(const name of ["web","audit","analyze"]){
+              const x=JSON.parse(fs.readFileSync("/tmp/decoded-"+name+".json","utf8"));
+              const a=x.accepts?.[0], b=x.extensions?.bazaar?.info, s=x.extensions?.bazaar?.schema;
+              if(x.x402Version!==2) throw new Error(name+": not x402 v2");
+              if(!a || a.network!=="eip155:8453" || a.scheme!=="exact" || a.payTo!==expected) throw new Error(name+": payment requirements mismatch");
+              if(!b || b.input?.type!=="http" || b.input?.method!=="POST" || b.output?.type!=="json") throw new Error(name+": invalid Bazaar info");
+              if(!s?.properties?.input || !s?.properties?.output) throw new Error(name+": invalid Bazaar schema");
+            }
+          '
