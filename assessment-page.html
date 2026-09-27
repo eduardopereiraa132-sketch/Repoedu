@@ -1,0 +1,43 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Evidence-first Vendor Assessment</title>
+<style>
+body{margin:0;background:#070b12;color:#eef2ff;font-family:Inter,system-ui,sans-serif}main{max-width:1050px;margin:auto;padding:42px 20px}
+h1{font-size:48px;line-height:1;letter-spacing:-.04em}.muted{color:#9aa8bd;line-height:1.6}
+.card{background:#0d1420;border:1px solid #223149;border-radius:16px;padding:22px;margin:18px 0}
+label{display:block;font-weight:800;margin:14px 0 7px}input,textarea{box-sizing:border-box;width:100%;padding:13px;border-radius:9px;border:1px solid #31425a;background:#09111d;color:#fff;font:inherit}textarea{min-height:260px}
+button{margin-top:16px;padding:14px 20px;border:0;border-radius:9px;font-weight:900;cursor:pointer}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.metric{padding:18px;background:#101a29;border-radius:12px}.metric b{font-size:28px}.status{font-weight:900;text-transform:uppercase;font-size:12px}.supported{color:#7ee2a8}.partial{color:#ffd37e}.unknown{color:#ff9c9c}.high{color:#ff9c9c}.medium{color:#ffd37e}.low{color:#7ee2a8}
+table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:11px;border-bottom:1px solid #223149;vertical-align:top}pre{white-space:pre-wrap}
+a{color:#aebcff}
+</style></head><body><main>
+<a href="/commercial">← Product</a>
+<h1>Evidence-first vendor assessment</h1>
+<p class="muted">Paste evidence you already have: SOC 2, ISO 27001, security questionnaire answers, policies, Trust Center text, contracts, or reviewer notes. Unknown stays unknown; the output is designed for human review.</p>
+<div class="card">
+<form id="f">
+<label>Vendor name</label><input id="name" placeholder="Acme Supplier">
+<label>Vendor URL</label><input id="url" type="url" placeholder="https://vendor.example">
+<label>Evidence / notes</label><textarea id="evidence" placeholder="Paste the evidence or assessment notes here..."></textarea>
+<button>Generate assessment</button>
+</form></div>
+<div id="result"></div>
+<script>
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+document.getElementById("f").addEventListener("submit",async e=>{
+ e.preventDefault(); const out=document.getElementById("result"); out.innerHTML='<div class="card">Analyzing evidence…</div>';
+ try{
+  const r=await fetch("/assessment",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({vendorName:document.getElementById("name").value,vendorUrl:document.getElementById("url").value,evidence:document.getElementById("evidence").value})});
+  const d=await r.json(); if(!r.ok) throw new Error(d.error||"Assessment failed");
+  const s=d.summary;
+  let html='<div class="card"><h2>Assessment summary</h2><div class="grid"><div class="metric">Risk signal<br><b class="'+s.riskLevel+'">'+esc(s.riskLevel)+'</b></div><div class="metric">Supported<br><b>'+s.supported+'</b></div><div class="metric">Partial<br><b>'+s.partial+'</b></div><div class="metric">Unknown<br><b>'+s.unknown+'</b></div></div>';
+  html+='<p class="muted">This is a first-pass evidence assessment. It does not certify the vendor.</p></div>';
+  html+='<div class="card"><h2>Control evidence</h2><table><tr><th>Control</th><th>Status</th><th>Evidence</th></tr>';
+  for(const c of d.controls) html+='<tr><td>'+esc(c.label)+'</td><td class="status '+c.status+'">'+esc(c.status)+'</td><td>'+esc(c.evidence.join(" "))+'</td></tr>';
+  html+='</table></div>';
+  html+='<div class="card"><h2>Targeted follow-ups</h2><ul>'+d.followUps.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul></div>';
+  html+='<div class="card"><h2>Decision record</h2><ul>'+d.decisionQuestions.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul><p class="muted">'+d.limitations.map(esc).join(" ")+'</p></div>';
+  html+='<div class="card"><h2>Machine-readable output</h2><pre>'+esc(JSON.stringify(d,null,2))+'</pre></div>';
+  out.innerHTML=html;
+ }catch(err){out.innerHTML='<div class="card"><b>Error:</b> '+esc(err.message)+'</div>'}
+});
+</script></main></body></html>
