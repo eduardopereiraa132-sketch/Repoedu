@@ -36,6 +36,14 @@ jobs:
             echo "$path HTTP $code"
             test "$code" = "402"
           done
+      - name: Verify advertised prices
+        run: |
+          set -e
+          body=$(curl -sS http://127.0.0.1:10000/.well-known/x402)
+          echo "$body" | grep -F '"price":"$0.005"' >/dev/null
+          echo "$body" | grep -F '"price":"$0.01"' >/dev/null
+          echo "$body" | grep -F '"payTo":"0x031a713863890eb611776aadd48397873ed153ab"' >/dev/null
+
       - name: Test local metadata
         run: |
           set -e
