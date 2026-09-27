@@ -17,22 +17,34 @@ jobs:
         run: npm install
       - name: Syntax check
         run: node --check server.js
-      - name: Test public service
-        env:
-          API_URL: https://repoedu-1.onrender.com/analyze
-        run: node test-payment.js
-      - name: Test public metadata
+      - name: Start local service
         run: |
-          node - <<'NODE'
-          const base = "https://repoedu-1.onrender.com";
-          for (const path of ["/", "/health", "/.well-known/x402", "/.well-known/ai-plugin.json", "/openapi.json", "/skill.md", "/llms.txt", "/robots.txt", "/sitemap.xml", "/icon.svg"]) {
-            const r = await fetch(base + path);
-            if (!r.ok) throw new Error(path + " returned HTTP " + r.status);
-            console.log(path, r.status);
-          }
-          for (const [path, body] of [["/analyze", {text:"smoke test"}], ["/site-audit", {url:"https://example.com"}]]) {
-            const r = await fetch(base + path, {method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
-            if (r.status !== 402) throw new Error(path + " expected 402, got " + r.status);
-            console.log(path, r.status);
-          }
-          NODE
+          npm start > /tmp/x402-server.log 2>&1 &
+          echo $! > /tmp/x402-server.pid
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:10000/health >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/x402-server.log
+          exit 1
+      - name: Test local payment protection
+        run: |
+          set -e
+          for path in /analyze /site-audit; do
+            if [ "$path" = "/analyze" ]; then body='{"text":"smoke test"}'; else body='{"url":"https://example.com"}'; fi
+            code=$(curl -sS -o /tmp/body -w "%{http_code}" -X POST "http://127.0.0.1:10000$path" -H "Content-Type: application/json" -d "$body")
+            echo "$path HTTP $code"
+            test "$code" = "402"
+          done
+      - name: Test local metadata
+        run: |
+          set -e
+          for path in / /health /.well-known/x402 /.well-known/ai-plugin.json /openapi.json /skill.md /llms.txt /robots.txt /sitemap.xml /icon.svg; do
+            code=$(curl -sS -o /tmp/body -w "%{http_code}" "http://127.0.0.1:10000$path")
+            echo "$path HTTP $code"
+            test "$code" = "200"
+          done
+      - name: Stop local service
+        if: always()
+        run: |
+          if [ -f /tmp/x402-server.pid ]; then kill "$(cat /tmp/x402-server.pid)" || true; fi
