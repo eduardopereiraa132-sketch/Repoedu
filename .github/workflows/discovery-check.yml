@@ -1,0 +1,35 @@
+name: x402 discovery preflight
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  discovery:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check live x402 endpoint
+        run: |
+          set -e
+          code=$(curl -sS -o /tmp/body -w "%{http_code}" -X POST https://repoedu-1.onrender.com/analyze             -H "Content-Type: application/json"             -d '{"text":"discovery preflight"}')
+          echo "HTTP $code"
+          test "$code" = "402"
+
+      - name: Validate Ontario listing payload
+        run: |
+          set -e
+          curl -sS -X POST https://ontarioprotocol.com/api/x402/list-service/validate             -H "Content-Type: application/json"             -d '{
+              "name":"Business Document Analyzer",
+              "description":"Paid machine-readable business-document analysis for AI agents.",
+              "buyer_query":"extract structured business-document signals for an autonomous AI agent",
+              "category":"data",
+              "endpoint":"https://repoedu-1.onrender.com/analyze",
+              "method":"POST",
+              "price_usdc":"0.50",
+              "network":"base",
+              "owner_url":"https://repoedu-1.onrender.com",
+              "owner_contact":"eduardopereiraa132@gmail.com",
+              "tags":["x402","ai-agent","business-documents","document-analysis","base","usdc"]
+            }' > /tmp/validation.json
+          cat /tmp/validation.json
