@@ -1,0 +1,50 @@
+name: x402 production smoke test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Render deployment
+        run: |
+          set -e
+          for i in {1..30}; do
+            if curl -fsS --max-time 10 https://repoedu-1.onrender.com/health >/tmp/health.json; then
+              cat /tmp/health.json
+              exit 0
+            fi
+            echo "Waiting for Render deployment ($i/30)..."
+            sleep 10
+          done
+          echo "Render service did not become reachable"
+          exit 1
+      - name: Verify production metadata
+        run: |
+          set -e
+          for path in /health /.well-known/x402 /openapi.json /skill.md /llms.txt; do
+            code=$(curl -sS --max-time 20 -o /tmp/body -w "%{http_code}" "https://repoedu-1.onrender.com$path")
+            echo "$path HTTP $code"
+            test "$code" = "200"
+          done
+      - name: Verify production x402 402 response
+        run: |
+          set -e
+          headers=/tmp/headers
+          body='{"url":"https://example.com"}'
+          code=$(curl -sS --max-time 30 -D "$headers" -o /tmp/body -w "%{http_code}" -X POST "https://repoedu-1.onrender.com/web-extract" -H "Content-Type: application/json" -d "$body")
+          echo "/web-extract HTTP $code"
+          test "$code" = "402"
+          value=$(grep -i '^payment-required:' "$headers" | sed 's/^[^:]*:[[:space:]]*//I' | tr -d '\r\n')
+          test -n "$value"
+          node -e '
+            const x=JSON.parse(Buffer.from(process.argv[1],"base64").toString("utf8"));
+            const a=x.accepts?.[0], b=x.extensions?.bazaar?.info, s=x.extensions?.bazaar?.schema;
+            if(x.x402Version!==2) throw new Error("not x402 v2");
+            if(!a || a.network!=="eip155:8453" || a.scheme!=="exact" || a.payTo!=="0x031a713863890eb611776aadd48397873ed153ab") throw new Error("payment requirements mismatch");
+            if(!b || b.input?.type!=="http" || b.input?.method!=="POST" || b.output?.type!=="json") throw new Error("invalid Bazaar info");
+            if(!s?.properties?.input || !s?.properties?.output) throw new Error("invalid Bazaar schema");
+          ' "$value"
