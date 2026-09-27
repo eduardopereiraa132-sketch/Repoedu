@@ -9,12 +9,28 @@ jobs:
   discovery:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+      - name: Start local service
+        run: |
+          npm start > /tmp/x402-server.log 2>&1 &
+          echo $! > /tmp/x402-server.pid
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:10000/health >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/x402-server.log
+          exit 1
       - name: Check unpaid payment responses
         run: |
           set -e
           for path in /analyze /site-audit; do
             if [ "$path" = "/analyze" ]; then body='{"text":"discovery preflight"}'; else body='{"url":"https://example.com"}'; fi
-            code=$(curl -sS -o /tmp/body -w "%{http_code}" -X POST "https://repoedu-1.onrender.com$path" -H "Content-Type: application/json" -d "$body")
+            code=$(curl -sS -o /tmp/body -w "%{http_code}" -X POST "http://127.0.0.1:10000$path" -H "Content-Type: application/json" -d "$body")
             echo "$path HTTP $code"
             test "$code" = "402"
           done
@@ -22,7 +38,11 @@ jobs:
         run: |
           set -e
           for path in / /health /.well-known/x402 /.well-known/ai-plugin.json /openapi.json /skill.md /llms.txt /robots.txt /sitemap.xml /icon.svg; do
-            code=$(curl -sS -o /tmp/body -w "%{http_code}" "https://repoedu-1.onrender.com$path")
+            code=$(curl -sS -o /tmp/body -w "%{http_code}" "http://127.0.0.1:10000$path")
             echo "$path HTTP $code"
             test "$code" = "200"
           done
+      - name: Stop local service
+        if: always()
+        run: |
+          if [ -f /tmp/x402-server.pid ]; then kill "$(cat /tmp/x402-server.pid)" || true; fi
