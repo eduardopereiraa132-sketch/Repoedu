@@ -17,6 +17,22 @@ jobs:
         run: npm install
       - name: Syntax check
         run: node --check server.js
+      - name: Wait for Render rollout
+        run: |
+          set -e
+          for i in {1..12}; do
+            code=$(curl -sS -o /tmp/root -w "%{http_code}" https://repoedu-1.onrender.com/)
+            echo "rollout probe $i: HTTP $code"
+            if [ "$code" = "200" ]; then
+              if grep -q "Agent Security & Document Intelligence" /tmp/root; then
+                echo "new deployment detected"
+                exit 0
+              fi
+            fi
+            sleep 10
+          done
+          echo "Render did not expose the new landing page within the retry window"
+          exit 1
       - name: Test public service
         env:
           API_URL: https://repoedu-1.onrender.com/analyze
