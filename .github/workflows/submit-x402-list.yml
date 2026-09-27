@@ -1,0 +1,26 @@
+name: Submit service to x402 List
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Submit service for directory review
+        run: |
+          set -e
+          curl -i -sS -X POST https://x402-list.com/api/v1/submit \
+            -H "Content-Type: application/json" \
+            -d '{
+              "url":"https://repoedu-1.onrender.com",
+              "email":"eduardopereiraa132@gmail.com",
+              "service_name":"Business Document Analyzer",
+              "description":"Machine-readable business-document analysis for AI agents. Extract dates, monetary amounts, obligations, security signals, missing control areas and risk flags.",
+              "website_url":"https://repoedu-1.onrender.com",
+              "category":"AI",
+              "endpoints":["POST /analyze"],
+              "notes":"x402 v2 exact on Base Mainnet, USDC, payee 0x031a713863890eb611776aadd48397873ed153ab. Discovery: /.well-known/x402, /openapi.json, /llms.txt, /skill.md."
+            }'
