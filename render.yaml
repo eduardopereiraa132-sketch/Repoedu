@@ -3,6 +3,7 @@ services:
     name: x402-business-agent
     runtime: node
     plan: free
+    autoDeploy: true
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /health
