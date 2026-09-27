@@ -13,6 +13,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Install dependencies
+        run: npm install
+      - name: Syntax check
+        run: node --check server.js
       - name: Test public service
         env:
           API_URL: https://repoedu-1.onrender.com/analyze
@@ -21,7 +25,7 @@ jobs:
         run: |
           node - <<'NODE'
           const base = "https://repoedu-1.onrender.com";
-          for (const path of ["/", "/health", "/.well-known/x402", "/openapi.json", "/skill.md", "/llms.txt", "/icon.svg"]) {
+          for (const path of ["/", "/health", "/.well-known/x402", "/.well-known/ai-plugin.json", "/openapi.json", "/skill.md", "/llms.txt", "/robots.txt", "/sitemap.xml", "/icon.svg"]) {
             const r = await fetch(base + path);
             if (!r.ok) throw new Error(path + " returned HTTP " + r.status);
             console.log(path, r.status);
