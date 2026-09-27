@@ -37,6 +37,8 @@ const outputSchema = {
   required:["service","wordCount","characterCount","dates","monetaryAmounts","obligations","securitySignals","missingAreas","riskFlags"]
 };
 const siteAuditInputSchema={type:"object",properties:{url:{type:"string",description:"Public http or https website URL."}},required:["url"]};
+const webExtractInputSchema={type:"object",properties:{url:{type:"string",description:"Public http or https webpage URL."}},required:["url"]};
+const webExtractOutputSchema={type:"object",properties:{service:{type:"string"},url:{type:"string"},finalUrl:{type:"string"},status:{type:"integer"},contentType:{type:"string"},title:{type:"string"},description:{type:"string"},text:{type:"string"},links:{type:"array",items:{type:"object"}},wordCount:{type:"integer"},truncated:{type:"boolean"}},required:["service","url","finalUrl","status","contentType","title","description","text","links","wordCount","truncated"]};
 const siteAuditOutputSchema={
   type:"object",properties:{
     service:{type:"string"},url:{type:"string"},finalUrl:{type:"string"},status:{type:"integer"},
