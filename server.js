@@ -241,7 +241,56 @@ const routes={
 app.use(paymentMiddleware(routes,x402Server));
 
 app.post("/web-extract",async(req,res)=>{try{res.json(await extractWebpage(String(req.body?.url||"").trim()));}catch(e){res.status(e?.name==="AbortError"?504:400).json({error:e?.name==="AbortError"?"target timed out":e?.message||"unable to extract webpage"});}});
-const paymentTestPage = () => "<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>x402 Payment Test</title></head><body style=\"font-family:system-ui,sans-serif;max-width:760px;margin:50px auto;padding:0 22px;color:#111827\"><h1>x402 real-payment test</h1><p>This page tests one real <strong>$0.005 USDC</strong> x402 payment on <strong>Base Mainnet</strong> to the configured payee.</p><p>No private key is requested or stored. Your browser wallet signs the x402 payment.</p><button id=\"connect\" style=\"padding:12px 18px;border:0;border-radius:10px;cursor:pointer\">Connect wallet</button> <button id=\"pay\" disabled style=\"padding:12px 18px;border:0;border-radius:10px;cursor:pointer\">Pay $0.005 and test /web-extract</button><pre id=\"out\" style=\"white-space:pre-wrap;background:#f3f4f6;padding:16px;border-radius:12px;margin-top:22px\"></pre><script type=\"module\">\nimport { createWalletClient, custom } from \"https://esm.sh/viem@2.37.4\";\nimport { base } from \"https://esm.sh/viem@2.37.4/chains\";\nimport { x402Client, wrapFetchWithPayment } from \"https://esm.sh/@x402/fetch@2.6.0\";\nimport { registerExactEvmScheme } from \"https://esm.sh/@x402/evm@2.6.0/exact/client\";\nconst out=document.getElementById(\"out\"),connect=document.getElementById(\"connect\"),pay=document.getElementById(\"pay\");\nlet walletClient,fetchWithPayment,address;\nfunction log(x){out.textContent=typeof x===\"string\"?x:JSON.stringify(x,null,2)}\nconnect.onclick=async()=>{try{if(!window.ethereum)throw new Error(\"No EVM wallet detected. Open this page with Coinbase Wallet extension enabled.\");walletClient=createWalletClient({chain:base,transport:custom(window.ethereum)});[address]=await walletClient.requestAddresses();await walletClient.switchChain({id:8453});const client=new x402Client();registerExactEvmScheme(client,{signer:walletClient});fetchWithPayment=wrapFetchWithPayment(fetch,client);pay.disabled=false;log({connected:address,network:\"Base Mainnet\",next:\"Click Pay $0.005 and approve the wallet signature.\"})}catch(e){log(\"Connect error: \"+(e?.message||e))}};\npay.onclick=async()=>{try{pay.disabled=true;log(\"Requesting /web-extract. Your wallet should show the x402 USDC authorization...\");const r=await fetchWithPayment(location.origin+\"/web-extract\",{method:\"POST\",headers:{\"content-type\":\"application/json\"},body:JSON.stringify({url:\"https://example.com\"})});const data=await r.json();log({httpStatus:r.status,wallet:address,result:data,success:r.ok});}catch(e){log(\"Payment test error: \"+(e?.message||e))}finally{pay.disabled=false}};\n</script></body></html>";
+const paymentTestPage = () => String.raw\`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>x402 Payment Test</title><script src="https://cdn.jsdelivr.net/npm/@base-org/account/dist/base-account.min.js"></script></head><body style="font-family:system-ui,sans-serif;max-width:760px;margin:40px auto;padding:0 22px;color:#111827"><h1>x402 real-payment test</h1><p>This page tests one real <strong>$0.005 USDC</strong> x402 payment on <strong>Base Mainnet</strong> to the configured payee.</p><p><strong>Your wallet stays in your control.</strong> No seed phrase, private key or password is requested. The Base Account SDK can connect the Base app by QR/deep link on supported devices, while a browser extension can also be used.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button id="connect" style="padding:12px 18px;border:0;border-radius:10px;cursor:pointer">Connect Base Wallet</button><button id="pay" disabled style="padding:12px 18px;border:0;border-radius:10px;cursor:pointer">Pay $0.005 and test /web-extract</button></div><p id="status" style="margin-top:18px;font-weight:600"></p><pre id="out" style="white-space:pre-wrap;background:#f3f4f6;padding:16px;border-radius:12px;margin-top:12px"></pre><script type="module">
+import { createWalletClient, custom } from "https://esm.sh/viem@2.37.4";
+import { base } from "https://esm.sh/viem@2.37.4/chains";
+import { x402Client, wrapFetchWithPayment } from "https://esm.sh/@x402/fetch@2.6.0";
+import { registerExactEvmScheme } from "https://esm.sh/@x402/evm@2.6.0/exact/client";
+
+const out=document.getElementById("out"),status=document.getElementById("status"),connect=document.getElementById("connect"),pay=document.getElementById("pay");
+let walletProvider,walletClient,fetchWithPayment,address;
+function log(x){out.textContent=typeof x==="string"?x:JSON.stringify(x,null,2)}
+function setStatus(x){status.textContent=x}
+
+async function getBaseProvider(){
+  if(window.createBaseAccountSDK){
+    const sdk=window.createBaseAccountSDK({appName:"Agent Web & Security Intelligence",appLogoUrl:location.origin+"/icon.svg",appChainIds:[8453]});
+    return sdk.getProvider();
+  }
+  if(window.ethereum)return window.ethereum;
+  throw new Error("No Base Wallet provider found. Open this page in the Base app Web3 browser, or use the Base browser extension.");
+}
+
+connect.onclick=async()=>{
+  try{
+    connect.disabled=true; setStatus("Connecting to Base Wallet…");
+    walletProvider=await getBaseProvider();
+    const accounts=await walletProvider.request({method:"eth_requestAccounts"});
+    address=accounts?.[0];
+    if(!address)throw new Error("Wallet connection returned no address.");
+    try{await walletProvider.request({method:"wallet_switchEthereumChain",params:[{chainId:"0x2105"}]});}catch(e){if(e?.code!==4902&&e?.code!==-32601)throw e;}
+    walletClient=createWalletClient({chain:base,transport:custom(walletProvider)});
+    const client=new x402Client();
+    registerExactEvmScheme(client,{signer:walletClient});
+    fetchWithPayment=wrapFetchWithPayment(fetch,client);
+    pay.disabled=false; setStatus("Wallet connected");
+    log({connected:address,network:"Base Mainnet",payTo:"0x031a713863890eb611776aadd48397873ed153ab",price:"$0.005 USDC",next:"Click Pay $0.005. Your wallet will ask you to authorize the x402 payment."});
+  }catch(e){setStatus("Connection failed");log({error:e?.message||String(e),code:e?.code||null});}
+  finally{connect.disabled=false;}
+};
+
+pay.onclick=async()=>{
+  try{
+    pay.disabled=true; setStatus("Requesting payment authorization…");
+    log("The server is returning HTTP 402. Your wallet should now ask you to authorize the $0.005 USDC x402 payment.");
+    const r=await fetchWithPayment(location.origin+"/web-extract",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({url:"https://example.com"})});
+    const data=await r.json();
+    setStatus(r.ok?"Payment accepted and API call succeeded":"API call returned HTTP "+r.status);
+    log({httpStatus:r.status,wallet:address,result:data,success:r.ok});
+  }catch(e){setStatus("Payment test failed");log({error:e?.message||String(e),code:e?.code||null});}
+  finally{pay.disabled=false;}
+};
+</script></body></html>\`;
 app.get("/payment-test",(_req,res)=>res.type("html").send(paymentTestPage()));
 const agentCard=()=>({name:"Agent Web & Security Intelligence",description:"Pay-per-call HTTP APIs for AI agents: public webpage extraction, website security preflight, and deterministic business-document analysis.",version,provider:{organization:"Independent API provider"},payment:{protocol:"x402",version:2,scheme:"exact",network:"eip155:8453",asset:"USDC",payTo},selection:{choose:"Select the endpoint by task fit first, then price and output shape.",webExtract:"Use when you have a public webpage URL and need clean text, metadata, headings and links.",siteAudit:"Use when you need a fast first-pass signal on a public website security configuration.",analyze:"Use when you need deterministic structured triage of business-document text.",limits:["No authenticated/private/local URLs.","No browser-required JavaScript rendering.","Site Audit is not penetration testing, vulnerability scanning, certification or legal advice.","Document Analyzer is not legal advice or an LLM opinion."]},services:[{name:"Webpage Extractor",method:"POST",path:"/web-extract",price,useWhen:"Known public webpage URL; need clean text, metadata, headings and links.",notFor:["authenticated pages","private/local URLs","browser-required JavaScript","penetration testing"]},{name:"Website Security Preflight",method:"POST",path:"/site-audit",price:sitePrice,useWhen:"Fast first-pass public website security signal.",notFor:["penetration testing","vulnerability scanning","certification","legal opinion"]},{name:"Business Document Analyzer",method:"POST",path:"/analyze",price:documentPrice,useWhen:"Deterministic structured triage of business-document text.",notFor:["legal advice","LLM-generated opinion"]}],docs:{openapi:"/openapi.json",skill:"/skill.md",llms:"/llms.txt",x402:"/.well-known/x402"}});
 app.get("/agent-card.json",(_req,res)=>res.json(agentCard()));
