@@ -228,12 +228,12 @@ app.post("/web-extract",async(req,res)=>{try{res.json(await extractWebpage(Strin
 app.get("/icon.svg",(_req,res)=>res.type("image/svg+xml").send('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="24" fill="#111827"/><path d="M35 25h58v16H51v17h35v15H51v30H35z" fill="#fff"/><path d="M72 73h21v30H72z" fill="#60a5fa"/></svg>'));
 
 app.get("/",(_req,res)=>{
-  const html='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent Security & Document Intelligence</title><meta name="description" content="Pay-per-call x402 APIs for AI agents: website security preflight and business document analysis."><link rel="icon" href="/icon.svg"></head><body style="font-family:system-ui,sans-serif;max-width:900px;margin:60px auto;padding:0 24px;color:#111827"><h1>Agent Security & Document Intelligence</h1><p>Machine-readable, pay-per-call APIs for AI agents and automation. x402 + USDC on Base Mainnet.</p><div style="display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))"><section style="border:1px solid #ddd;border-radius:16px;padding:22px"><h2>Website Security Preflight</h2><p>Fresh public-site signals for vendor-risk and compliance workflows.</p><code>POST /site-audit</code><p><strong>'+price+' USDC/request</strong></p><a href="/openapi.json">OpenAPI</a> · <a href="/skill.md">Agent skill</a></section><section style="border:1px solid #ddd;border-radius:16px;padding:22px"><h2>Business Document Analyzer</h2><p>Structured dates, obligations, money, security signals and gaps.</p><code>POST /analyze</code><p><strong>'+price+' USDC/request</strong></p><a href="/openapi.json">OpenAPI</a> · <a href="/llms.txt">LLMs.txt</a></section></div><h2>Payment</h2><p>Network: '+network+'<br>Payee: <code>'+payTo+'</code><br>Protocol: x402 v2 exact</p><p><a href="/.well-known/x402">x402 metadata</a> · <a href="/health">health</a></p></body></html>';
+  const html='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent Web & Security Intelligence</title><meta name="description" content="Low-cost pay-per-call x402 APIs for AI agents: webpage extraction, website security preflight and business document analysis."><link rel="icon" href="/icon.svg"></head><body style="font-family:system-ui,sans-serif;max-width:900px;margin:60px auto;padding:0 24px;color:#111827"><h1>Agent Web & Security Intelligence</h1><p>Machine-readable, pay-per-call APIs for AI agents and automation. x402 + USDC on Base Mainnet.</p><div style="display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))"><section style="border:1px solid #ddd;border-radius:16px;padding:22px"><h2>Website Security Preflight</h2><p>Fresh public-site signals for vendor-risk and compliance workflows.</p><code>POST /site-audit</code><p><strong>'+price+' USDC/request</strong></p><a href="/openapi.json">OpenAPI</a> · <a href="/skill.md">Agent skill</a></section><section style="border:1px solid #ddd;border-radius:16px;padding:22px"><h2>Business Document Analyzer</h2><p>Structured dates, obligations, money, security signals and gaps.</p><code>POST /analyze</code><p><strong>'+price+' USDC/request</strong></p><a href="/openapi.json">OpenAPI</a> · <a href="/llms.txt">LLMs.txt</a></section></div><h2>Payment</h2><p>Network: '+network+'<br>Payee: <code>'+payTo+'</code><br>Protocol: x402 v2 exact</p><p><a href="/.well-known/x402">x402 metadata</a> · <a href="/health">health</a></p></body></html>';
   res.type("html").send(html);
 });
-app.get("/health",(_req,res)=>res.json({ok:true,service:"agent-security-document-intelligence",version,network,prices:{webExtract:price,siteAudit:sitePrice,documentAnalyzer:documentPrice},facilitator:facilitatorUrl,cacheEntries:extractionCache.size}));
+app.get("/health",(_req,res)=>res.json({ok:true,service:"agent-web-security-intelligence",version,network,prices:{webExtract:price,siteAudit:sitePrice,documentAnalyzer:documentPrice},facilitator:facilitatorUrl,cacheEntries:extractionCache.size}));
 app.get("/.well-known/x402",(_req,res)=>res.json({
-  x402Version:2,service:"Agent Security & Document Intelligence",version,
+  x402Version:2,service:"Agent Web & Security Intelligence",version,
   endpoints:[
     {method:"POST",path:"/web-extract",url:publicUrl+"/web-extract",price:sitePrice,network,asset:"USDC",payTo,contentType:"application/json"},
     {method:"POST",path:"/site-audit",url:publicUrl+"/site-audit",price:sitePrice,network,asset:"USDC",payTo,contentType:"application/json"},
@@ -243,13 +243,13 @@ app.get("/.well-known/x402",(_req,res)=>res.json({
   docs:publicUrl+"/openapi.json",llms:publicUrl+"/llms.txt",skill:publicUrl+"/skill.md"
 }));
 app.get("/.well-known/ai-plugin.json",(_req,res)=>res.json({
-  schema_version:"v1",name_for_human:"Agent Security & Document Intelligence",name_for_model:"agent_security_document_intelligence",
-  description_for_model:"Pay-per-call x402 APIs for website security preflight and structured business document analysis.",
+  schema_version:"v1",name_for_human:"Agent Web & Security Intelligence",name_for_model:"agent_web_security_intelligence",
+  description_for_model:"Low-cost pay-per-call x402 APIs for webpage extraction, website security preflight and structured business document analysis.",
   api:{type:"openapi",url:publicUrl+"/openapi.json"},auth:{type:"x402",network,asset:"USDC",price,payTo},
   endpoints:{webExtract:publicUrl+"/web-extract",siteAudit:publicUrl+"/site-audit",analyze:publicUrl+"/analyze",x402:publicUrl+"/.well-known/x402",llms:publicUrl+"/llms.txt",skill:publicUrl+"/skill.md"}
 }));
 app.get("/skill.md",(_req,res)=>res.type("text/markdown").send([
-  "# Agent Security & Document Intelligence","","Pay-per-call x402 APIs for AI agents.","",
+  "# Agent Web & Security Intelligence","","Pay-per-call x402 APIs for AI agents.","",
   "## Website Security Preflight","POST "+publicUrl+"/site-audit","Price: "+price+" USDC. Network: Base Mainnet (eip155:8453). Payee: "+payTo,
   'Input: {"url":"https://example.com"}',"Returns live public-site signals: status, final URL, response time, HTTPS, security headers, cookie flags, Server disclosure, robots.txt, security.txt, title and findings.","",
   "## Business Document Analyzer","POST "+publicUrl+"/analyze","Price: "+price+" USDC. Network: Base Mainnet (eip155:8453). Payee: "+payTo,
@@ -258,7 +258,7 @@ app.get("/skill.md",(_req,res)=>res.type("text/markdown").send([
   "Unpaid POST requests return HTTP 402 with x402 payment requirements."
 ].join("\n")));
 app.get("/llms.txt",(_req,res)=>res.type("text/plain").send([
-  "# Agent Security & Document Intelligence","","Paid x402 APIs for AI agents on Base Mainnet.","",
+  "# Agent Web & Security Intelligence","","Paid x402 APIs for AI agents on Base Mainnet.","",
   "## Website Security Preflight","POST "+publicUrl+"/site-audit","Price: "+price+" USDC",'Input: {"url":"https://example.com"}',"Purpose: live public website security preflight.","",
   "## Business Document Analyzer","POST "+publicUrl+"/analyze","Price: "+price+" USDC",'Input: {"text":"string"}',"Purpose: deterministic structured extraction from business documents.","",
   "## Payment","x402 v2, exact scheme, eip155:8453, USDC.","Payee: "+payTo,"",
@@ -268,7 +268,7 @@ app.get("/robots.txt",(_req,res)=>res.type("text/plain").send("User-agent: *\nAl
 app.get("/sitemap.xml",(_req,res)=>res.type("application/xml").send('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>'+publicUrl+'/</loc></url><url><loc>'+publicUrl+'/openapi.json</loc></url><url><loc>'+publicUrl+'/skill.md</loc></url><url><loc>'+publicUrl+'/llms.txt</loc></url><url><loc>'+publicUrl+'/.well-known/x402</loc></url></urlset>'));
 
 app.get("/openapi.json",(_req,res)=>res.json({
-  openapi:"3.1.0",info:{title:"Agent Security & Document Intelligence",version,description:"Low-cost pay-per-call x402 APIs for AI agents on Base Mainnet."},servers:[{url:publicUrl}],
+  openapi:"3.1.0",info:{title:"Agent Web & Security Intelligence",version,description:"Low-cost pay-per-call x402 APIs for AI agents on Base Mainnet."},servers:[{url:publicUrl}],
   paths:{
     "/web-extract":{post:{summary:"Webpage Extractor",requestBody:{required:true,content:{"application/json":{schema:webExtractInputSchema}}},responses:{"200":{description:"Clean webpage content",content:{"application/json":{schema:webExtractOutputSchema}}},"402":{description:"x402 payment required"}}}},
     "/site-audit":{post:{summary:"Website Security Preflight",requestBody:{required:true,content:{"application/json":{schema:siteAuditInputSchema}}},responses:{"200":{description:"Live public website security signals",content:{"application/json":{schema:siteAuditOutputSchema}}},"402":{description:"x402 payment required"}}}},
