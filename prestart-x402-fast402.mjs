@@ -3,7 +3,12 @@ import fs from "node:fs";
 const file = "server.js";
 let source = fs.readFileSync(file, "utf8");
 const marker = "// FAST_402_GATE_V2";
-if (source.includes(marker)) process.exit(0);
+const oldGate=/\n\/\/ FAST_402_GATE_V[12][\\s\\S]*?\napp\.use\(fast402\);\n/g;
+source=source.replace(oldGate,"\n");
+if (source.includes(marker)) {
+  fs.writeFileSync(file, source);
+  process.exit(0);
+}
 
 const insertion = `
 ${marker}
@@ -17,14 +22,9 @@ function buildFastBazaar(cfg){
   const declared=cfg.extensions?.bazaar;
   if(!declared) return {};
   const info=declared.info ? structuredClone(declared.info) : {};
-  if(info.input){
-    info.input={type:"http",method:"POST",...info.input};
-  } else {
-    info.input={type:"http",method:"POST"};
-  }
-  if(info.output){
-    info.output={type:"json",...info.output};
-  }
+  if(info.input) info.input={type:"http",method:"POST",...info.input};
+  else info.input={type:"http",method:"POST"};
+  if(info.output) info.output={type:"json",...info.output};
   return {bazaar:{info,schema:declared.schema||{type:"object",properties:{}}}};
 }
 function fast402(req,res,next){
@@ -48,13 +48,8 @@ function fast402(req,res,next){
       iconUrl:resource.iconUrl||undefined
     },
     accepts:[{
-      scheme:"exact",
-      network:network,
-      amount:dollarsToAtomic(priceValue),
-      asset:BASE_USDC,
-      payTo:payTo,
-      maxTimeoutSeconds:300,
-      extra:{name:"USDC",version:"2"}
+      scheme:"exact",network:network,amount:dollarsToAtomic(priceValue),asset:BASE_USDC,payTo:payTo,
+      maxTimeoutSeconds:300,extra:{name:"USDC",version:"2"}
     }],
     extensions:buildFastBazaar(cfg)
   };
@@ -64,8 +59,8 @@ function fast402(req,res,next){
 app.use(fast402);
 `;
 
-const target = "app.use(paymentMiddleware(routes,x402Server));";
+const target="app.use(paymentMiddleware(routes,x402Server));";
 if(!source.includes(target)) throw new Error("x402 middleware target not found");
-source = source.replace(target, insertion + "\n" + target);
-fs.writeFileSync(file, source);
+source=source.replace(target,insertion+"\n"+target);
+fs.writeFileSync(file,source);
 console.log("Installed fast 402 gate with Bazaar metadata");
