@@ -1,0 +1,12 @@
+{
+  "openapi":"3.1.0",
+  "info":{"title":"EvidenceCheck API","version":"2.6.0","description":"Evidence-first vendor due-diligence and public-web security preflight APIs. Paid routes use x402 USDC on Base Mainnet."},
+  "servers":[{"url":"https://evidencecheck-api.onrender.com"}],
+  "paths":{
+    "/web-extract":{"post":{"summary":"Extract a public webpage","requestBody":{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["url"],"properties":{"url":{"type":"string","format":"uri"}}}}}},"responses":{"402":{"description":"x402 payment required"},"200":{"description":"Structured webpage extraction"}}}},
+    "/site-audit":{"post":{"summary":"Audit observable public website security signals","requestBody":{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["url"],"properties":{"url":{"type":"string","format":"uri"}}}}}},"responses":{"402":{"description":"x402 payment required"},"200":{"description":"Structured security preflight"}}}},
+    "/vendor-preflight":{"post":{"summary":"Run vendor security preflight","requestBody":{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["url"],"properties":{"url":{"type":"string","format":"uri"},"requirements":{"type":"array","items":{"type":"string"}}}}}}},"responses":{"402":{"description":"x402 payment required"},"200":{"description":"Vendor evidence gaps and next questions"}}}},
+    "/analyze":{"post":{"summary":"Analyze business document text","requestBody":{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["text"],"properties":{"text":{"type":"string"}}}}}},"responses":{"402":{"description":"x402 payment required"},"200":{"description":"Structured document findings"}}}}
+  },
+  "x-evidencecheck":{"payment":{"protocol":"x402","network":"eip155:8453","asset":"USDC","scheme":"exact","payTo":"0x031a713863890eb611776aadd48397873ed153ab"},"pricing":{"web-extract":"$0.005","site-audit":"$0.01","vendor-preflight":"$0.025","analyze":"$0.005"}}
+}
