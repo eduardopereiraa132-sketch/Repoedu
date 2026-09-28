@@ -2,18 +2,25 @@
 
 **Know what to verify before you approve.**
 
-EvidenceCheck is an evidence-first vendor due-diligence service for procurement, third-party risk, security/compliance teams and AI agents. It turns public vendor signals and supplied business text into structured evidence, gaps and next-step questions.
+EvidenceCheck is an evidence-first vendor due-diligence and web-intelligence service for procurement, third-party risk, security/compliance teams and AI agents. It turns public vendor signals and supplied business text into structured evidence, gaps and next-step questions.
 
-## Live service
+## Start here — for AI agents
 
-- Live API: https://repoedu.onrender.com
-- Buyer page: https://repoedu.onrender.com/buy.html
-- Live demo: https://repoedu.onrender.com/demo
-- API definition: https://repoedu.onrender.com/openapi.json
-- Machine skill: https://repoedu.onrender.com/skill.md
-- LLM discovery: https://repoedu.onrender.com/llms.txt
-- Agent card: https://repoedu.onrender.com/.well-known/agent-card.json
-- x402 discovery: https://repoedu.onrender.com/.well-known/x402
+**Canonical service:** https://repoedu.onrender.com
+
+**Universal machine manifest:** https://repoedu.onrender.com/agent-discovery.json
+
+**LLM instructions:** https://repoedu.onrender.com/llms.txt
+
+**OpenAPI:** https://repoedu.onrender.com/openapi.json
+
+**Agent card:** https://repoedu.onrender.com/.well-known/agent.json
+
+**x402 discovery:** https://repoedu.onrender.com/.well-known/x402-discovery.json
+
+**Skill:** https://repoedu.onrender.com/skill.md
+
+The paid routes declare the x402 Bazaar discovery extension, so compatible discovery clients can index the service's capabilities, schemas, pricing and payment terms. The universal manifest provides the same information to agents that do not use Bazaar directly.
 
 ## The buyer problem
 
@@ -22,8 +29,6 @@ Vendor onboarding and recurring supplier review often require repetitive first-p
 The product is deliberately **not** positioned as a generic AI summarizer. Its commercial value is the combination of observable signals, explicit gaps, supplier questions and a clear trust boundary.
 
 ## What a buyer gets
-
-Depending on the endpoint, EvidenceCheck can provide:
 
 - Public website security preflight
 - Vendor security signals
@@ -48,7 +53,7 @@ Paid x402 endpoints use USDC on Base mainnet (`eip155:8453`):
 | `/vendor-preflight` | Vendor-risk preflight and evidence gaps | US$0.025 |
 | `/analyze` | Business-document analysis | US$0.005 |
 
-The low-cost endpoints are designed to be easy for software and AI agents to trial. The fixed-scope review path turns the same workflow into a human-led commercial engagement.
+The low-cost endpoints are intentionally easy for software and AI agents to trial. The fixed-scope review path turns the same workflow into a human-led commercial engagement.
 
 ## Commercial offer
 
@@ -64,11 +69,11 @@ One defined vendor review, public-site preflight, supplied-document review, stru
 
 Larger procurement/security teams can use the workflow for recurring vendor triage, with scope and pricing agreed around volume and required human review.
 
-## Agent discovery
+## Agent discovery and distribution
 
-The service publishes OpenAPI, LLM, skill, agent-card and x402 discovery metadata so compatible software can discover and call paid capabilities programmatically.
+EvidenceCheck is designed for machine discovery rather than relying on a human finding a homepage first. Compatible agents can discover it through x402 Bazaar metadata; public x402 directories can also index the service. Current ecosystem directories include x402 List and x402.new. Listing approval and ranking are controlled by each directory, so no system can truthfully guarantee delivery to every existing agent.
 
-The service also includes a separate earning-agent path through BasedAgents. That worker is a distinct revenue channel: x402 lets external buyers pay the API; the earning worker can look for already-funded marketplace work. Neither path should be represented as guaranteed revenue.
+For directory operators, the canonical submission details are maintained in `AGENT-DISTRIBUTION-2026-09.md`.
 
 ## Trust boundary
 
@@ -80,4 +85,4 @@ USDC receiving wallet on Base: `0x031a713863890eb611776aadd48397873ed153ab`
 
 ## Project status
 
-The production API and buyer-facing site are deployed on Render from the GitHub repository. Auto-deploy is enabled on `main`. The buyer-facing commercial page has been upgraded with a clearer value proposition, structured proof/output, pricing paths, trust boundaries and a direct demo-to-purchase flow.
+The canonical API is deployed on Render from this GitHub repository with auto-deploy from `main`. Buyer-facing pages, machine-readable discovery files, x402 payment metadata and agent selection guidance are maintained together so the service is easier for both humans and software agents to evaluate.
