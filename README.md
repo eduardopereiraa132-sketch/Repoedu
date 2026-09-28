@@ -4,9 +4,19 @@
 
 EvidenceCheck is an evidence-first vendor due-diligence and web-intelligence service for procurement, third-party risk, security/compliance teams and AI agents. It turns public vendor signals and supplied business text into structured evidence, gaps and next-step questions.
 
-## Start here — for AI agents
+## Buyer-first entry points
 
 **Canonical service:** https://repoedu.onrender.com
+
+**Buyer page:** https://repoedu.onrender.com/buy.html
+
+**Decision Kit:** https://repoedu.onrender.com/decision-kit.html
+
+**Live example:** https://repoedu.onrender.com/demo
+
+The Decision Kit is the clearest commercial explanation of the product: the value is not a generic AI summary; it is a repeatable verification queue that separates observable evidence from unknowns and turns gaps into supplier questions.
+
+## Start here — for AI agents
 
 **Universal machine manifest:** https://repoedu.onrender.com/agent-discovery.json
 
@@ -65,15 +75,23 @@ Use only the capability required by the workflow. No subscription is required fo
 
 One defined vendor review, public-site preflight, supplied-document review, structured findings/gaps and a target 48-hour turnaround. This is a starting commercial offer for validation, not a claim of existing customer contracts.
 
-### Pilot and recurring programs
+### Recurring intake — US$1,250/month starting package
 
-Larger procurement/security teams can use the workflow for recurring vendor triage, with scope and pricing agreed around volume and required human review.
+A starting scope of up to 10 vendor preflights per month, with a consistent review workflow and monthly evidence summary. Final scope and suitability are confirmed before purchase.
+
+### Team program — from US$2,500/month
+
+Higher-volume vendor triage, recurring reporting and workflow integration with scope agreed around volume and required human review.
+
+These are offer prices and revenue scenarios, **not guaranteed sales or existing revenue**.
 
 ## Agent discovery and distribution
 
-EvidenceCheck is designed for machine discovery rather than relying on a human finding a homepage first. Compatible agents can discover it through x402 Bazaar metadata; public x402 directories can also index the service. Current ecosystem directories include x402 List and x402.new. Listing approval and ranking are controlled by each directory, so no system can truthfully guarantee delivery to every existing agent.
+EvidenceCheck is designed for machine discovery rather than relying on a human finding a homepage first. Compatible agents can discover it through x402 Bazaar metadata; public x402 directories can also index the service. Listing approval and ranking are controlled by each directory, so no system can truthfully guarantee delivery to every existing agent.
 
-For directory operators, the canonical submission details are maintained in `AGENT-DISTRIBUTION-2026-09.md`.
+The current distribution plan is maintained in `AGENT-DISTRIBUTION-2026-09.md`.
+
+Recommended external discovery channels include x402 List and x402scan. A public HTTPS origin is already deployed on Render, which is a prerequisite for directory probing. The service should accumulate real external payments before claiming traction or verified status.
 
 ## Trust boundary
 
@@ -83,6 +101,16 @@ EvidenceCheck is a **first-pass due-diligence workflow**. It is not a penetratio
 
 USDC receiving wallet on Base: `0x031a713863890eb611776aadd48397873ed153ab`
 
+## Deployment
+
+The canonical API is deployed on Render from this GitHub repository with auto-deploy from `main`. The public buyer site and API share the same repository so product messaging, machine discovery metadata and the payment service can evolve together.
+
 ## Project status
 
-The canonical API is deployed on Render from this GitHub repository with auto-deploy from `main`. Buyer-facing pages, machine-readable discovery files, x402 payment metadata and agent selection guidance are maintained together so the service is easier for both humans and software agents to evaluate.
+**Live deployment:** `https://repoedu.onrender.com`
+
+**API:** `https://evidencecheck-api.onrender.com`
+
+**Buyer site:** `https://evidencecheck-site.onrender.com`
+
+The service is technically prepared to accept x402 requests, but **no revenue should be claimed until an external payer completes a real mainnet transaction**.
