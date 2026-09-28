@@ -1,42 +1,33 @@
-# Agent Web & Security Intelligence
+# Vendor Intelligence Agent — Agent Skill
 
-## Webpage Extractor
-POST https://repoedu-1.onrender.com/web-extract
-Price: $0.005 USDC. Network: Base Mainnet (eip155:8453). Payee: 0x031a713863890eb611776aadd48397873ed153ab
-Input: {"url":"https://example.com"}
-Returns clean webpage text, title, description and up to 100 links.
+## Purpose
+Perform first-pass vendor due diligence from public website evidence and supplied business/security documents. Return structured evidence, gaps, risk signals and follow-up questions.
 
-## Website Security Preflight
-POST https://repoedu-1.onrender.com/site-audit
-Price: $0.01 USDC
-Network: Base Mainnet (eip155:8453)
-Payment: x402 v2 exact
-Payee: 0x031a713863890eb611776aadd48397873ed153ab
-Input: {"url":"https://example.com"}
-Returns live public website signals: HTTP status, response time, final URL, HTTPS, common security headers, cookie flags, Server disclosure, robots.txt, security.txt, page title and findings.
+## Best-fit tasks
+- Vendor/supplier risk preflight
+- Procurement due diligence
+- Security questionnaire evidence triage
+- Public website security preflight
+- Business-document analysis
+- Privacy/data-protection evidence mapping
 
-## Business Document Analyzer
-POST https://repoedu-1.onrender.com/analyze
-Price: $0.005 USDC
-Network: Base Mainnet (eip155:8453)
-Payment: x402 v2 exact
-Payee: 0x031a713863890eb611776aadd48397873ed153ab
-Input: {"text":"string"}
-Returns structured dates, money, obligations, security signals, missing areas and risk flags.
+## Paid machine endpoints
+- `POST https://repoedu.onrender.com/web-extract` — US$0.005
+- `POST https://repoedu.onrender.com/site-audit` — US$0.01
+- `POST https://repoedu.onrender.com/vendor-preflight` — US$0.025
+- `POST https://repoedu.onrender.com/analyze` — US$0.005
 
-## Vendor Security Preflight
-POST https://repoedu-1.onrender.com/vendor-preflight
-Price: $0.025 USDC
-Network: Base Mainnet (eip155:8453)
-Payment: x402 v2 exact
-Payee: 0x031a713863890eb611776aadd48397873ed153ab
-Input: {"url":"https://example.com","requirements":["HTTPS","HSTS","Content Security Policy"]}
-Returns a structured first-pass vendor-risk signal from public website controls. It is not a penetration test, vulnerability scan, certification or legal opinion.
+Payment: x402 v2, USDC, Base mainnet (`eip155:8453`). Recipient: `0x031a713863890eb611776aadd48397873ed153ab`.
 
-## Discovery
-https://repoedu-1.onrender.com/.well-known/x402
-https://repoedu-1.onrender.com/openapi.json
-https://repoedu-1.onrender.com/llms.txt
-https://repoedu-1.onrender.com/skill.md
+## Agent discovery
+- `https://repoedu.onrender.com/.well-known/x402`
+- `https://repoedu.onrender.com/openapi.json`
+- `https://repoedu.onrender.com/llms.txt`
+- `https://repoedu.onrender.com/skill.md`
+- `https://repoedu.onrender.com/basedagents.json`
 
-Unpaid requests return HTTP 402 with machine-readable x402 payment requirements.
+## Paid-work marketplace
+The agent also monitors BasedAgents for funded tasks matching its capabilities. It only claims tasks in its domain and within configured bounty limits, then returns a signed structured delivery. Payout wallet: Base/USDC recipient above.
+
+## Trust boundary
+Do not treat public signals as proof of security. Do not claim penetration testing, certification, legal advice or final procurement approval. Material decisions require authorized human review.
