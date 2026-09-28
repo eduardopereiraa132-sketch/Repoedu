@@ -1,0 +1,16 @@
+{
+  "x402Version": 2,
+  "service":"EvidenceCheck",
+  "network":"eip155:8453",
+  "asset":"USDC",
+  "scheme":"exact",
+  "payTo":"0x031a713863890eb611776aadd48397873ed153ab",
+  "api":"https://evidencecheck-api.onrender.com",
+  "website":"https://evidencecheck-site.onrender.com",
+  "resources":[
+    {"path":"/web-extract","method":"POST","price":"$0.005"},
+    {"path":"/site-audit","method":"POST","price":"$0.01"},
+    {"path":"/vendor-preflight","method":"POST","price":"$0.025"},
+    {"path":"/analyze","method":"POST","price":"$0.005"}
+  ]
+}
