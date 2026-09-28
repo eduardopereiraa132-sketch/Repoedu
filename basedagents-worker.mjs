@@ -1,10 +1,11 @@
 import http from "node:http";
-import { deserializeKeypair, RegistryClient, publicKeyToAgentId } from "basedagents";
+import fs from "node:fs";
+import { generateKeypair, serializeKeypair, deserializeKeypair, RegistryClient, publicKeyToAgentId } from "basedagents";
 import { assessEvidence } from "./assessment-engine.mjs";
 
 const API = process.env.BASEDAGENTS_API_URL || "https://api.basedagents.ai";
 const WALLET = process.env.PAY_TO || "0x031a713863890eb611776aadd48397873ed153ab";
-const KEYPAIR_JSON = process.env.BASEDAGENTS_KEYPAIR_JSON;
+const KEYPAIR_FILE = process.env.BASEDAGENTS_KEYPAIR_FILE || "/tmp/basedagents-keypair.json";
 const MIN_BOUNTY = BigInt(process.env.BASEDAGENTS_MIN_USDC_ATOMIC || "500000");
 const MAX_BOUNTY = BigInt(process.env.BASEDAGENTS_MAX_USDC_ATOMIC || "25000000");
 const POLL_MS = Number(process.env.BASEDAGENTS_POLL_MS || 60000);
@@ -16,12 +17,15 @@ http.createServer((req, res) => {
   res.end(JSON.stringify({ service: "Vendor Intelligence Agent", agenticMarketplace: "BasedAgents" }));
 }).listen(PORT, "0.0.0.0", () => console.log(`[basedagents] health server on ${PORT}`));
 
-if (!KEYPAIR_JSON) {
-  console.warn("[basedagents] worker disabled: BASEDAGENTS_KEYPAIR_JSON is not configured");
-  process.exit(0);
+async function loadKeypair() {
+  if (process.env.BASEDAGENTS_KEYPAIR_JSON) return deserializeKeypair(process.env.BASEDAGENTS_KEYPAIR_JSON);
+  if (fs.existsSync(KEYPAIR_FILE)) return deserializeKeypair(fs.readFileSync(KEYPAIR_FILE, "utf8"));
+  const kp = await generateKeypair();
+  fs.writeFileSync(KEYPAIR_FILE, serializeKeypair(kp), { mode: 0o600 });
+  return kp;
 }
 
-const kp = deserializeKeypair(KEYPAIR_JSON);
+const kp = await loadKeypair();
 const agentId = publicKeyToAgentId(kp.publicKey);
 const client = new RegistryClient(API);
 
@@ -62,7 +66,7 @@ async function makeDeliverable(task) {
 async function ensureRegistered() {
   try { await client.getAgent(agentId); console.log(`[basedagents] registered as ${agentId}`); }
   catch {
-    const agent = await client.register(kp, { name: "Vendor Intelligence Agent", description: "Evidence-first vendor due diligence, public-site security preflight and supplier-risk triage.", capabilities: ["research", "data", "security-review", "vendor-risk", "document-analysis", "procurement"], protocols: ["https", "mcp", "x402"], version: "1.3.0", skills: [{ name: "basedagents", registry: "npm" }, { name: "x402", registry: "npm" }] });
+    const agent = await client.register(kp, { name: `Vendor Intelligence Agent ${agentId.slice(-8)}`, description: "Evidence-first vendor due diligence, public-site security preflight and supplier-risk triage.", capabilities: ["research", "data", "security-review", "vendor-risk", "document-analysis", "procurement"], protocols: ["https", "mcp", "x402"], version: "1.3.0", skills: [{ name: "basedagents", registry: "npm" }, { name: "x402", registry: "npm" }] });
     console.log(`[basedagents] registered ${agent.agent_id}`);
   }
   try { await client.updateWallet(kp, { wallet_address: WALLET, wallet_network: "eip155:8453" }); console.log(`[basedagents] payout wallet set`); }
