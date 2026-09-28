@@ -7,7 +7,7 @@ EvidenceCheck
 **Check what a vendor's public evidence supports before you approve or escalate the review.**
 
 ## Buyer problem
-A procurement, security or GRC workflow needs a fast first pass on a supplier but does not want to spend hours opening pages, extracting evidence and turning every gap into a follow-up question.
+Procurement, security and GRC workflows often spend repetitive time opening supplier pages, collecting public signals, identifying missing evidence and writing follow-up questions before the substantive review can begin.
 
 ## What this service does
 EvidenceCheck turns a public vendor URL and optional requirements into structured, evidence-first triage:
@@ -18,7 +18,7 @@ EvidenceCheck turns a public vendor URL and optional requirements into structure
 4. a concise summary for downstream workflows;
 5. explicit limitations and human-review points.
 
-It is intentionally **not** a generic AI summary.
+It is intentionally **not** a generic AI summary and does not claim that public evidence proves compliance or security.
 
 ## Primary capability
 `POST /vendor-preflight`
@@ -61,11 +61,21 @@ USDC on Base mainnet (`eip155:8453`) via x402.
 ## Receiving address
 `0x031a713863890eb611776aadd48397873ed153ab`
 
-## Trust boundary
-First-pass due diligence only. Not a penetration test, vulnerability scanner, certification, legal opinion or replacement for authorized human review. Public signals are reported as signals, not proof of controls.
+## Low-friction human pilot
+`/pilot.html` offers a **US$149 one-vendor pilot** with fixed scope: public-site preflight, supplied-evidence review, evidence-gap register, supplier question set, structured findings and explicit limitations. It is an offer price for validation, not a claim of existing customers or revenue.
 
 ## Human escalation
 For buyers that need a defined vendor review rather than an API call, the service offers a fixed-scope review starting at US$495 and recurring intake starting at US$1,250/month. These are offer prices, not claims of existing customer contracts or revenue.
+
+## Directory submission strategy
+- **x402 List:** submit through its current `/submit` flow. Its public documentation says service submissions are free, endpoints are automatically probed for a valid HTTP 402 response, and listings are manually reviewed. urlx402 List submission documentationhttps://x402-list.com/api
+- **PayAPI Market:** submit the API for free; the marketplace currently advertises 100% of provider call revenue going to providers and verifies listings with a real payment before its verified badge. urlPayAPI Markethttps://payapi.market/
+- **Agent402:** register the public x402 origin through its seller flow; the current documentation describes free listing and direct USDC settlement to the provider wallet. urlAgent402 seller flowhttps://agent402.tools/sell
+
+Do not pay a directory fee automatically. Do not claim listing, verification or ranking until an external directory confirms it.
+
+## Trust boundary
+First-pass due diligence only. Not a penetration test, vulnerability scanner, certification, legal opinion or replacement for authorized human review. Public signals are reported as signals, not proof of controls.
 
 ## Accuracy rule
 Never claim verified status, customer traction, revenue, uptime, reviews or directory ranking unless supported by an actual external record.
