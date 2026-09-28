@@ -1,0 +1,8 @@
+{
+  "x402Version": 1,
+  "name": "Agent Document Risk Analyzer",
+  "description": "Machine-first business document risk and compliance analysis for AI agents.",
+  "payment": {"scheme":"exact","network":"eip155:8453","asset":"USDC","price":"$0.50","payTo":"0x031a713863890eb611776aadd48397873ed153ab"},
+  "resources":[{"method":"POST","path":"/analyze","price":"$0.50","contentType":"application/json","input":"{text:string}"}],
+  "discovery": {"skill":"/skill.md","openapi":"/openapi.json"}
+}
