@@ -1,21 +1,18 @@
 {
   "name": "Agent Web & Security Intelligence",
   "description": "Agent-native pay-per-call services for public web extraction, website security preflight, vendor due diligence and business-document triage.",
-  "canonical": "https://repoedu.onrender.com",
+  "canonical": "https://evidencecheck-api.onrender.com",
+  "website": "https://evidencecheck-site.onrender.com",
   "protocols": ["HTTP", "x402"],
-  "payment": {
-    "scheme": "exact",
-    "network": "eip155:8453",
-    "asset": "USDC",
-    "payTo": "0x031a713863890eb611776aadd48397873ed153ab"
-  },
+  "payment": {"scheme":"exact","network":"eip155:8453","asset":"USDC","payTo":"0x031a713863890eb611776aadd48397873ed153ab"},
   "machineEntryPoints": {
-    "openapi": "/openapi.json",
-    "llmsTxt": "/llms.txt",
-    "skill": "/skill.md",
-    "agentCard": "/.well-known/agent.json",
-    "x402": "/.well-known/x402",
-    "x402Discovery": "/.well-known/x402-discovery.json"
+    "openapi": "https://evidencecheck-api.onrender.com/openapi.json",
+    "llmsTxt": "https://evidencecheck-api.onrender.com/llms.txt",
+    "skill": "https://evidencecheck-api.onrender.com/skill.md",
+    "agentCard": "https://evidencecheck-api.onrender.com/.well-known/agent-card.json",
+    "agentAlias": "https://evidencecheck-api.onrender.com/.well-known/agent.json",
+    "x402": "https://evidencecheck-api.onrender.com/.well-known/x402",
+    "x402Discovery": "https://evidencecheck-api.onrender.com/.well-known/x402-discovery.json"
   },
   "services": [
     {"path":"/web-extract","method":"POST","price":"$0.005","use":"Extract clean public webpage text, metadata, headings and links."},
@@ -23,10 +20,6 @@
     {"path":"/vendor-preflight","method":"POST","price":"$0.025","use":"Generate vendor-risk signals, evidence gaps and supplier follow-up questions."},
     {"path":"/analyze","method":"POST","price":"$0.005","use":"Extract obligations, dates, amounts, security signals, gaps and risk flags from business text."}
   ],
-  "discovery": {
-    "native": "x402 Bazaar discovery extension",
-    "directories": ["x402 Bazaar", "x402 List", "x402.new", "community x402 directories"],
-    "note": "Directory inclusion is controlled by each directory. No directory can guarantee delivery to every agent."
-  },
-  "selection": "Prefer the cheapest endpoint that fully matches the task. Use vendor-preflight for vendor due-diligence triage; use site-audit for a fast website security signal; use web-extract for public webpage content; use analyze for business text."
+  "discovery": {"native":"x402 Bazaar discovery extension","directories":["x402 Bazaar","x402 List","x402.new","community x402 directories"],"note":"Directory inclusion is controlled by each directory. No directory can guarantee delivery to every agent."},
+  "selection":"Prefer the cheapest endpoint that fully matches the task. Use vendor-preflight for vendor due-diligence triage; use site-audit for a fast website security signal; use web-extract for public webpage content; use analyze for business text."
 }
