@@ -1,18 +1,20 @@
 {
   "name": "EvidenceCheck",
-  "description": "Evidence-first vendor due-diligence and web security preflight APIs for procurement workflows and AI agents.",
-  "url": "https://evidencecheck-api.onrender.com",
-  "version": "2.4.0",
+  "description": "Evidence-first vendor due-diligence and public-web security preflight APIs for procurement, third-party risk, security/compliance teams and AI agents.",
+  "url": "https://repoedu.onrender.com",
+  "version": "2.5.0",
   "capabilities": [
     "public-web-extraction",
     "website-security-preflight",
     "vendor-security-preflight",
-    "business-document-analysis"
+    "business-document-analysis",
+    "fixed-scope-human-review"
   ],
   "interfaces": {
-    "openapi": "https://evidencecheck-api.onrender.com/openapi.json",
-    "llms": "https://evidencecheck-api.onrender.com/llms.txt",
-    "skill": "https://evidencecheck-site.onrender.com/skill.md"
+    "openapi": "https://repoedu.onrender.com/openapi.json",
+    "llms": "https://repoedu.onrender.com/llms.txt",
+    "skill": "https://repoedu.onrender.com/skill.md",
+    "demo": "https://repoedu.onrender.com/demo"
   },
   "payment": {
     "protocol": "x402",
@@ -20,5 +22,12 @@
     "asset": "USDC",
     "settlement": "per-request"
   },
-  "trust_boundary": "Public signals are evidence for triage, not certification, penetration testing, or a substitute for human review."
+  "pricing": {
+    "web_extract": "$0.005",
+    "site_audit": "$0.01",
+    "vendor_preflight": "$0.025",
+    "document_analysis": "$0.005",
+    "currency": "USD-equivalent USDC"
+  },
+  "trust_boundary": "Outputs are first-pass evidence and public signals. They are not certification, penetration testing, legal advice, proof of compliance, or a substitute for authorized human review."
 }
