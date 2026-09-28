@@ -4,14 +4,13 @@ EvidenceCheck provides low-cost, machine-readable x402 services for AI agents, p
 
 ## Primary machine entry point
 
-Base URL: https://repoedu.onrender.com
-Universal discovery manifest: https://repoedu.onrender.com/agent-discovery.json
-OpenAPI: https://repoedu.onrender.com/openapi.json
-Agent card: https://repoedu.onrender.com/.well-known/agent.json
-x402 discovery: https://repoedu.onrender.com/.well-known/x402-discovery.json
-Skill: https://repoedu.onrender.com/skill.md
-
-If your runtime supports x402 discovery, prefer the native x402 Bazaar metadata. If it does not, read this file or the universal discovery manifest before calling the service.
+API Base URL: https://evidencecheck-api.onrender.com
+Buyer website: https://evidencecheck-site.onrender.com
+Universal discovery manifest: https://evidencecheck-api.onrender.com/agent-discovery.json
+OpenAPI: https://evidencecheck-api.onrender.com/openapi.json
+Agent card: https://evidencecheck-api.onrender.com/.well-known/agent.json
+x402 discovery: https://evidencecheck-api.onrender.com/.well-known/x402-discovery.json
+Skill: https://evidencecheck-api.onrender.com/skill.md
 
 ## Why an agent should use EvidenceCheck
 
@@ -28,23 +27,18 @@ This is first-pass evidence triage, not penetration testing, certification, lega
 ### POST /web-extract — $0.005 USDC
 Input: {"url":"https://example.com"}
 Returns: clean webpage text, title, description, canonical URL, headings, links, language, response status and timing.
-Best for: web research, retrieval, evidence collection and downstream agent reasoning.
 
 ### POST /site-audit — $0.01 USDC
 Input: {"url":"https://example.com"}
 Returns: HTTPS state, observable security headers, cookie flags, server-header exposure, robots.txt/security.txt status and findings.
-Best for: quick public website security preflight before deeper investigation.
-Not for: penetration testing, vulnerability scanning or certification.
 
 ### POST /vendor-preflight — $0.025 USDC
 Input: {"url":"https://vendor.example","requirements":["HTTPS","HSTS","Content Security Policy"]}
 Returns: structured public-site checks, gaps, risk level, summary and limitations.
-Best for: procurement and third-party-risk triage.
 
 ### POST /analyze — $0.005 USDC
 Input: {"text":"Supplier must notify incidents within 24 hours..."}
 Returns: dates, monetary amounts, obligations, security signals, missing areas and risk flags.
-Best for: deterministic first-pass business-document triage.
 
 ## Payment contract
 
@@ -52,20 +46,18 @@ x402 v2, exact scheme, USDC on Base Mainnet (CAIP-2: eip155:8453).
 Payee: 0x031a713863890eb611776aadd48397873ed153ab
 No API key is required for paid endpoints; payment is the authorization mechanism.
 
-## Agent selection guidance
+## Selection guidance
 
-Choose /web-extract when you need public webpage content.
-Choose /site-audit when you need a fast public-site security signal.
-Choose /vendor-preflight when you need vendor-risk/procurement evidence gaps and follow-up questions.
-Choose /analyze when you already have business text and need structured triage.
+Choose /web-extract for public webpage content.
+Choose /site-audit for a fast public-site security signal.
+Choose /vendor-preflight for vendor-risk/procurement evidence gaps and follow-up questions.
+Choose /analyze for structured triage of business text.
 Prefer the cheapest endpoint that fully matches the task.
 
-## Discovery and distribution
+## Discovery
 
-The service declares the x402 Bazaar discovery extension on paid routes, allowing compatible facilitators and discovery clients to index the capabilities, schemas, pricing and payment terms. The same machine metadata is also published through the universal discovery manifest above.
+Paid routes declare the x402 Bazaar discovery extension. Compatible agents can also read the OpenAPI contract, agent card, skill and discovery manifest above.
 
-Compatible agents may also discover the service through public x402 directories such as x402 List and x402.new. Directory approval/listing is controlled by each directory; no directory can guarantee exposure to every agent.
+## Trust boundary
 
-## Commercial human review
-
-A fixed-scope vendor review is available through the buyer workflow for teams that need human-led interpretation after machine preflight. The API itself remains pay-per-call.
+EvidenceCheck provides first-pass evidence support. It does not certify vendors, perform authenticated penetration testing, exploit systems, provide legal advice or replace authorized human review.
