@@ -1,0 +1,25 @@
+# EvidenceCheck
+
+EvidenceCheck is an evidence-first vendor due-diligence service for procurement, third-party risk, security/compliance teams and AI agents.
+
+## Primary capabilities
+- /web-extract — clean public webpage extraction
+- /site-audit — public website security preflight
+- /vendor-preflight — vendor evidence, gaps and supplier questions
+- /analyze — business-document analysis
+- /review-purchase — fixed-scope human-led vendor review
+
+## Machine interfaces
+- /openapi.json
+- /skill.md
+- /basedagents.json
+- /demo
+
+## Payment
+Paid machine endpoints use x402 with USDC on Base mainnet (eip155:8453). Prices are published by the service.
+
+## Trust boundary
+Outputs are first-pass evidence and signals. They are not certification, a penetration test, a legal opinion, or proof that a vendor is secure/compliant. Material findings require appropriate human verification.
+
+## Commercial intent
+The product is designed to reduce repetitive first-pass vendor research and turn missing evidence into concrete next actions.
