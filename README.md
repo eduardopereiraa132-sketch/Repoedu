@@ -1,79 +1,84 @@
-# Vendor Intelligence Agent
+# EvidenceCheck
 
-**Know what is missing before you approve a vendor.**
+**Know what a vendor shows. Know what you still need.**
 
-AI-assisted first-pass vendor due diligence for procurement, security and compliance teams — now exposed both as pay-per-request x402 capabilities and as an earning agent that can claim funded work from the BasedAgents marketplace.
+EvidenceCheck is an evidence-first vendor due-diligence service for procurement, third-party risk, security/compliance teams and AI agents. It turns public vendor signals and supplied business text into structured evidence, gaps and next-step questions.
 
 ## Live service
 
-- Live: https://repoedu.onrender.com
-- Demo: https://repoedu.onrender.com/demo
+- Live API: https://repoedu.onrender.com
+- Buyer page: https://repoedu.onrender.com/for-buyers.html
+- Agent page: https://repoedu.onrender.com/for-agents.html
+- Live demo: https://repoedu.onrender.com/demo
 - API definition: https://repoedu.onrender.com/openapi.json
 - Machine skill: https://repoedu.onrender.com/skill.md
-- Agent manifest: https://repoedu.onrender.com/basedagents.json
+- LLM discovery: https://repoedu.onrender.com/llms.txt
+- Agent card: https://repoedu.onrender.com/.well-known/agent-card.json
+- x402 discovery: https://repoedu.onrender.com/.well-known/x402
 
-## The job it removes
+## The buyer problem
 
-Vendor onboarding often means opening websites, reading security documents, checking contract language, extracting dates and commitments, identifying missing evidence, then writing follow-up questions. The product turns that repetitive first-pass work into a repeatable evidence workflow.
+Vendor onboarding and recurring supplier review often require repetitive first-pass work: opening websites, reading security material, checking observable controls, extracting obligations and dates, identifying missing evidence, then writing follow-up questions. EvidenceCheck turns that work into a repeatable evidence workflow.
 
-## What the buyer gets
+The product is deliberately **not** positioned as a generic AI summarizer. Its commercial value is the combination of observable signals, explicit gaps, supplier questions and a clear trust boundary.
 
-Give the service a vendor URL and the evidence you already have. It returns a structured review containing:
+## What a buyer gets
+
+Depending on the endpoint, EvidenceCheck can provide:
 
 - Public website security preflight
 - Vendor security signals
-- Contract/document obligations
-- Dates and monetary commitments
+- Clean webpage text, metadata, headings and links
+- Business-document dates, monetary amounts and obligations
 - Missing evidence and control gaps
-- Supplier questions to resolve gaps
-- Executive-ready summary
+- Supplier follow-up questions
+- Structured JSON for downstream workflows
+- Human-readable fixed-scope review for deeper work
 - Explicit limitations and human-review points
 
-The output is designed to answer a practical question: **what do we know, what is missing, and what should we verify next?**
-
-## Why this is commercially useful
-
-The product is not positioned as another generic AI summarizer. Its value is the workflow around evidence, gaps and next actions. It can be used before a deeper security assessment, during procurement triage, or for recurring supplier reviews.
+The practical question is: **what do we know, what is missing, and what should we verify next?**
 
 ## Machine API
 
-Paid x402 endpoints on Base mainnet/USDC:
+Paid x402 endpoints use USDC on Base mainnet (`eip155:8453`):
 
 | Endpoint | Purpose | Entry price |
 |---|---|---:|
 | `/web-extract` | Extract clean webpage text, metadata and links | US$0.005 |
 | `/site-audit` | Public website security preflight | US$0.01 |
-| `/vendor-preflight` | Vendor-risk preflight and gaps | US$0.025 |
+| `/vendor-preflight` | Vendor-risk preflight and evidence gaps | US$0.025 |
 | `/analyze` | Business-document analysis | US$0.005 |
-| `/review-purchase` | Fixed-scope vendor review intake | US$495 |
 
-The low-cost endpoints are deliberately easy for software and AI agents to trial. The fixed-scope review turns the same workflow into a human-led commercial engagement.
+The low-cost endpoints are designed to be easy for software and AI agents to trial. The fixed-scope review path turns the same workflow into a human-led commercial engagement.
 
-## Autonomous earning path
+## Commercial offer
 
-The service also runs a separate BasedAgents worker. It registers an agent identity, associates the payout wallet on Base, monitors open funded tasks, filters for vendor/security/procurement work within configured economics, claims suitable tasks, produces evidence-first deliverables and submits signed receipts.
+### API — pay per request
 
-This is a second revenue path rather than a replacement for the API: **x402 lets buyers pay this service; BasedAgents lets the service look for already-funded work.** BasedAgents settles accepted bounties in USDC on Base. See `BASEDAGENTS.md` for the operating rules.
+Use only the capability required by the workflow. No subscription is required for the machine endpoints.
 
-## Commercial packages
+### Fixed-scope review — US$495
 
-### Proof of Value — US$495
-One defined vendor review, public-site preflight, supplied-document review, structured findings/gaps and a target 48-hour turnaround.
+One defined vendor review, public-site preflight, supplied-document review, structured findings/gaps and a target 48-hour turnaround. This is a starting commercial offer for validation, not a claim of existing customer contracts.
 
-### Pilot — US$2,500 setup + US$500/month
-Up to 25 vendor assessments/month with configured requirements, structured reports and measurement of review time and human-intervention rate.
+### Pilot and recurring programs
 
-### Business — US$1,500/month
-Up to 100 vendor assessments/month with shared workflow, supplier-question generation, history and API access where applicable.
+Larger procurement/security teams can use the workflow for recurring vendor triage, with scope and pricing agreed around volume and required human review.
 
-Packages are starting points for validation, not claims of existing customer contracts.
+## Agent discovery
 
-## Trust boundaries
+The service publishes OpenAPI, LLM, skill, agent-card and x402 discovery metadata so compatible software can discover and call paid capabilities programmatically.
 
-This is a first-pass due-diligence workflow. It is **not** a penetration test, certification, vulnerability scanner, legal opinion or replacement for authorized human decisions. Public signals are reported as signals, not proof. Material findings should be verified by the responsible team.
+The service also includes a separate earning-agent path through BasedAgents. That worker is a distinct revenue channel: x402 lets external buyers pay the API; the earning worker can look for already-funded marketplace work. Neither path should be represented as guaranteed revenue.
 
-## Machine discovery
+## Trust boundary
 
-The service publishes machine-readable OpenAPI, x402 and agent-discovery metadata so compatible buyers can discover paid capabilities programmatically. The production service uses Base mainnet (`eip155:8453`) and USDC. Receiving wallet: `0x031a713863890eb611776aadd48397873ed153ab`.
+EvidenceCheck is a **first-pass due-diligence workflow**. It is not a penetration test, vulnerability scanner, certification, legal opinion or replacement for authorized human decisions. Public signals are reported as signals, not proof. Material findings should be verified by the responsible team.
 
-See `BUYER-QUICKSTART.md`, `AGENT-DISCOVERY.md`, `skill.md` and `BASEDAGENTS.md` for machine-facing usage.
+## Receiving wallet
+
+USDC receiving wallet on Base: `0x031a713863890eb611776aadd48397873ed153ab`
+
+## Project status
+
+The production API and buyer-facing site are deployed on Render from the GitHub repository. The current production service is the `evidencecheck-api` deployment; the public buyer site is served from the same repository as a Render static site. Auto-deploy is enabled on `main`.
