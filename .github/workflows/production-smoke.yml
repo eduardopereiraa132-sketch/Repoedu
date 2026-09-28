@@ -1,89 +1,88 @@
-name: x402 production smoke test
+name: EvidenceCheck production smoke test
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   production:
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for Render deployment
+      - name: Wait for API deployment
         run: |
           set -e
           for i in {1..30}; do
-            if curl -fsS --max-time 10 https://repoedu-1.onrender.com/health >/tmp/health.json; then
+            if curl -fsS --max-time 10 https://evidencecheck-api.onrender.com/health >/tmp/health.json; then
               cat /tmp/health.json
               exit 0
             fi
-            echo "Waiting for Render deployment ($i/30)..."
+            echo "Waiting for Render API deployment ($i/30)..."
             sleep 10
           done
-          echo "Render service did not become reachable"
+          echo "EvidenceCheck API did not become reachable"
           exit 1
-      - name: Verify production metadata
+
+      - name: Verify API discovery metadata
         run: |
           set -e
-          for path in /health /.well-known/x402 /openapi.json /skill.md /llms.txt; do
-            code=$(curl -sS --max-time 20 -o /tmp/body -w "%{http_code}" "https://repoedu-1.onrender.com$path")
+          for path in /health /.well-known/x402 /openapi.json /skill.md /llms.txt /agent-discovery.json /.well-known/agent-card.json /.well-known/agent.json /.well-known/x402-discovery.json; do
+            code=$(curl -sS --max-time 20 -o /tmp/body -w "%{http_code}" "https://evidencecheck-api.onrender.com$path")
             echo "$path HTTP $code"
             test "$code" = "200"
           done
-      - name: Probe external Bazaar discovery
-        continue-on-error: true
-        run: |
-          set -u
-          node <<'NODE'
-          const urls = [
-            "https://facilitator.openx402.ai/discovery/resources?type=http&network=eip155%3A8453&limit=100",
-            "https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources?type=http&network=eip155%3A8453&limit=100"
-          ];
-          const target = "https://repoedu-1.onrender.com/";
-          for (const u of urls) {
-            try {
-              const r = await fetch(u, {signal: AbortSignal.timeout(15000)});
-              const text = await r.text();
-              let json; try { json=JSON.parse(text); } catch {}
-              const items = json?.items || json?.resources || [];
-              const hits = items.filter(x => {
-                const resource = x.resource || x.resourceUrl || x.url || "";
-                return String(resource).startsWith(target);
-              });
-              console.log(JSON.stringify({endpoint:u,status:r.status,items:items.length,matchingResources:hits.map(x=>x.resource||x.resourceUrl||x.url)}));
-            } catch (e) {
-              console.log(JSON.stringify({endpoint:u,error:String(e?.message||e)}));
-            }
-          }
-          NODE
 
-      - name: Verify production x402 402 responses
+      - name: Verify unpaid x402 responses and payment contract
         run: |
           set -e
           check_402() {
             path="$1"
             body="$2"
-            headers="/tmp/headers-$3"
-            code=$(curl -sS --max-time 30 -D "$headers" -o "/tmp/body-$3" -w "%{http_code}" -X POST "https://repoedu-1.onrender.com$path" -H "Content-Type: application/json" -d "$body")
+            name="$3"
+            headers="/tmp/headers-$name"
+            code=$(curl -sS --max-time 30 -D "$headers" -o "/tmp/body-$name" -w "%{http_code}" -X POST "https://evidencecheck-api.onrender.com$path" -H "Content-Type: application/json" -d "$body")
             echo "$path HTTP $code"
             test "$code" = "402"
             value=$(grep -i '^payment-required:' "$headers" | sed 's/^[^:]*:[[:space:]]*//I' | tr -d '\r\n')
             test -n "$value"
-            echo "$value" | base64 -d >/tmp/decoded-$3.json
+            echo "$value" | base64 -d >/tmp/decoded-$name.json
           }
           check_402 /web-extract '{"url":"https://example.com"}' web
           check_402 /site-audit '{"url":"https://example.com"}' audit
           check_402 /analyze '{"text":"Supplier must notify incidents within 24 hours."}' analyze
           check_402 /vendor-preflight '{"url":"https://example.com","requirements":["HTTPS","HSTS"]}' vendor
-          node -e '
-            const fs=require("fs");
-            const expected="0x031a713863890eb611776aadd48397873ed153ab";
-            for(const name of ["web","audit","analyze","vendor"]){
-              const x=JSON.parse(fs.readFileSync("/tmp/decoded-"+name+".json","utf8"));
-              const a=x.accepts?.[0], b=x.extensions?.bazaar?.info, s=x.extensions?.bazaar?.schema;
-              if(x.x402Version!==2) throw new Error(name+": not x402 v2");
-              if(!a || a.network!=="eip155:8453" || a.scheme!=="exact" || a.payTo!==expected) throw new Error(name+": payment requirements mismatch");
-              if(!b || b.input?.type!=="http" || b.input?.method!=="POST" || b.output?.type!=="json") throw new Error(name+": invalid Bazaar info");
-              if(!s?.properties?.input || !s?.properties?.output) throw new Error(name+": invalid Bazaar schema");
-            }
-          '
+          node <<'NODE'
+          const fs=require('fs');
+          const expected='0x031a713863890eb611776aadd48397873ed153ab';
+          const expectedNetwork='eip155:8453';
+          const expectedPrices={web:'5000',audit:'10000',analyze:'5000',vendor:'25000'};
+          for(const name of Object.keys(expectedPrices)){
+            const x=JSON.parse(fs.readFileSync('/tmp/decoded-'+name+'.json','utf8'));
+            const a=x.accepts?.[0];
+            if(x.x402Version!==2) throw new Error(name+': not x402 v2');
+            if(!a || a.network!==expectedNetwork || a.scheme!=='exact' || a.payTo!==expected) throw new Error(name+': payment requirements mismatch');
+            if(String(a.amount)!==expectedPrices[name]) throw new Error(name+': price mismatch: '+a.amount);
+          }
+          NODE
+
+      - name: Verify buyer-site routes and no placeholder contact links
+        run: |
+          set -e
+          site=https://evidencecheck-site.onrender.com
+          for path in / /demo/ /offer.html /agent-buy.html /buyer-brief.html /openapi.json /skill.md /llms.txt /agent-discovery.json /.well-known/agent-card.json /.well-known/agent.json /.well-known/x402 /.well-known/x402-discovery.json; do
+            code=$(curl -sS --max-time 20 -o /tmp/site-body -w "%{http_code}" "$site$path")
+            echo "$path HTTP $code"
+            test "$code" = "200"
+          done
+          body=$(curl -fsS --max-time 20 "$site/offer.html")
+          if printf '%s' "$body" | grep -q 'evidencecheck\.example'; then
+            echo 'Placeholder .example contact link found in offer.html'
+            exit 1
+          fi
+          home=$(curl -fsS --max-time 20 "$site/")
+          for href in '/demo' '/offer.html' '/agent-buy.html' '/openapi.json'; do
+            printf '%s' "$home" | grep -Fq "href=\"$href\"" || { echo "Missing home link $href"; exit 1; }
+          done
