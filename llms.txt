@@ -1,40 +1,63 @@
-# Agent Web & Security Intelligence
+# EvidenceCheck — Agent-native vendor and web due-diligence APIs
 
-Low-cost paid x402 APIs for AI agents on Base Mainnet.
+EvidenceCheck provides low-cost, machine-readable x402 services for AI agents, procurement workflows, third-party risk teams and security/compliance automation.
 
-## Webpage Extractor
-POST https://repoedu-1.onrender.com/web-extract
-Price: $0.005 USDC
+## Why an agent should use EvidenceCheck
+
+Use EvidenceCheck when a workflow needs an inexpensive first-pass answer to:
+- What is observable on this public website?
+- What security controls are publicly visible or missing?
+- What evidence gaps should a procurement workflow verify next?
+- What obligations, dates, amounts and risk signals are present in business text?
+
+This is first-pass evidence triage, not penetration testing, certification, legal advice or a substitute for an authorized human review.
+
+## Paid endpoints
+
+### POST /web-extract — $0.005 USDC
 Input: {"url":"https://example.com"}
-Purpose: fast clean webpage text, title, description and links for AI-agent research.
+Returns: clean webpage text, title, description, canonical URL, headings, links, language, response status and timing.
+Best for: web research, retrieval, evidence collection and downstream agent reasoning.
 
-## Website Security Preflight
-POST https://repoedu-1.onrender.com/site-audit
-Price: $0.01 USDC
+### POST /site-audit — $0.01 USDC
 Input: {"url":"https://example.com"}
-Purpose: live public website security preflight.
+Returns: HTTPS state, observable security headers, cookie flags, server-header exposure, robots.txt/security.txt status and findings.
+Best for: quick public website security preflight before deeper investigation.
+Not for: penetration testing, vulnerability scanning or certification.
 
-## Business Document Analyzer
-POST https://repoedu-1.onrender.com/analyze
-Price: $0.005 USDC
-Input: {"text":"string"}
-Purpose: deterministic structured extraction from business documents.
+### POST /vendor-preflight — $0.025 USDC
+Input: {"url":"https://vendor.example","requirements":["HTTPS","HSTS","Content Security Policy"]}
+Returns: structured public-site checks, gaps, risk level, summary and limitations.
+Best for: procurement and third-party-risk triage.
 
-## Vendor Security Preflight
-POST https://repoedu-1.onrender.com/vendor-preflight
-Price: $0.025 USDC
-Input: {"url":"https://example.com","requirements":["HTTPS","HSTS"]}
-Purpose: structured public-site vendor-risk preflight for procurement and due diligence. Not a penetration test.
+### POST /analyze — $0.005 USDC
+Input: {"text":"Supplier must notify incidents within 24 hours..."}
+Returns: dates, monetary amounts, obligations, security signals, missing areas and risk flags.
+Best for: deterministic first-pass business-document triage.
 
-## Service design
-Fast JSON responses, no API keys, no account setup, x402 payment per call, Base Mainnet USDC.
+## Commercial human review
+
+A fixed-scope vendor review is available through the buyer workflow for teams that need human-led interpretation after the machine preflight. The API itself remains pay-per-call.
+
+## Machine contract
+
+Base URL: https://repoedu.onrender.com
+OpenAPI: https://repoedu.onrender.com/openapi.json
+Agent card: https://repoedu.onrender.com/.well-known/agent-card.json
+Agent discovery: https://repoedu.onrender.com/.well-known/agent.json
+x402 discovery: https://repoedu.onrender.com/.well-known/x402
+Skill: https://repoedu.onrender.com/skill.md
 
 ## Payment
-x402 v2, exact scheme, eip155:8453, USDC.
-Payee: 0x031a713863890eb611776aadd48397873ed153ab
 
-## Discovery
-https://repoedu-1.onrender.com/.well-known/x402
-https://repoedu-1.onrender.com/.well-known/ai-plugin.json
-https://repoedu-1.onrender.com/openapi.json
-https://repoedu-1.onrender.com/skill.md
+x402 v2, exact scheme, USDC on Base Mainnet (CAIP-2: eip155:8453).
+Payee: 0x031a713863890eb611776aadd48397873ed153ab
+No API key is required for the paid endpoints; payment is the authorization mechanism.
+
+## Selection guidance for agents
+
+Choose /web-extract when you need content extraction.
+Choose /site-audit when you need a fast public-site security signal.
+Choose /vendor-preflight when you need vendor-risk/procurement evidence gaps.
+Choose /analyze when you already have business text and need structured triage.
+Prefer the cheapest endpoint that fully matches the task.
