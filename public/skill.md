@@ -19,7 +19,7 @@ EvidenceCheck provides narrow, machine-readable first-pass intelligence for proc
 
 ### Vendor Security Preflight
 - Endpoint: `POST /vendor-preflight`
-- Price: `$0.05` USDC per request
+- Price: `$0.025` USDC per request
 - Input: `{ "url": "https://vendor.example", "requirements": [] }`
 - Returns structured checks, evidence gaps, risk signal, summary and limitations.
 
@@ -35,11 +35,17 @@ EvidenceCheck provides narrow, machine-readable first-pass intelligence for proc
 - Asset: USDC
 - Scheme: exact
 - Payment: required per request
+- Receiver: `0x031a713863890eb611776aadd48397873ed153ab`
 
 ## Discovery
+- API: `https://evidencecheck-api.onrender.com`
 - OpenAPI: `/openapi.json`
 - LLM guide: `/llms.txt`
 - Agent card: `/.well-known/agent-card.json`
+- Agent alias: `/.well-known/agent.json`
+- x402 metadata: `/.well-known/x402`
+- x402 discovery: `/.well-known/x402-discovery.json`
+- Buyer website: `https://evidencecheck-site.onrender.com`
 
 ## Trust boundary
 EvidenceCheck reports observable signals. It does not certify vendors, perform authenticated penetration testing, exploit systems, or replace contractual, legal, compliance, or human security review.
