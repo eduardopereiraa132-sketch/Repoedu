@@ -1,14 +1,13 @@
 # EvidenceCheck
 
-**Know what a vendor shows. Know what you still need.**
+**Know what to verify before you approve.**
 
 EvidenceCheck is an evidence-first vendor due-diligence service for procurement, third-party risk, security/compliance teams and AI agents. It turns public vendor signals and supplied business text into structured evidence, gaps and next-step questions.
 
 ## Live service
 
 - Live API: https://repoedu.onrender.com
-- Buyer page: https://repoedu.onrender.com/for-buyers.html
-- Agent page: https://repoedu.onrender.com/for-agents.html
+- Buyer page: https://repoedu.onrender.com/buy.html
 - Live demo: https://repoedu.onrender.com/demo
 - API definition: https://repoedu.onrender.com/openapi.json
 - Machine skill: https://repoedu.onrender.com/skill.md
@@ -81,4 +80,4 @@ USDC receiving wallet on Base: `0x031a713863890eb611776aadd48397873ed153ab`
 
 ## Project status
 
-The production API and buyer-facing site are deployed on Render from the GitHub repository. The current production service is the `evidencecheck-api` deployment; the public buyer site is served from the same repository as a Render static site. Auto-deploy is enabled on `main`.
+The production API and buyer-facing site are deployed on Render from the GitHub repository. Auto-deploy is enabled on `main`. The buyer-facing commercial page has been upgraded with a clearer value proposition, structured proof/output, pricing paths, trust boundaries and a direct demo-to-purchase flow.
