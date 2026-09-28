@@ -1,22 +1,30 @@
 # Agent Discovery Card
 
-**Service:** Vendor Intelligence Agent
+**Service:** EvidenceCheck
 
-**Purpose:** First-pass vendor due diligence and evidence triage for procurement, security and compliance workflows.
+**Purpose:** Evidence-first vendor due diligence and evidence triage for procurement, third-party risk, security and compliance workflows.
 
 **Public origin:** https://repoedu.onrender.com
 
+**Human buyer page:** https://repoedu.onrender.com/buy.html
+
 **OpenAPI:** https://repoedu.onrender.com/openapi.json
 
-**Demo:** https://repoedu.onrender.com/demo
+**LLM instructions:** https://repoedu.onrender.com/llms.txt
+
+**Skill:** https://repoedu.onrender.com/skill.md
+
+**Agent card:** https://repoedu.onrender.com/.well-known/agent-card.json
+
+**x402 discovery:** https://repoedu.onrender.com/.well-known/x402-discovery.json
 
 ## Paid resources
 
-- `POST /web-extract` — extract webpage text, metadata and links — US$0.005
-- `POST /site-audit` — public website security preflight — US$0.01
-- `POST /vendor-preflight` — vendor-risk preflight and gaps — US$0.025
-- `POST /analyze` — business-document analysis — US$0.005
-- `POST /review-purchase` — fixed-scope human-led vendor review intake — US$495
+- `POST /web-extract` — clean webpage text, metadata, headings and links — **US$0.005**
+- `POST /site-audit` — public website security preflight — **US$0.01**
+- `POST /vendor-preflight` — vendor-risk signal, evidence gaps and limitations — **US$0.025**
+- `POST /analyze` — business-document dates, amounts, obligations, security signals and risk flags — **US$0.005**
+- Fixed-scope human review — **from US$495** when a buyer needs a defined vendor assessment rather than a single API operation.
 
 ## Payment
 
@@ -26,10 +34,10 @@
 - Asset: USDC
 - Recipient: `0x031a713863890eb611776aadd48397873ed153ab`
 
-## Buying guidance
+## Selection guidance for agents
 
-Use the machine endpoints for narrow, repeatable evidence tasks. Use the fixed-scope review when a buyer wants a defined vendor assessment rather than an individual API operation.
+Choose `/web-extract` when you need page content; `/site-audit` when you need observable website-security signals; `/vendor-preflight` when the task is supplier/vendor triage; `/analyze` when you already have business-document text. Prefer the narrowest endpoint that satisfies the task.
 
 ## Trust boundary
 
-Outputs are first-pass evidence triage. The service does not perform authenticated penetration testing, exploitation, certification, legal review or final procurement approval. Buyers should verify material findings before making consequential decisions.
+Outputs are first-pass evidence triage. The service does not perform authenticated penetration testing, exploitation, certification, legal review or final procurement approval. Public signals are signals, not proof. Buyers should verify material findings before consequential decisions.
