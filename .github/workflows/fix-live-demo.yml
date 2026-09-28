@@ -1,0 +1,42 @@
+name: Fix live demo route
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch demo route and link
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('public/index.html')
+          s = p.read_text()
+          old = 'https://evidencecheck-api.onrender.com/demo'
+          new = 'https://evidencecheck-api.onrender.com/payment-test'
+          if old in s:
+              p.write_text(s.replace(old, new))
+          s = Path('server.js').read_text()
+          marker = 'app.get("/payment-test",(_req,res)=>{'
+          alias = 'app.get("/demo",(_req,res)=>{\n  res.setHeader("Cache-Control","no-store, no-cache, must-revalidate, proxy-revalidate");\n  res.setHeader("Pragma","no-cache");\n  res.setHeader("Expires","0");\n  res.type("html").send(paymentTestPage());\n});\n'
+          if 'app.get("/demo",' not in s and marker in s:
+              s = s.replace(marker, alias + marker, 1)
+              Path('server.js').write_text(s)
+          PY
+      - name: Commit if changed
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/index.html server.js
+          if git diff --cached --quiet; then
+            echo 'No changes needed'
+          else
+            git commit -m 'Fix live demo route'
+            git push
+          fi
