@@ -68,9 +68,9 @@ USDC on Base mainnet (`eip155:8453`) via x402.
 For buyers that need a defined vendor review rather than an API call, the service offers a fixed-scope review starting at US$495 and recurring intake starting at US$1,250/month. These are offer prices, not claims of existing customer contracts or revenue.
 
 ## Directory submission strategy
-- **x402 List:** submit through its current `/submit` flow. Its public documentation says service submissions are free, endpoints are automatically probed for a valid HTTP 402 response, and listings are manually reviewed. urlx402 List submission documentationhttps://x402-list.com/api
-- **PayAPI Market:** submit the API for free; the marketplace currently advertises 100% of provider call revenue going to providers and verifies listings with a real payment before its verified badge. urlPayAPI Markethttps://payapi.market/
-- **Agent402:** register the public x402 origin through its seller flow; the current documentation describes free listing and direct USDC settlement to the provider wallet. urlAgent402 seller flowhttps://agent402.tools/sell
+- **x402 List:** submit through its current `/submit` flow. Its public documentation says service submissions are free, endpoints are automatically probed for a valid HTTP 402 response, and listings are manually reviewed.
+- **PayAPI Market:** submit the API for free; the marketplace currently advertises 100% of provider call revenue going to providers and verifies listings with a real payment before its verified badge.
+- **Agent402:** register the public x402 origin through its seller flow; its current documentation describes free listing and direct USDC settlement to the provider wallet.
 
 Do not pay a directory fee automatically. Do not claim listing, verification or ranking until an external directory confirms it.
 
