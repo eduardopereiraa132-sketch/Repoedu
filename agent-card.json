@@ -1,76 +1,16 @@
 {
-  "name": "Agent Web & Security Intelligence",
-  "description": "Pay-per-call HTTP APIs for AI agents: public webpage extraction, website security preflight, and deterministic business-document analysis.",
-  "payment": {
-    "protocol": "x402",
-    "version": 2,
-    "scheme": "exact",
-    "network": "eip155:8453",
-    "asset": "USDC",
-    "payTo": "0x031a713863890eb611776aadd48397873ed153ab"
-  },
-  "services": [
-    {
-      "name": "Webpage Extractor",
-      "method": "POST",
-      "path": "/web-extract",
-      "price": "$0.005",
-      "useWhen": "You already have a public webpage URL and need clean text, metadata, headings and links.",
-      "notFor": [
-        "authenticated pages",
-        "private/local URLs",
-        "browser-required JavaScript",
-        "penetration testing"
-      ]
-    },
-    {
-      "name": "Website Security Preflight",
-      "method": "POST",
-      "path": "/site-audit",
-      "price": "$0.01",
-      "useWhen": "You need a fast first-pass security signal for a public website.",
-      "notFor": [
-        "penetration testing",
-        "vulnerability scanning",
-        "certification",
-        "legal opinion"
-      ]
-    },
-    {
-      "name": "Vendor Security Preflight",
-      "method": "POST",
-      "path": "/vendor-preflight",
-      "price": "$0.025",
-      "useWhen": "You need a fast first-pass vendor-risk signal from a public website before deeper review.",
-      "notFor": [
-        "penetration testing",
-        "vulnerability scanning",
-        "certification",
-        "legal opinion"
-      ]
-    },
-    {
-      "name": "Business Document Analyzer",
-      "method": "POST",
-      "path": "/analyze",
-      "price": "$0.005",
-      "useWhen": "You need deterministic structured triage of business-document text.",
-      "notFor": [
-        "legal advice",
-        "LLM-generated opinion"
-      ]
-    }
+  "name": "EvidenceCheck",
+  "description": "Evidence-first vendor due-diligence capabilities for AI agents and procurement, third-party risk, security and compliance workflows. The service turns public vendor signals and supplied business text into structured evidence, gaps and next-step questions.",
+  "payment": {"protocol":"x402","version":2,"scheme":"exact","network":"eip155:8453","asset":"USDC","payTo":"0x031a713863890eb611776aadd48397873ed153ab"},
+  "capabilities": [
+    {"name":"Webpage Extractor","method":"POST","path":"/web-extract","price":"$0.005","useWhen":"A public webpage must be converted into clean text, metadata, headings and links.","output":"Structured webpage data"},
+    {"name":"Website Security Preflight","method":"POST","path":"/site-audit","price":"$0.01","useWhen":"A public website needs a fast first-pass security signal before deeper review.","output":"Observable headers, cookies, HTTPS and disclosure signals"},
+    {"name":"Vendor Security Preflight","method":"POST","path":"/vendor-preflight","price":"$0.025","useWhen":"A procurement or security agent needs a fast vendor-risk signal and evidence-gap checklist.","output":"Risk signal, checks, gaps, summary and limitations"},
+    {"name":"Business Document Analyzer","method":"POST","path":"/analyze","price":"$0.005","useWhen":"Business-document text needs deterministic structured triage.","output":"Dates, amounts, obligations, security signals, gaps and risk flags"}
   ],
-  "docs": {
-    "openapi": "/openapi.json",
-    "skill": "/skill.md",
-    "llms": "/llms.txt",
-    "x402": "/.well-known/x402",
-    "discovery": "/.well-known/x402-discovery"
-  },
-  "version": "2.3.0",
-  "discovery": {
-    "bazaar": "x402 Bazaar metadata is declared on every paid endpoint; catalog inclusion depends on a compatible facilitator and a real paid request.",
-    "wellKnown": "/.well-known/x402-discovery is an additional proposal-format discovery document."
-  }
+  "trustBoundary": ["first-pass due diligence only","not a penetration test","not a vulnerability scanner","not a certification or attestation","not legal advice","material decisions require human verification"],
+  "docs":{"openapi":"/openapi.json","skill":"/skill.md","llms":"/llms.txt","x402":"/.well-known/x402","discovery":"/.well-known/x402-discovery.json"},
+  "human":{"buyer":"/buy.html","demo":"/demo"},
+  "discovery":{"bazaar":"Paid routes declare x402 Bazaar metadata for compatible facilitators/catalogs.","wellKnown":"/.well-known/x402-discovery.json"},
+  "version":"3.0.0"
 }
