@@ -8,13 +8,15 @@
 
 **Human buyer page:** https://repoedu.onrender.com/buy.html
 
+**Universal machine manifest:** https://repoedu.onrender.com/.well-known/agent.json
+
+**Agent card:** https://repoedu.onrender.com/.well-known/agent-card.json
+
 **OpenAPI:** https://repoedu.onrender.com/openapi.json
 
 **LLM instructions:** https://repoedu.onrender.com/llms.txt
 
 **Skill:** https://repoedu.onrender.com/skill.md
-
-**Agent card:** https://repoedu.onrender.com/.well-known/agent-card.json
 
 **x402 discovery:** https://repoedu.onrender.com/.well-known/x402-discovery.json
 
@@ -33,6 +35,10 @@
 - Network: Base mainnet (`eip155:8453`)
 - Asset: USDC
 - Recipient: `0x031a713863890eb611776aadd48397873ed153ab`
+
+## Discovery strategy
+
+The paid routes publish x402 Bazaar discovery metadata through the x402 extension, and the service exposes OpenAPI, llms.txt, skill.md, an agent card and a universal `.well-known/agent.json` manifest. Compatible x402 directories can therefore index the service without a private integration. No single registry can truthfully guarantee reach to every agent; actual usage still depends on task fit, discovery policy, budget and trust rules.
 
 ## Selection guidance for agents
 
