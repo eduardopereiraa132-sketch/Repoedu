@@ -1,80 +1,88 @@
-# Vendor Intelligence Agent
+# EvidenceCheck
 
 ## Hero
 
-**Know what is missing before you approve a vendor.**
+**Know what a vendor's evidence actually supports — before you approve it.**
 
-AI-assisted vendor due diligence for procurement, security and compliance teams.
+EvidenceCheck is a first-pass vendor due-diligence workflow for procurement, security, compliance and third-party-risk teams. Give it a vendor URL or supplied business evidence and get a structured verification queue: what was observed, what is missing, what to ask the supplier next, and what still needs human review.
 
-Paste a vendor URL and add the evidence you already have. Get a structured first-pass review that separates **observed evidence, gaps and items that still require human verification**.
+**Primary CTA:** Run a vendor preflight  
+**Secondary CTA:** Try the API
 
-**Primary CTA:** Run a vendor assessment  
-**Secondary CTA:** See the machine API
+### The fastest useful question
+**Should this vendor move forward, or does the evidence need more work?**
 
-## The problem
-
-Vendor onboarding often means chasing PDFs, security questionnaires, contract clauses, browser tabs and email threads. The bottleneck is not finding one more AI summary; it is turning scattered evidence into a repeatable review that a team can actually act on.
-
-Vendor Intelligence Agent turns that first-pass work into a consistent workflow.
+EvidenceCheck does not pretend that a public website proves security. It turns observable evidence into a repeatable triage step before your team spends hours on questionnaires, PDFs and manual research.
 
 ## What you get
 
-- **Public-site security preflight** — observable HTTPS, security headers, cookies, robots/security files and disclosure signals.
-- **Document intelligence** — obligations, dates, monetary commitments, security signals, missing areas and risk flags.
-- **Evidence-aware assessment** — findings are separated from inference and unknowns.
-- **Gap checklist** — missing evidence becomes concrete supplier questions.
-- **Executive-ready output** — concise summary plus machine-readable detail.
-- **Audit-friendly limitations** — clear boundaries around what was and was not verified.
+- **Vendor preflight** — public evidence, security signals, gaps, targeted supplier questions and limitations in one structured response.
+- **Website security preflight** — observable HTTPS, security headers, cookie flags, robots/security files and other public signals.
+- **Document intelligence** — dates, monetary amounts, obligations, security signals, missing areas and risk flags.
+- **Evidence vs. unknowns** — findings are separated from inference so reviewers can see what is actually supported.
+- **Action queue** — missing evidence becomes concrete follow-up questions instead of a vague summary.
+- **Machine-readable output** — JSON for procurement, GRC, workflow automation and AI agents.
 
-## Why it is different
+## Why teams use it
 
-**It does not pretend to be a penetration test.**
+Vendor review time is often spent on collection and first-pass triage rather than the decisions that require experienced judgment. EvidenceCheck handles the repeatable layer and makes the handoff explicit.
 
-The system is deliberately positioned as a first-pass due-diligence layer. It helps teams collect, extract and triage evidence faster without presenting public signals as proof of security.
+**The product is not another generic AI summarizer.** The output is designed around a decision workflow:
 
-That makes the output useful for procurement and security workflows while keeping material decisions with authorized people.
+**Evidence → gaps → supplier questions → human review**
 
-## Best fit
+## Try before you commit
 
-- Procurement teams onboarding multiple software vendors
-- Security teams triaging vendor reviews before deeper assessment
-- Compliance teams collecting evidence for recurring reviews
-- B2B companies that need a repeatable supplier-review process
+### Machine API
+Use individual capabilities on a pay-per-request basis. Compatible agents can call the endpoints with USDC on Base through x402.
 
-## Pilot
+- `/vendor-preflight` — **US$0.025**
+- `/site-audit` — **US$0.01**
+- `/web-extract` — **US$0.005**
+- `/analyze` — **US$0.005**
 
-**Start with a defined vendor set rather than committing to a large rollout.**
+The low entry prices are deliberate: the easiest way to evaluate the product is to run one real check.
 
-US$2,500 implementation pilot + US$500/month.
+### Human-led review
+For organizations that need a defined review rather than an API call, EvidenceCheck offers a fixed-scope vendor review and recurring intake. Scope, turnaround and human-review requirements are confirmed before purchase.
 
-Pilot includes assessment configuration, the first vendor set, structured reports and measurement of review time and human-intervention rate.
+**Fixed-scope starting offer: US$495**  
+One defined vendor review, public-site preflight, supplied-document review, structured findings/gaps and a target 48-hour turnaround.
 
-For smaller proof-of-value engagements, request a fixed-scope quote.
+**Recurring intake starting offer: US$1,250/month**  
+Up to 10 vendor preflights per month with a consistent review workflow and monthly evidence summary, subject to final scope.
 
-## Machine-to-machine API
+These are offer prices, not claims of existing customers or revenue.
 
-Individual capabilities are also available as x402-paid endpoints on Base using USDC. This lets compatible AI agents and software call specific functions programmatically instead of purchasing the full workflow.
+## Example workflow
 
-Examples include webpage extraction, website security preflight, vendor security preflight and business-document analysis.
+1. Submit the vendor's public URL.
+2. EvidenceCheck collects observable signals.
+3. The system identifies gaps and generates targeted supplier questions.
+4. Your workflow receives structured JSON.
+5. A human reviewer decides whether to approve, request evidence or escalate.
 
-## Trust & limitations
+## Built for agents too
 
-- Not a penetration test.
-- Not a certification or compliance attestation.
-- Not legal advice.
-- Public-site signals do not prove the absence or presence of vulnerabilities.
-- Material procurement and security decisions remain subject to human review.
+EvidenceCheck exposes machine-readable discovery through OpenAPI, `llms.txt`, skill metadata and x402 discovery metadata. A compatible agent can discover a capability, understand its schema and price, pay for a single request and receive structured output without a subscription.
+
+## Trust boundary
+
+EvidenceCheck is **first-pass due diligence**, not a penetration test, vulnerability scanner, certification, legal opinion or compliance attestation. Public signals do not prove that a control exists or that a system is secure. Material decisions remain with authorized people.
 
 ## FAQ
 
-### Does it replace procurement or security staff?
-No. It automates collection, extraction, triage and follow-up preparation so people can spend more time on the decisions that require judgment.
+### Does it replace a security or procurement team?
+No. It reduces repetitive collection and triage so qualified people can focus on decisions and exceptions.
 
 ### Does it test a vendor's systems?
-No. The current first-pass workflow uses publicly observable website signals and supplied documents. It does not perform authenticated testing or exploitation.
+No. The current workflow is limited to public website signals and supplied business/security evidence. It does not perform authenticated testing or exploitation.
 
-### Can it use our questionnaire or control framework?
-Yes as a commercial customization. Requirements can be mapped into the preflight workflow and supplier-question checklist.
+### What makes the output different from a normal AI summary?
+The workflow explicitly separates observed evidence, gaps, supplier questions and limitations. The result is intended to become a review queue, not just prose.
 
-### Can an AI agent buy a single capability?
-Yes. The machine-facing API exposes priced x402 endpoints for compatible buyers, with Base mainnet/USDC payment metadata and discovery information.
+### Can an AI agent buy a single check?
+Yes. The machine API exposes priced x402 endpoints on Base with USDC payment metadata and discovery information.
+
+### Can I try it without a contract?
+Yes. The machine endpoints are pay-per-request. The smallest checks cost fractions of a dollar, so a buyer can validate the output before considering a larger engagement.
