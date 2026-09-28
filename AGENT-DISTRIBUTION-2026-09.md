@@ -3,11 +3,14 @@
 ## Goal
 Maximize machine discoverability of EvidenceCheck and reach buyers who already use pay-per-call agent services, without claiming guaranteed traffic or fabricated traction.
 
-## Why this category is commercially credible
-Vendor security assessments and third-party risk management are established workflows. Current TPRM platforms explicitly support vendor inventories, questionnaires, evidence collection, risk classification, assessments and decision records. EvidenceCheck is positioned as a narrower first-pass layer rather than a replacement for a full TPRM platform.
+## Positioning
+**EvidenceCheck is the verification step before the expensive vendor review.** Its strongest job is `vendor-preflight`: check what a supplier's public evidence supports, identify what is still unknown, and produce targeted questions before a team spends hours on a questionnaire or deeper review.
+
+It is deliberately narrower than a full TPRM platform and more evidence-bounded than a generic AI summary.
 
 ## Canonical machine entry points
-- Base URL: https://repoedu.onrender.com
+- API: https://evidencecheck-api.onrender.com
+- Buyer site: https://evidencecheck-site.onrender.com
 - OpenAPI: /openapi.json
 - LLM instructions: /llms.txt
 - Skill: /skill.md
@@ -17,48 +20,50 @@ Vendor security assessments and third-party risk management are established work
 - Human buyer brief: /buyer-brief.html
 
 ## Discovery channels — current priority
-1. **x402 Bazaar** — native x402 discovery layer. The x402 project documents Bazaar as a machine-readable catalog for payable HTTP endpoints and MCP tools; routes need the Bazaar extension to become discoverable. Keep schemas, prices and payment requirements accurate.
-2. **Agent402 Marketplace** — currently lists tens of thousands of discoverable services and describes free registration, semantic buyer discovery and direct USDC settlement. Prepare a listing using the canonical service URL and the strongest single use case: vendor preflight before approval.
-3. **PayAPI Market** — currently advertises free API listing, agent search, x402 settlement and a verified-provider concept. Submit only after the public endpoint passes a real mainnet payment test; do not claim verification before that.
-4. **x402.new** — currently advertises a large live directory of x402 services. Maintain machine-readable discovery endpoints and monitor whether EvidenceCheck appears after indexing.
-5. **x402 List / x402scan and compatible community directories** — submit the public service URL where permitted. Any paid review/listing fee requires explicit owner approval and should not be paid automatically.
-6. **Direct discovery** — keep OpenAPI, llms.txt, skill.md and well-known metadata stable so agents can discover the service without a pre-existing integration.
+1. **x402 Bazaar** — native x402 discovery layer. Keep schemas, prices and payment requirements accurate so compatible discovery clients can index the paid routes.
+2. **Agent402 Marketplace** — current marketplace materials describe free registration, semantic buyer discovery and direct USDC settlement. Listing copy should lead with `vendor-preflight`, not the generic extractor endpoints.
+3. **PayAPI Market** — current materials advertise free API listing, agent search, x402 settlement and settlement-verified listings. Submit after a real mainnet payment test; never claim verification beforehand.
+4. **x402.new** — maintain machine-readable discovery endpoints and monitor indexing.
+5. **x402 List / x402scan / community directories** — submit where permitted. Do not pay a listing or review fee without explicit owner approval.
+6. **Direct discovery** — keep OpenAPI, llms.txt, skill.md and well-known metadata stable so agents can discover the service without a prior integration.
 
 ## Listing copy
 **Service name:** EvidenceCheck
 
 **One-line pitch:** Verify what a vendor's public evidence supports before you approve or escalate the review.
 
-**Description:** Evidence-first vendor due-diligence API for procurement, third-party risk, security and compliance workflows. Give it a vendor URL or supplied business/security evidence and receive structured observable signals, gaps, targeted supplier questions and explicit human-review points. Pay per request in USDC on Base via x402.
+**Description:** Evidence-first vendor due-diligence API for procurement, third-party risk, security and compliance workflows. Give it a vendor URL or supplied business/security evidence and receive observable signals, explicit evidence gaps, targeted supplier questions and human-review boundaries. Pay per request in USDC on Base via x402.
 
 **Best first use case:** `vendor-preflight` — a fast first-pass check before a team spends hours on a full questionnaire or review.
 
 **Protected paths:**
-- `/web-extract`
-- `/site-audit`
 - `/vendor-preflight`
+- `/site-audit`
+- `/web-extract`
 - `/analyze`
 
-## Commercial positioning
-Lead with the specific job: **"Check what a vendor's public evidence supports before you approve or escalate the review."** Avoid generic "AI security" claims. The buyer is not purchasing a chatbot; they are purchasing a verification step and a structured next-action queue.
+## Buyer-facing proof strategy
+- Show a concrete live example before asking for a larger purchase.
+- Keep the output schema deterministic and easy to inspect.
+- Make limitations explicit: public evidence is not proof; unknown is not absent.
+- Keep entry pricing low enough for an agent to test without approval friction.
+- Do not manufacture testimonials, customer logos, revenue, uptime, verification badges or buyer volume.
 
-## Conversion assets
-- Main landing page: `/`
-- Buyer page: `/buy.html`
-- Buyer brief: `/buyer-brief.html`
-- Decision workflow: `/decision-kit.html`
-- Human-led offer: `/offer.html`
-- Live example: `/demo`
-- Free preview: `/assessment-page.html`
+## Commercial ladder
+1. Free preview / example.
+2. $0.005–$0.025 machine call for a focused task.
+3. $495 fixed-scope human-led vendor review.
+4. $1,250/month recurring intake starting package.
+5. Higher-volume team program from $2,500/month.
 
-The product should show a real example before asking for a larger purchase. Do not manufacture testimonials, customer logos, revenue, uptime or verification claims.
+These are offer prices, not guaranteed revenue.
 
 ## Buyer funnel
-1. Agent or human discovers the capability.
-2. Buyer sees a concrete example and machine-readable schema.
-3. Buyer runs a low-cost or free preview.
-4. Buyer uses the focused API call if the result is useful.
-5. Human buyer can escalate to the fixed-scope review or recurring intake.
+1. Agent or human discovers EvidenceCheck.
+2. It evaluates the narrow capability and schema.
+3. It runs a low-cost or free preview.
+4. It pays for the focused call if the result is useful.
+5. A human buyer can escalate to a defined review or recurring intake.
 
 ## Important constraint
-No directory can truthfully guarantee exposure to every existing agent. Listing improves discoverability; actual calls depend on an agent's discovery method, task fit, budget, trust policy and endpoint availability.
+No directory can truthfully guarantee exposure to every existing agent. Listing improves discoverability; actual calls depend on an agent's discovery method, task fit, budget, trust policy, endpoint availability and reputation.
