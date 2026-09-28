@@ -2,16 +2,18 @@
   "schema": "x402-discovery/v1",
   "name": "EvidenceCheck",
   "description": "Evidence-first vendor due-diligence capabilities for procurement, third-party risk, security and compliance workflows.",
+  "category": "security",
   "baseUrl": "https://repoedu.onrender.com",
+  "website": "https://evidencecheck-site.onrender.com/buy.html",
   "protocol": "x402",
   "payment": {"network":"eip155:8453","asset":"USDC","scheme":"exact","payTo":"0x031a713863890eb611776aadd48397873ed153ab"},
   "capabilities": [
-    {"id":"web-extract","method":"POST","path":"/web-extract","price":"$0.005","input":"Public webpage URL","output":"Clean text, metadata, headings and links"},
-    {"id":"site-audit","method":"POST","path":"/site-audit","price":"$0.01","input":"Public website URL","output":"Observable security preflight signals and disclosure checks"},
-    {"id":"vendor-preflight","method":"POST","path":"/vendor-preflight","price":"$0.025","input":"Public vendor URL plus optional requirements","output":"Vendor risk signal, evidence gaps, supplier questions and limitations"},
-    {"id":"document-analyzer","method":"POST","path":"/analyze","price":"$0.005","input":"Business document text","output":"Dates, amounts, obligations, security signals, gaps and risk flags"}
+    {"id":"web-extract","method":"POST","path":"/web-extract","price":"$0.005","inputSchema":{"type":"object","required":["url"],"properties":{"url":{"type":"string","format":"uri"}}},"exampleInput":{"url":"https://example.com/security"},"output":"Clean text, metadata, headings and links"},
+    {"id":"site-audit","method":"POST","path":"/site-audit","price":"$0.01","inputSchema":{"type":"object","required":["url"],"properties":{"url":{"type":"string","format":"uri"}}},"exampleInput":{"url":"https://example.com"},"output":"Observable security preflight signals and disclosure checks"},
+    {"id":"vendor-preflight","method":"POST","path":"/vendor-preflight","price":"$0.025","inputSchema":{"type":"object","required":["url"],"properties":{"url":{"type":"string","format":"uri"},"requirements":{"type":"array","items":{"type":"string"}}}},"exampleInput":{"url":"https://example.com","requirements":["access control","incident response","data protection"]},"output":"Vendor risk signal, evidence gaps, supplier questions and limitations"},
+    {"id":"document-analyzer","method":"POST","path":"/analyze","price":"$0.005","inputSchema":{"type":"object","required":["text"],"properties":{"text":{"type":"string"}}},"exampleInput":{"text":"Supplier agreement: annual fee USD 24,000. Renewal date 31 December. Supplier must notify incidents within 24 hours."},"output":"Dates, amounts, obligations, security signals, gaps and risk flags"}
   ],
   "machineDocs": {"openapi":"/openapi.json","llms":"/llms.txt","skill":"/skill.md","agentCard":"/.well-known/agent-card.json","x402":"/.well-known/x402"},
-  "humanDocs": {"buyer":"/buy.html","demo":"/demo"},
+  "humanDocs": {"buyer":"/buy.html","decisionKit":"/decision-kit.html","demo":"/demo"},
   "trustBoundary": ["first-pass due diligence only","not a penetration test","not a certification","not legal advice","material decisions require human verification"]
 }
