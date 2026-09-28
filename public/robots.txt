@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://evidencecheck-site.onrender.com/sitemap.xml
