@@ -1,33 +1,17 @@
 {
   "name": "EvidenceCheck",
   "description": "Evidence-first vendor due-diligence and public-web security preflight APIs for procurement, third-party risk, security/compliance teams and AI agents.",
-  "url": "https://repoedu.onrender.com",
-  "version": "2.5.0",
-  "capabilities": [
-    "public-web-extraction",
-    "website-security-preflight",
-    "vendor-security-preflight",
-    "business-document-analysis",
-    "fixed-scope-human-review"
-  ],
+  "url": "https://evidencecheck-api.onrender.com",
+  "version": "2.6.0",
+  "capabilities": ["public-web-extraction","website-security-preflight","vendor-security-preflight","business-document-analysis","fixed-scope-human-review"],
   "interfaces": {
-    "openapi": "https://repoedu.onrender.com/openapi.json",
-    "llms": "https://repoedu.onrender.com/llms.txt",
-    "skill": "https://repoedu.onrender.com/skill.md",
-    "demo": "https://repoedu.onrender.com/demo"
+    "api": "https://evidencecheck-api.onrender.com",
+    "openapi": "https://evidencecheck-api.onrender.com/openapi.json",
+    "llms": "https://evidencecheck-api.onrender.com/llms.txt",
+    "skill": "https://evidencecheck-api.onrender.com/skill.md",
+    "demo": "https://evidencecheck-site.onrender.com/demo"
   },
-  "payment": {
-    "protocol": "x402",
-    "network": "eip155:8453",
-    "asset": "USDC",
-    "settlement": "per-request"
-  },
-  "pricing": {
-    "web_extract": "$0.005",
-    "site_audit": "$0.01",
-    "vendor_preflight": "$0.025",
-    "document_analysis": "$0.005",
-    "currency": "USD-equivalent USDC"
-  },
-  "trust_boundary": "Outputs are first-pass evidence and public signals. They are not certification, penetration testing, legal advice, proof of compliance, or a substitute for authorized human review."
+  "payment": {"protocol":"x402","network":"eip155:8453","asset":"USDC","settlement":"per-request","payTo":"0x031a713863890eb611776aadd48397873ed153ab"},
+  "pricing": {"web_extract":"$0.005","site_audit":"$0.01","vendor_preflight":"$0.025","document_analysis":"$0.005","currency":"USD-equivalent USDC"},
+  "trust_boundary":"Outputs are first-pass evidence and public signals. They are not certification, penetration testing, legal advice, proof of compliance, or a substitute for authorized human review."
 }
