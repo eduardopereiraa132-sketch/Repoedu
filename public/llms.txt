@@ -1,28 +1,41 @@
 # EvidenceCheck
 
-EvidenceCheck is an evidence-first vendor due-diligence service for procurement, third-party risk, security/compliance teams and AI agents.
+EvidenceCheck is an evidence-first vendor due-diligence and public-signal analysis service for procurement, third-party risk, security/compliance teams and AI agents.
 
-## Primary capabilities
-- POST /web-extract — clean public webpage extraction; starting at $0.005 USDC
-- POST /site-audit — public website security preflight; $0.01 USDC
-- POST /vendor-preflight — vendor evidence, gaps and supplier questions; $0.025 USDC
-- POST /analyze — business-document analysis
+## Core buyer problem
+Repeated vendor first-pass research is slow: teams collect public signals, copy notes, compare basic controls and still need to identify missing evidence and supplier follow-up questions. EvidenceCheck turns that repetitive first pass into narrow, composable machine tasks.
+
+## Primary paid capabilities
+- POST /web-extract — extract clean public webpage text, metadata, headings and links; from $0.005 USDC
+- POST /site-audit — inspect observable website security signals such as HTTPS, security headers, cookie flags, robots.txt and security.txt; $0.01 USDC
+- POST /vendor-preflight — combine public vendor signals into evidence gaps, risk indicators and concrete supplier questions; $0.025 USDC
+- POST /analyze — analyze supplied business-document text
 - /review-purchase — fixed-scope human-led vendor review
 
 ## Machine interfaces
 - https://evidencecheck-api.onrender.com/openapi.json
 - https://evidencecheck-api.onrender.com/skill.md
 - https://evidencecheck-api.onrender.com/basedagents.json
-- https://evidencecheck-site.onrender.com/demo
+- https://evidencecheck-api.onrender.com/.well-known/agent-card.json
+- https://evidencecheck-api.onrender.com/stats
+- https://evidencecheck-site.onrender.com/
 
 ## Payment
 Paid machine endpoints use x402 with USDC on Base mainnet (eip155:8453). Payment is per request; no subscription is required for API calls.
 
+## Recommended agent flow
+1. Discover service metadata and OpenAPI.
+2. Choose the narrowest endpoint that satisfies the task.
+3. Send the request and follow the x402 payment challenge when required.
+4. Parse the JSON result.
+5. Preserve limitations and evidence gaps in downstream reasoning.
+6. Ask the vendor or a qualified reviewer to verify material findings.
+
 ## Trust boundary
-Outputs are first-pass evidence and signals. They are not certification, a penetration test, a legal opinion, or proof that a vendor is secure/compliant. Material findings require appropriate human verification.
+Outputs are first-pass evidence and public signals. They are not certification, a penetration test, a legal opinion, proof of compliance, or proof that a vendor is secure. Material findings require appropriate human verification.
 
 ## Best-fit buyer
 Procurement and third-party-risk workflows that repeatedly need to answer: what can we observe publicly, what evidence is missing, and what should we ask the supplier next?
 
-## Commercial intent
-The product is designed to reduce repetitive first-pass vendor research and turn missing evidence into concrete next actions. It is intentionally composable: agents can call a narrow endpoint and continue their own workflow with the returned JSON.
+## Commercial positioning
+EvidenceCheck is intentionally composable. A buyer or agent can pay a few cents for one narrow task instead of adopting a large workflow platform. The product is useful when the cost of repetitive first-pass research is higher than the cost of an automated evidence primitive.
