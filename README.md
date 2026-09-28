@@ -2,13 +2,15 @@
 
 **Know what is missing before you approve a vendor.**
 
-AI-assisted first-pass vendor due diligence for procurement, security and compliance teams, with machine-facing x402 endpoints for compatible AI agents and software.
+AI-assisted first-pass vendor due diligence for procurement, security and compliance teams — now exposed both as pay-per-request x402 capabilities and as an earning agent that can claim funded work from the BasedAgents marketplace.
 
 ## Live service
 
 - Live: https://repoedu.onrender.com
 - Demo: https://repoedu.onrender.com/demo
 - API definition: https://repoedu.onrender.com/openapi.json
+- Machine skill: https://repoedu.onrender.com/skill.md
+- Agent manifest: https://repoedu.onrender.com/basedagents.json
 
 ## The job it removes
 
@@ -35,7 +37,7 @@ The product is not positioned as another generic AI summarizer. Its value is the
 
 ## Machine API
 
-Paid x402 endpoints on Base mainnet/USDC currently include:
+Paid x402 endpoints on Base mainnet/USDC:
 
 | Endpoint | Purpose | Entry price |
 |---|---|---:|
@@ -45,7 +47,13 @@ Paid x402 endpoints on Base mainnet/USDC currently include:
 | `/analyze` | Business-document analysis | US$0.005 |
 | `/review-purchase` | Fixed-scope vendor review intake | US$495 |
 
-The low-cost endpoints make individual capabilities easy to test. The fixed-scope review turns the same workflow into a human-led commercial engagement.
+The low-cost endpoints are deliberately easy for software and AI agents to trial. The fixed-scope review turns the same workflow into a human-led commercial engagement.
+
+## Autonomous earning path
+
+The service also runs a separate BasedAgents worker. It registers an agent identity, associates the payout wallet on Base, monitors open funded tasks, filters for vendor/security/procurement work within configured economics, claims suitable tasks, produces evidence-first deliverables and submits signed receipts.
+
+This is a second revenue path rather than a replacement for the API: **x402 lets buyers pay this service; BasedAgents lets the service look for already-funded work.** BasedAgents settles accepted bounties in USDC on Base. See `BASEDAGENTS.md` for the operating rules.
 
 ## Commercial packages
 
@@ -66,6 +74,6 @@ This is a first-pass due-diligence workflow. It is **not** a penetration test, c
 
 ## Machine discovery
 
-The service publishes machine-readable OpenAPI and x402/Bazaar discovery metadata so compatible buyers can discover paid capabilities programmatically. The production service uses Base mainnet (`eip155:8453`) and USDC.
+The service publishes machine-readable OpenAPI, x402 and agent-discovery metadata so compatible buyers can discover paid capabilities programmatically. The production service uses Base mainnet (`eip155:8453`) and USDC. Receiving wallet: `0x031a713863890eb611776aadd48397873ed153ab`.
 
-See `BUYER-QUICKSTART.md` for the buyer decision guide and `AGENT-DISCOVERY.md` for the machine-facing discovery card.
+See `BUYER-QUICKSTART.md`, `AGENT-DISCOVERY.md`, `skill.md` and `BASEDAGENTS.md` for machine-facing usage.
