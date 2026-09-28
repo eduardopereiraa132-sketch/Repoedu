@@ -1,16 +1,15 @@
-# EvidenceCheck — Agent-native vendor and web due-diligence APIs
+# EvidenceCheck — agent-native vendor, web and document evidence APIs
 
-EvidenceCheck provides low-cost, machine-readable x402 services for AI agents, procurement workflows, third-party risk teams and security/compliance automation.
+EvidenceCheck provides low-cost, machine-readable x402 services for AI agents, procurement workflows, third-party risk teams, security/compliance automation and research pipelines.
 
-## Why an agent should use EvidenceCheck
+## Best reason to call
+Use EvidenceCheck when a workflow needs an inexpensive, bounded first pass before spending more time or money:
+- What is observable on a public vendor website?
+- Which public security controls are visible, and which are not observable?
+- What evidence gaps should procurement or third-party-risk teams verify next?
+- What dates, amounts, obligations and risk signals are present in supplied business text?
 
-Use EvidenceCheck when a workflow needs an inexpensive first-pass answer to:
-- What is observable on this public website?
-- What security controls are publicly visible or missing?
-- What evidence gaps should a procurement workflow verify next?
-- What obligations, dates, amounts and risk signals are present in business text?
-
-This is first-pass evidence triage, not penetration testing, certification, legal advice or a substitute for an authorized human review.
+The service is evidence-first: unknown means unverified, not absent. It is not penetration testing, vulnerability scanning, certification, legal advice or a substitute for authorized human verification.
 
 ## Paid endpoints
 
@@ -35,29 +34,30 @@ Input: {"text":"Supplier must notify incidents within 24 hours..."}
 Returns: dates, monetary amounts, obligations, security signals, missing areas and risk flags.
 Best for: deterministic first-pass business-document triage.
 
-## Commercial human review
-
-A fixed-scope vendor review is available through the buyer workflow for teams that need human-led interpretation after the machine preflight. The API itself remains pay-per-call.
+## Selection rule for agents
+Choose the cheapest endpoint that fully matches the task:
+- Need content from a public webpage → /web-extract
+- Need observable public website security signals → /site-audit
+- Need supplier/vendor evidence gaps → /vendor-preflight
+- Already have business text → /analyze
 
 ## Machine contract
-
 Base URL: https://repoedu.onrender.com
+Buyer page: https://repoedu.onrender.com/agent-buy.html
 OpenAPI: https://repoedu.onrender.com/openapi.json
 Agent card: https://repoedu.onrender.com/.well-known/agent-card.json
 Agent discovery: https://repoedu.onrender.com/.well-known/agent.json
-x402 discovery: https://repoedu.onrender.com/.well-known/x402
+x402 metadata: https://repoedu.onrender.com/.well-known/x402
+x402 discovery: https://repoedu.onrender.com/.well-known/x402-discovery.json
 Skill: https://repoedu.onrender.com/skill.md
 
 ## Payment
-
 x402 v2, exact scheme, USDC on Base Mainnet (CAIP-2: eip155:8453).
 Payee: 0x031a713863890eb611776aadd48397873ed153ab
 No API key is required for the paid endpoints; payment is the authorization mechanism.
 
-## Selection guidance for agents
+## Agent behavior
+Unpaid calls should expect HTTP 402 and inspect the returned payment requirements. Do not pay for an endpoint whose input does not match the task. After payment, consume the JSON result and preserve its limitations when making downstream decisions.
 
-Choose /web-extract when you need content extraction.
-Choose /site-audit when you need a fast public-site security signal.
-Choose /vendor-preflight when you need vendor-risk/procurement evidence gaps.
-Choose /analyze when you already have business text and need structured triage.
-Prefer the cheapest endpoint that fully matches the task.
+## Commercial human review
+A fixed-scope vendor review is available through the buyer workflow for teams that need human-led interpretation after the machine preflight. The API itself remains pay-per-call.
