@@ -1,10 +1,8 @@
 User-agent: *
 Allow: /
 
-# Machine-readable discovery entry points
-Sitemap: https://repoedu.onrender.com/sitemap.xml
+Sitemap: https://evidencecheck-site.onrender.com/sitemap.xml
 
-# LLM / agent discovery
-LLMs-Txt: https://repoedu.onrender.com/llms.txt
-Agent-Card: https://repoedu.onrender.com/.well-known/agent.json
-X402-Discovery: https://repoedu.onrender.com/.well-known/x402-discovery.json
+# Machine-readable entry points
+# API: https://evidencecheck-api.onrender.com/agent-discovery.json
+# LLM: https://evidencecheck-api.onrender.com/llms.txt
