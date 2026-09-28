@@ -1,0 +1,16 @@
+{
+  "service":"EvidenceCheck",
+  "api":"https://evidencecheck-api.onrender.com",
+  "website":"https://evidencecheck-site.onrender.com",
+  "protocol":"x402",
+  "network":"eip155:8453",
+  "asset":"USDC",
+  "scheme":"exact",
+  "payTo":"0x031a713863890eb611776aadd48397873ed153ab",
+  "resources":[
+    {"url":"https://evidencecheck-api.onrender.com/web-extract","method":"POST","price":"$0.005"},
+    {"url":"https://evidencecheck-api.onrender.com/site-audit","method":"POST","price":"$0.01"},
+    {"url":"https://evidencecheck-api.onrender.com/vendor-preflight","method":"POST","price":"$0.025"},
+    {"url":"https://evidencecheck-api.onrender.com/analyze","method":"POST","price":"$0.005"}
+  ]
+}
