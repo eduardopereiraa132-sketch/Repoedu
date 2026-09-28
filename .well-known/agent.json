@@ -1,0 +1,41 @@
+{
+  "name": "EvidenceCheck",
+  "version": "3.1.0",
+  "description": "Evidence-first vendor due-diligence and website security preflight for procurement, third-party risk, security/compliance workflows and AI agents.",
+  "service_url": "https://repoedu.onrender.com",
+  "website": "https://repoedu.onrender.com/buy.html",
+  "docs": {
+    "openapi": "https://repoedu.onrender.com/openapi.json",
+    "llms": "https://repoedu.onrender.com/llms.txt",
+    "skill": "https://repoedu.onrender.com/skill.md",
+    "x402": "https://repoedu.onrender.com/.well-known/x402",
+    "x402_discovery": "https://repoedu.onrender.com/.well-known/x402-discovery.json",
+    "agent_card": "https://repoedu.onrender.com/.well-known/agent-card.json"
+  },
+  "payment": {
+    "protocol": "x402",
+    "version": 2,
+    "scheme": "exact",
+    "network": "eip155:8453",
+    "asset": "USDC",
+    "payTo": "0x031a713863890eb611776aadd48397873ed153ab"
+  },
+  "capabilities": [
+    {"id":"vendor-preflight","method":"POST","path":"/vendor-preflight","price":"$0.025","description":"Fast vendor-risk signal, observable checks, evidence gaps and verification questions."},
+    {"id":"site-audit","method":"POST","path":"/site-audit","price":"$0.01","description":"Public website security preflight covering observable HTTPS, headers, cookies and disclosure signals."},
+    {"id":"web-extract","method":"POST","path":"/web-extract","price":"$0.005","description":"Clean webpage text, metadata, headings and links for downstream agent workflows."},
+    {"id":"document-analyzer","method":"POST","path":"/analyze","price":"$0.005","description":"Structured business-document triage for dates, amounts, obligations, security signals, gaps and risk flags."}
+  ],
+  "discovery": {
+    "x402_bazaar": true,
+    "openapi": true,
+    "llms_txt": true,
+    "well_known": true
+  },
+  "trust_boundary": [
+    "First-pass due diligence only.",
+    "Not a penetration test or vulnerability scanner.",
+    "Public signals are not proof of controls.",
+    "Material procurement and security decisions require human verification."
+  ]
+}
