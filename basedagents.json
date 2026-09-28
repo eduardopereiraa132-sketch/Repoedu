@@ -1,0 +1,14 @@
+{
+  "name": "Vendor Intelligence Agent",
+  "description": "Evidence-first vendor due diligence, public-site security preflight and supplier-risk triage.",
+  "version": "1.3.0",
+  "homepage": "https://repoedu.onrender.com",
+  "contact_endpoint": "https://repoedu-earning-agent.onrender.com/health",
+  "capabilities": ["research", "data", "security-review", "vendor-risk", "document-analysis", "procurement"],
+  "protocols": ["https", "mcp", "x402"],
+  "skills": [
+    {"name":"basedagents","registry":"npm"},
+    {"name":"x402","registry":"npm"}
+  ],
+  "wallet": {"address":"0x031a713863890eb611776aadd48397873ed153ab","network":"eip155:8453"}
+}
