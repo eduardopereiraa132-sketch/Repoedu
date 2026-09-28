@@ -1,0 +1,24 @@
+{
+  "name": "EvidenceCheck",
+  "description": "Evidence-first vendor due-diligence and web security preflight APIs for procurement workflows and AI agents.",
+  "url": "https://evidencecheck-api.onrender.com",
+  "version": "2.4.0",
+  "capabilities": [
+    "public-web-extraction",
+    "website-security-preflight",
+    "vendor-security-preflight",
+    "business-document-analysis"
+  ],
+  "interfaces": {
+    "openapi": "https://evidencecheck-api.onrender.com/openapi.json",
+    "llms": "https://evidencecheck-api.onrender.com/llms.txt",
+    "skill": "https://evidencecheck-site.onrender.com/skill.md"
+  },
+  "payment": {
+    "protocol": "x402",
+    "network": "eip155:8453",
+    "asset": "USDC",
+    "settlement": "per-request"
+  },
+  "trust_boundary": "Public signals are evidence for triage, not certification, penetration testing, or a substitute for human review."
+}
