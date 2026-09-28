@@ -2,50 +2,37 @@
 
 **Know what to verify before you approve.**
 
-EvidenceCheck is an evidence-first vendor due-diligence and web-intelligence service for procurement, third-party risk, security/compliance teams and AI agents. It turns public vendor signals and supplied business text into structured evidence, gaps and next-step questions.
+EvidenceCheck is an evidence-first vendor due-diligence and public web-intelligence service for procurement, third-party risk, security/compliance teams and AI agents. It turns public vendor signals and supplied business text into structured evidence, explicit gaps, targeted supplier questions and a clear next-action queue.
 
 ## Buyer-first entry points
 
-**Canonical service:** https://repoedu.onrender.com
+**API:** https://evidencecheck-api.onrender.com  
+**Buyer site:** https://evidencecheck-site.onrender.com  
+**Buyer page:** https://evidencecheck-site.onrender.com/buy.html  
+**Decision Kit:** https://evidencecheck-site.onrender.com/decision-kit.html  
+**Live example:** https://evidencecheck-site.onrender.com/demo
 
-**Buyer page:** https://repoedu.onrender.com/buy.html
-
-**Decision Kit:** https://repoedu.onrender.com/decision-kit.html
-
-**Live example:** https://repoedu.onrender.com/demo
-
-The Decision Kit is the clearest commercial explanation of the product: the value is not a generic AI summary; it is a repeatable verification queue that separates observable evidence from unknowns and turns gaps into supplier questions.
+The commercial promise is deliberately narrow: **check what a vendor's public evidence supports before a team spends time on a deeper review.** It is not positioned as a generic AI summary or a replacement for authorized security assessment.
 
 ## Start here — for AI agents
 
-**Universal machine manifest:** https://repoedu.onrender.com/agent-discovery.json
+**Universal machine manifest:** https://evidencecheck-api.onrender.com/agent-discovery.json  
+**LLM instructions:** https://evidencecheck-api.onrender.com/llms.txt  
+**OpenAPI:** https://evidencecheck-api.onrender.com/openapi.json  
+**Agent card:** https://evidencecheck-api.onrender.com/.well-known/agent.json  
+**x402 discovery:** https://evidencecheck-api.onrender.com/.well-known/x402-discovery.json  
+**Skill:** https://evidencecheck-api.onrender.com/skill.md
 
-**LLM instructions:** https://repoedu.onrender.com/llms.txt
+The paid routes declare machine-readable discovery metadata so compatible clients can inspect capabilities, schemas, prices and payment terms before deciding whether to call them.
 
-**OpenAPI:** https://repoedu.onrender.com/openapi.json
-
-**Agent card:** https://repoedu.onrender.com/.well-known/agent.json
-
-**x402 discovery:** https://repoedu.onrender.com/.well-known/x402-discovery.json
-
-**Skill:** https://repoedu.onrender.com/skill.md
-
-The paid routes declare the x402 Bazaar discovery extension, so compatible discovery clients can index the service's capabilities, schemas, pricing and payment terms. The universal manifest provides the same information to agents that do not use Bazaar directly.
-
-## The buyer problem
-
-Vendor onboarding and recurring supplier review often require repetitive first-pass work: opening websites, reading security material, checking observable controls, extracting obligations and dates, identifying missing evidence, then writing follow-up questions. EvidenceCheck turns that work into a repeatable evidence workflow.
-
-The product is deliberately **not** positioned as a generic AI summarizer. Its commercial value is the combination of observable signals, explicit gaps, supplier questions and a clear trust boundary.
-
-## What a buyer gets
+## What buyers get
 
 - Public website security preflight
 - Vendor security signals
 - Clean webpage text, metadata, headings and links
 - Business-document dates, monetary amounts and obligations
 - Missing evidence and control gaps
-- Supplier follow-up questions
+- Targeted supplier follow-up questions
 - Structured JSON for downstream workflows
 - Human-readable fixed-scope review for deeper work
 - Explicit limitations and human-review points
@@ -58,22 +45,22 @@ Paid x402 endpoints use USDC on Base mainnet (`eip155:8453`):
 
 | Endpoint | Purpose | Entry price |
 |---|---|---:|
-| `/web-extract` | Extract clean webpage text, metadata and links | US$0.005 |
+| `/vendor-preflight` | Vendor-risk preflight, evidence gaps and supplier questions | US$0.025 |
 | `/site-audit` | Public website security preflight | US$0.01 |
-| `/vendor-preflight` | Vendor-risk preflight and evidence gaps | US$0.025 |
-| `/analyze` | Business-document analysis | US$0.005 |
+| `/web-extract` | Clean webpage text, metadata and links | US$0.005 |
+| `/analyze` | Business-document evidence triage | US$0.005 |
 
-The low-cost endpoints are intentionally easy for software and AI agents to trial. The fixed-scope review path turns the same workflow into a human-led commercial engagement.
+**Selection rule:** use the cheapest endpoint that fully matches the task. For vendor approval/triage, start with `/vendor-preflight`.
 
 ## Commercial offer
 
 ### API — pay per request
 
-Use only the capability required by the workflow. No subscription is required for the machine endpoints.
+Use one narrow capability at a time. No subscription is required for the machine endpoints.
 
 ### Fixed-scope review — US$495
 
-One defined vendor review, public-site preflight, supplied-document review, structured findings/gaps and a target 48-hour turnaround. This is a starting commercial offer for validation, not a claim of existing customer contracts.
+One defined vendor review, public-site preflight, supplied-document review, structured findings/gaps and a target 48-hour turnaround. This is an offer price for validation, not a claim of existing customer contracts.
 
 ### Recurring intake — US$1,250/month starting package
 
@@ -85,17 +72,13 @@ Higher-volume vendor triage, recurring reporting and workflow integration with s
 
 These are offer prices and revenue scenarios, **not guaranteed sales or existing revenue**.
 
-## Agent discovery and distribution
+## Distribution
 
-EvidenceCheck is designed for machine discovery rather than relying on a human finding a homepage first. Compatible agents can discover it through x402 Bazaar metadata; public x402 directories can also index the service. Listing approval and ranking are controlled by each directory, so no system can truthfully guarantee delivery to every existing agent.
-
-The current distribution plan is maintained in `AGENT-DISTRIBUTION-2026-09.md`.
-
-Recommended external discovery channels include x402 List and x402scan. A public HTTPS origin is already deployed on Render, which is a prerequisite for directory probing. The service should accumulate real external payments before claiming traction or verified status.
+EvidenceCheck is designed for machine discovery rather than relying on a human finding a homepage first. Current ecosystem research shows active x402 marketplaces where agents discover and pay for APIs, including Agent402 Marketplace and PayAPI Market. Directory inclusion, ranking and buyer volume are controlled by each directory and are not guaranteed. See `AGENT-DISTRIBUTION-2026-09.md` for the current distribution plan.
 
 ## Trust boundary
 
-EvidenceCheck is a **first-pass due-diligence workflow**. It is not a penetration test, vulnerability scanner, certification, legal opinion or replacement for authorized human decisions. Public signals are reported as signals, not proof. Material findings should be verified by the responsible team.
+EvidenceCheck is a **first-pass due-diligence workflow**. It is not a penetration test, vulnerability scanner, certification, legal opinion or replacement for authorized human decisions. Public signals are reported as signals, not proof. Missing public evidence is reported as unknown rather than proof of absence. Material findings should be verified by the responsible team.
 
 ## Receiving wallet
 
@@ -103,14 +86,8 @@ USDC receiving wallet on Base: `0x031a713863890eb611776aadd48397873ed153ab`
 
 ## Deployment
 
-The canonical API is deployed on Render from this GitHub repository with auto-deploy from `main`. The public buyer site and API share the same repository so product messaging, machine discovery metadata and the payment service can evolve together.
+The canonical API is deployed on Render from this GitHub repository with auto-deploy from `main`. The buyer site and API share the same repository so product messaging, machine discovery metadata and payment service can evolve together.
 
-## Project status
+## Revenue status
 
-**Live deployment:** `https://repoedu.onrender.com`
-
-**API:** `https://evidencecheck-api.onrender.com`
-
-**Buyer site:** `https://evidencecheck-site.onrender.com`
-
-The service is technically prepared to accept x402 requests, but **no revenue should be claimed until an external payer completes a real mainnet transaction**.
+**No revenue should be claimed until an external payer completes a real mainnet transaction.** The system can be deployed and configured to accept x402 payments, but technical readiness is not evidence of sales.
