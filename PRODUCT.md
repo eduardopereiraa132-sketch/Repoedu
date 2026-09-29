@@ -23,7 +23,7 @@ The product targets a specific operational bottleneck: repetitive first-pass ven
 
 ## Machine-facing services
 
-The live API exposes small, independently useful capabilities for compatible AI/software buyers through x402 on Base mainnet using USDC:
+The live API exposes small, independently useful capabilities for compatible AI/software buyers through x402 on Base mainnet using USDC. The canonical production origin is `https://repoedu.onrender.com`.
 
 - **Webpage Extractor** — clean machine-readable webpage text, metadata and links.
 - **Website Security Preflight** — observable HTTPS, security headers, cookie flags, robots/security files and disclosure signals.
