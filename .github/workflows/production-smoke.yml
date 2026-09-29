@@ -58,7 +58,7 @@ jobs:
           const fs=require('fs');
           const expected='0x031a713863890eb611776aadd48397873ed153ab';
           const expectedNetwork='eip155:8453';
-          const expectedPrices={web:'5000',audit:'10000',analyze:'5000',vendor:'25000'};
+          const expectedPrices={web:'5000',audit:'10000',analyze:'10000',vendor:'25000'};
           for(const name of Object.keys(expectedPrices)){
             const x=JSON.parse(fs.readFileSync('/tmp/decoded-'+name+'.json','utf8'));
             const a=x.accepts?.[0];
