@@ -68,7 +68,7 @@ Current distribution path:
 4. Submit to other x402 directories where available.
 5. Keep descriptions and pricing narrow so buyer routers can match the service to concrete tasks.
 
-Agent402 currently documents free seller registration with `POST /api/index/register`; buyers pay the seller wallet directly and the marketplace takes 0% from sellers. citeturn928305search2turn928305search3
+Agent402 currently documents free seller registration with `POST /api/index/register`; buyers pay the seller wallet directly and the marketplace takes 0% from sellers.
 
 A GitHub Actions workflow in this repository performs the live-origin check and registration automatically after a main-branch deployment.
 
