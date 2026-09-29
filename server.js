@@ -45,7 +45,7 @@ const pilotPrice = process.env.PILOT_PRICE || "$495";
 const facilitatorUrl = process.env.FACILITATOR_URL || "https://facilitator.payai.network";
 const publicUrl = (process.env.PUBLIC_URL || "https://repoedu.onrender.com").replace(/\/$/, "");
 const publicSiteUrl = (process.env.PUBLIC_SITE_URL || "https://repoedu.onrender.com").replace(/\/$/, "");
-const version = "3.3.0";
+const version = "3.4.0";
 const CACHE_TTL_MS = 120000;
 const extractionCache = new Map();
 
