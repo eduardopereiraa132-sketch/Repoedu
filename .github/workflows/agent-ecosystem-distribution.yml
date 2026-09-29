@@ -1,0 +1,52 @@
+name: Agent ecosystem distribution
+on:
+  push:
+    branches: [main]
+    paths:
+      - "agent-discovery-broker.mjs"
+      - "AGENT-DISCOVERY-BROKER.md"
+      - ".github/workflows/agent-ecosystem-distribution.yml"
+  workflow_dispatch:
+jobs:
+  verify-and-list:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify EvidenceCheck
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORIGIN="https://evidencecheck-api.onrender.com"
+          curl -fsS --max-time 20 "$ORIGIN/health" >/tmp/health.json
+          curl -fsS --max-time 20 "$ORIGIN/.well-known/x402-discovery.json" >/tmp/discovery.json
+          code=$(curl -sS --max-time 20 -o /tmp/paid.txt -D /tmp/headers.txt -w "%{http_code}" -X POST "$ORIGIN/vendor-preflight" -H "content-type: application/json" --data '{"url":"https://example.com"}')
+          test "$code" = "402"
+          grep -qi "payment-required" /tmp/headers.txt
+      - name: Check public agent directories
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS --max-time 20 "https://api.a2a-registry.org/public/agents?q=security&limit=3" >/tmp/a2a.json
+          curl -fsS --max-time 20 "https://allagents.app/search?q=security&format=json" >/tmp/allagents.json
+          echo "Public agent discovery APIs reachable."
+      - name: Register EvidenceCheck with ALLAGENTS when absent
+        shell: bash
+        run: |
+          set -euo pipefail
+          current=$(curl -fsS --max-time 20 "https://allagents.app/search?q=EvidenceCheck&format=json" || true)
+          if echo "$current" | grep -qi "EvidenceCheck"; then
+            echo "EvidenceCheck already listed."
+            exit 0
+          fi
+          body='{"name":"EvidenceCheck","specialty":"security","description":"Evidence-first vendor due diligence and public security preflight for procurement, third-party risk, compliance and AI-agent workflows. Pay per request with x402 v2 USDC on Base.","endpoints":{"a2a":"https://evidencecheck-agent-discovery.onrender.com/a2a","site":"https://evidencecheck-site.onrender.com","api":"https://evidencecheck-api.onrender.com"},"protocols":["A2A","HTTP","x402"],"country":"UY","tags":["security","vendor-risk","procurement","due-diligence","compliance","research","x402","usdc","base"]}'
+          curl -fsS --max-time 20 -X POST "https://allagents.app/register" -H "content-type: application/json" --data "$body" >/tmp/register.json
+          echo "ALLAGENTS registration succeeded."
+      - name: Summary
+        run: |
+          {
+            echo "## EvidenceCheck distribution"
+            echo "- Canonical API: https://evidencecheck-api.onrender.com"
+            echo "- Discovery broker: https://evidencecheck-agent-discovery.onrender.com"
+            echo "- ALLAGENTS: checked/registered"
+            echo "- A2A Registry: public search verified"
+          } >> "$GITHUB_STEP_SUMMARY"
