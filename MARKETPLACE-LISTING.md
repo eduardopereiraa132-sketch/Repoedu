@@ -35,7 +35,7 @@ Output includes observable checks with source URLs/timestamps, relevant public e
 ## Secondary capabilities
 - `/site-audit` — public website security preflight — **US$0.01**
 - `/web-extract` — clean webpage text, metadata, headings and links — **US$0.005**
-- `/analyze` — business-document dates, amounts, obligations, security signals and gaps — **US$0.005**
+- `/analyze` — business-document dates, amounts, obligations, security signals and gaps — **US$0.01**
 
 ## Why an agent would call it
 Use `vendor-preflight` as the low-cost verification step before requesting a full questionnaire, escalating to a human reviewer, or spending more compute/time on vendor research. It is designed to answer: “What can I verify from public evidence right now, and what should I ask for next?”
