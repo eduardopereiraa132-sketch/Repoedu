@@ -1,35 +1,31 @@
 services:
   - type: web
-    name: x402-business-agent
+    name: evidencecheck-api
     runtime: node
     plan: free
-    region: oregon
+    region: virginia
     autoDeployTrigger: commit
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node prestart-safe.mjs && node prestart-x402-fast402.mjs && node server.js
     healthCheckPath: /health
     envVars:
       - key: NETWORK
         value: eip155:8453
       - key: PAY_TO
         value: 0x031a713863890eb611776aadd48397873ed153ab
-      - key: DOCUMENT_PRICE
-        value: $0.01
       - key: PRICE
         value: $0.005
       - key: SITE_PRICE
+        value: $0.01
+      - key: DOCUMENT_PRICE
         value: $0.01
       - key: VENDOR_PRICE
         value: $0.025
       - key: PILOT_PRICE
         value: $495
       - key: FACILITATOR_URL
-        value: https://facilitator.openx402.ai
+        value: https://facilitator.payai.network
       - key: PUBLIC_URL
-        value: https://repoedu.onrender.com
+        value: https://evidencecheck-api.onrender.com
       - key: PUBLIC_SITE_URL
-        value: https://repoedu.onrender.com
-      - key: DATABASE_URL
-        fromDatabase:
-          name: Repoedu-intelligence-db
-          property: connectionString
+        value: https://evidencecheck-site.onrender.com
