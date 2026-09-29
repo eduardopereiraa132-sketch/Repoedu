@@ -10,9 +10,31 @@
   "scheme": "exact",
   "payTo": "0x031a713863890eb611776aadd48397873ed153ab",
   "resources": [
-    {"url":"https://evidencecheck-api.onrender.com/web-extract","method":"POST","price":"$0.005","useWhen":"public webpage extraction"},
-    {"url":"https://evidencecheck-api.onrender.com/site-audit","method":"POST","price":"$0.01","useWhen":"public website security preflight"},
-    {"url":"https://evidencecheck-api.onrender.com/vendor-preflight","method":"POST","price":"$0.025","useWhen":"vendor evidence preflight"},
-    {"url":"https://evidencecheck-api.onrender.com/analyze","method":"POST","price":"$0.01","useWhen":"business-document triage"}
-  ]
+    {
+      "url": "https://evidencecheck-api.onrender.com/web-extract",
+      "method": "POST",
+      "price": "$0.005",
+      "useWhen": "public webpage extraction"
+    },
+    {
+      "url": "https://evidencecheck-api.onrender.com/site-audit",
+      "method": "POST",
+      "price": "$0.01",
+      "useWhen": "public website security preflight"
+    },
+    {
+      "url": "https://evidencecheck-api.onrender.com/vendor-preflight",
+      "method": "POST",
+      "price": "$0.025",
+      "useWhen": "vendor evidence preflight"
+    },
+    {
+      "url": "https://evidencecheck-api.onrender.com/analyze",
+      "method": "POST",
+      "price": "$0.01",
+      "useWhen": "business-document triage"
+    }
+  ],
+  "token": "USD Coin",
+  "lastUpdated": "2026-09-29T01:38:12.887Z"
 }
