@@ -3,7 +3,7 @@
 ## Service 1: Webpage Extractor
 
 Live paid endpoint:
-POST https://repoedu-1.onrender.com/web-extract
+POST https://repoedu.onrender.com/web-extract
 
 Price: $0.005 USDC/request
 
@@ -12,7 +12,7 @@ Purpose: extract clean machine-readable text, metadata, headings and links from 
 ## Service 2: Vendor Security Preflight
 
 Live paid endpoint:
-POST https://repoedu-1.onrender.com/vendor-preflight
+POST https://repoedu.onrender.com/vendor-preflight
 
 Price: $0.025 USDC/request
 
@@ -23,7 +23,7 @@ Purpose: structured first-pass vendor-risk signal from publicly observable websi
 ## Service 3: Website Security Preflight
 
 Live paid endpoint:
-POST https://repoedu-1.onrender.com/site-audit
+POST https://repoedu.onrender.com/site-audit
 
 Price: $0.01 USDC/request
 
@@ -32,7 +32,7 @@ Purpose: live public website security signals for vendor-risk, compliance and au
 ## Service 4: Business Document Analyzer
 
 Live paid endpoint:
-POST https://repoedu-1.onrender.com/analyze
+POST https://repoedu.onrender.com/analyze
 
 Price: $0.005 USDC/request
 
@@ -48,13 +48,13 @@ Purpose: deterministic structured extraction of dates, monetary amounts, obligat
 
 ## Machine-readable discovery
 
-- https://repoedu-1.onrender.com/.well-known/x402
-- https://repoedu-1.onrender.com/.well-known/ai-plugin.json
-- https://repoedu-1.onrender.com/.well-known/x402-discovery
-- https://repoedu-1.onrender.com/agent-card.json
-- https://repoedu-1.onrender.com/openapi.json
-- https://repoedu-1.onrender.com/llms.txt
-- https://repoedu-1.onrender.com/skill.md
+- https://repoedu.onrender.com/.well-known/x402
+- https://repoedu.onrender.com/.well-known/ai-plugin.json
+- https://repoedu.onrender.com/.well-known/x402-discovery
+- https://repoedu.onrender.com/agent-card.json
+- https://repoedu.onrender.com/openapi.json
+- https://repoedu.onrender.com/llms.txt
+- https://repoedu.onrender.com/skill.md
 
 ## Agent behavior
 
