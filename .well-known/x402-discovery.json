@@ -3,10 +3,11 @@
   "name": "EvidenceCheck",
   "description": "Evidence-first vendor due-diligence capabilities for procurement, third-party risk, security and compliance workflows.",
   "category": "security",
-  "baseUrl": "https://repoedu.onrender.com",
-  "website": "https://repoedu.onrender.com/buy.html",
+  "baseUrl": "https://evidencecheck-api.onrender.com",
+  "website": "https://evidencecheck-site.onrender.com/buy.html",
   "protocol": "x402",
   "payment": {
+    "version": 2,
     "network": "eip155:8453",
     "asset": "USDC",
     "scheme": "exact",
@@ -18,117 +19,72 @@
       "method": "POST",
       "path": "/vendor-preflight",
       "price": "$0.025",
+      "useWhen": "Public vendor evidence preflight before deeper review.",
       "inputSchema": {
         "type": "object",
-        "required": [
-          "url"
-        ],
+        "required": ["url"],
         "properties": {
-          "url": {
-            "type": "string",
-            "format": "uri"
-          },
-          "requirements": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
+          "url": {"type": "string", "format": "uri"},
+          "requirements": {"type": "array", "items": {"type": "string"}}
         }
-      },
-      "exampleInput": {
-        "url": "https://example.com",
-        "requirements": [
-          "access control",
-          "incident response",
-          "data protection"
-        ]
-      },
-      "output": "Vendor risk signal, observable checks, evidence gaps, supplier questions and limitations"
+      }
     },
     {
       "id": "site-audit",
       "method": "POST",
       "path": "/site-audit",
       "price": "$0.01",
+      "useWhen": "Fast public website security preflight.",
       "inputSchema": {
         "type": "object",
-        "required": [
-          "url"
-        ],
-        "properties": {
-          "url": {
-            "type": "string",
-            "format": "uri"
-          }
-        }
-      },
-      "exampleInput": {
-        "url": "https://example.com"
-      },
-      "output": "Observable public-site security preflight signals and disclosure checks"
+        "required": ["url"],
+        "properties": {"url": {"type": "string", "format": "uri"}}
+      }
     },
     {
       "id": "web-extract",
       "method": "POST",
       "path": "/web-extract",
       "price": "$0.005",
+      "useWhen": "Convert a public webpage into clean machine-readable content.",
       "inputSchema": {
         "type": "object",
-        "required": [
-          "url"
-        ],
-        "properties": {
-          "url": {
-            "type": "string",
-            "format": "uri"
-          }
-        }
-      },
-      "exampleInput": {
-        "url": "https://example.com/security"
-      },
-      "output": "Clean text, metadata, headings and links"
+        "required": ["url"],
+        "properties": {"url": {"type": "string", "format": "uri"}}
+      }
     },
     {
       "id": "document-analyzer",
       "method": "POST",
       "path": "/analyze",
-      "price": "$0.005",
+      "price": "$0.01",
+      "useWhen": "Structured first-pass triage of supplied business-document text.",
       "inputSchema": {
         "type": "object",
-        "required": [
-          "text"
-        ],
+        "required": ["text"],
         "properties": {
-          "text": {
-            "type": "string"
-          }
+          "text": {"type": "string", "maxLength": 50000}
         }
-      },
-      "exampleInput": {
-        "text": "Supplier agreement: annual fee USD 24,000. Supplier must notify incidents within 24 hours."
-      },
-      "output": "Dates, amounts, obligations, security signals, gaps and risk flags"
+      }
     }
   ],
   "machineDocs": {
-    "openapi": "/openapi.json",
-    "llms": "/llms.txt",
-    "skill": "/skill.md",
-    "agentCard": "/.well-known/agent-card.json",
-    "x402": "/.well-known/x402"
+    "openapi": "https://evidencecheck-api.onrender.com/openapi.json",
+    "llms": "https://evidencecheck-api.onrender.com/llms.txt",
+    "skill": "https://evidencecheck-api.onrender.com/skill.md",
+    "agentCard": "https://evidencecheck-api.onrender.com/.well-known/agent-card.json",
+    "x402": "https://evidencecheck-api.onrender.com/.well-known/x402"
   },
   "humanDocs": {
-    "buyer": "/buy.html",
-    "demo": "/demo",
-    "purchase": "/purchase",
-    "commercial": "/commercial"
+    "buyer": "https://evidencecheck-site.onrender.com/buy.html",
+    "demo": "https://evidencecheck-site.onrender.com/demo.html",
+    "purchase": "https://evidencecheck-api.onrender.com/purchase"
   },
   "trustBoundary": [
     "first-pass due diligence only",
     "not a penetration test",
-    "not a certification",
+    "not a vulnerability scanner",
+    "not a certification or attestation",
     "not legal advice",
     "material decisions require human verification"
   ]
