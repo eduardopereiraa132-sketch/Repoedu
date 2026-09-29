@@ -1,7 +1,7 @@
 {
   "name": "EvidenceCheck",
   "description": "Evidence-first vendor due-diligence APIs for procurement, security, GRC and AI-agent workflows.",
-  "version": "3.2.0",
+  "version": "3.4.0",
   "website": "https://evidencecheck-site.onrender.com",
   "api": "https://evidencecheck-api.onrender.com",
   "payment": {
@@ -10,7 +10,8 @@
     "scheme": "exact",
     "network": "eip155:8453",
     "asset": "USDC",
-    "payTo": "0x031a713863890eb611776aadd48397873ed153ab"
+    "payTo": "0x031a713863890eb611776aadd48397873ed153ab",
+    "token": "USD Coin"
   },
   "services": [
     {
@@ -38,8 +39,17 @@
       "name": "Business Document Analyzer",
       "method": "POST",
       "path": "/analyze",
-      "price": "$0.005",
+      "price": "$0.01",
       "useWhen": "Structured triage of supplied business-document text."
     }
-  ]
+  ],
+  "discovery": {
+    "selectionRule": "Choose the narrowest endpoint that fully matches the task; prefer vendor-preflight for supplier/TPRM triage.",
+    "machineDocs": {
+      "openapi": "https://evidencecheck-api.onrender.com/openapi.json",
+      "llmsTxt": "https://evidencecheck-api.onrender.com/llms.txt",
+      "skill": "https://evidencecheck-api.onrender.com/skill.md",
+      "x402": "https://evidencecheck-api.onrender.com/.well-known/x402-discovery.json"
+    }
+  }
 }
