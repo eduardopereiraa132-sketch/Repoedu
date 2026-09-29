@@ -1,35 +1,32 @@
-# Agent Document Risk Analyzer
+# EvidenceCheck — Business Document Analyzer
 
 ## Purpose
-Perform a rapid first-pass analysis of business documents for security, privacy, compliance, operational obligations, deadlines, owners, missing evidence and follow-up actions.
+Perform deterministic first-pass triage of supplied business-document text for dates, monetary amounts, obligations, security signals, missing areas and risk flags.
 
 ## Endpoint
-`POST /analyze`
+POST https://evidencecheck-api.onrender.com/analyze
+
+## Price
+US$0.01 per call via x402 exact / USDC / Base Mainnet.
 
 ## Input
-```json
-{"text":"document text"}
-```
+{"text":"Supplier must notify incidents within 24 hours. Annual fee USD 24,000."}
 
 ## Output
-```json
 {
-  "summary":"...",
-  "risks":[{"severity":"high|medium|low","finding":"...","evidence":"...","action":"..."}],
-  "obligations":[{"obligation":"...","owner":"...","deadline":"..."}],
-  "missing_evidence":["..."],
-  "recommended_actions":["..."]
+  "service": "Business Document Analyzer",
+  "wordCount": 18,
+  "characterCount": 103,
+  "dates": ["within 24 hours"],
+  "monetaryAmounts": ["USD 24,000"],
+  "obligations": ["Supplier must notify incidents within 24 hours."],
+  "securitySignals": ["security","incident"],
+  "missingAreas": ["access control"],
+  "riskFlags": ["obligations detected","deadlines or time periods detected"]
 }
-```
-
-## Payment
-US$0.50 per call. x402 `exact` scheme. USDC on Base mainnet (`eip155:8453`).
 
 ## Agent behavior
-1. Read this contract before calling.
-2. Send only data necessary for analysis.
-3. Treat output as a first-pass analytical result.
-4. Do not treat it as legal, regulatory or certification advice.
-
-## Discovery
-Machine-readable metadata should be exposed at `/.well-known/x402` and `/openapi.json` once deployed.
+1. Send only the text necessary for triage.
+2. Treat the output as a first-pass analytical result.
+3. Use source documents and human verification for material decisions.
+4. Do not treat missing public wording as proof that a control is absent.
