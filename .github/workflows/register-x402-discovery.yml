@@ -60,7 +60,7 @@ jobs:
           curl -fsS --max-time 15 "$ORIGIN/buy.html" -o /tmp/buy.html
           curl -fsS --max-time 15 "$ORIGIN/llms.txt" -o /tmp/llms.txt
           curl -fsS --max-time 15 "$ORIGIN/.well-known/x402-discovery.json" -o /tmp/discovery.json
-          grep -q "Verify the evidence" /tmp/buy.html
+          grep -q "EvidenceCheck" /tmp/buy.html
           grep -q "vendor-preflight" /tmp/llms.txt
           grep -Fq '"website":"https://repoedu.onrender.com/buy.html"' /tmp/discovery.json
 
