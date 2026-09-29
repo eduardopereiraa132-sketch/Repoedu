@@ -39,7 +39,7 @@ Use individual capabilities on a pay-per-request basis. Compatible agents can ca
 - `/vendor-preflight` — **US$0.025**
 - `/site-audit` — **US$0.01**
 - `/web-extract` — **US$0.005**
-- `/analyze` — **US$0.005**
+- `/analyze` — **US$0.01**
 
 The low entry prices are deliberate: the easiest way to evaluate the product is to run one real check.
 
