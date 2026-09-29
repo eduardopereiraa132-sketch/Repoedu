@@ -10,9 +10,11 @@ Perform first-pass vendor due diligence from public website evidence and supplie
 - POST https://evidencecheck-api.onrender.com/analyze — US$0.01
 
 ## Selection rule
+Use `/vendor-preflight` for supplier/vendor triage; `/site-audit` for bounded public website signals; `/web-extract` for clean webpage content; `/analyze` when document text is already available.
 Choose the cheapest endpoint that fully matches the task. Prefer /vendor-preflight for vendor approval or third-party-risk triage.
 
 ## Payment
+USDC token name: USD Coin (EIP-3009 on Base).
 x402 v2, exact scheme, USDC on Base Mainnet (eip155:8453).
 Receiver: 0x031a713863890eb611776aadd48397873ed153ab.
 A buyer should always use the live 402 payment requirements returned by the requested endpoint as the authoritative amount and destination.
