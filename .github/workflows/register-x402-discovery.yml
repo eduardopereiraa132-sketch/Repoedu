@@ -1,0 +1,59 @@
+name: Register x402 service for agent discovery
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find live API origin
+        id: discover
+        shell: bash
+        run: |
+          set -euo pipefail
+          for origin in \
+            "https://repoedu.onrender.com" \
+            "https://evidencecheck-api.onrender.com" \
+            "https://x402-business-agent.onrender.com"
+          do
+            echo "Checking $origin"
+            if curl -fsS --max-time 15 "$origin/health" >/tmp/health.json; then
+              echo "origin=$origin" >> "$GITHUB_OUTPUT"
+              cat /tmp/health.json
+              exit 0
+            fi
+          done
+          echo "No live candidate origin found" >&2
+          exit 1
+
+      - name: Verify x402 challenge
+        env:
+          ORIGIN: ${{ steps.discover.outputs.origin }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -o /tmp/response.txt -D /tmp/headers.txt -w "%{http_code}" \
+            -X POST "$ORIGIN/vendor-preflight" \
+            -H "content-type: application/json" \
+            --data '{"url":"https://example.com"}')
+          echo "HTTP $code"
+          if [ "$code" != "402" ]; then
+            echo "Expected HTTP 402 from paid route; got $code" >&2
+            cat /tmp/headers.txt
+            cat /tmp/response.txt
+            exit 1
+          fi
+          grep -qi "payment-required" /tmp/headers.txt
+
+      - name: Register origin with Agent402
+        env:
+          ORIGIN: ${{ steps.discover.outputs.origin }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS -X POST "https://agent402.tools/api/index/register" \
+            -H "content-type: application/json" \
+            --data "{\"origin\":\"$ORIGIN\"}" | tee /tmp/register.json
+          echo
+          echo "Registered: $ORIGIN"
