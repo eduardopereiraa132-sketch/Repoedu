@@ -18,6 +18,7 @@ jobs:
           for i in {1..30}; do
             if curl -fsS --max-time 10 https://repoedu.onrender.com/health >/tmp/health.json; then
               cat /tmp/health.json
+              grep -Fq '"publicUrl":"https://repoedu.onrender.com"' /tmp/health.json
               exit 0
             fi
             echo "Waiting for Render API deployment ($i/30)..."
