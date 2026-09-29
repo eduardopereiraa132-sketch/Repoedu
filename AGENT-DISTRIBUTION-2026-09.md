@@ -20,12 +20,11 @@ It is deliberately narrower than a full TPRM platform and more evidence-bounded 
 - Human buyer brief: /buyer-brief.html
 
 ## Discovery channels — current priority
-1. **x402 Bazaar** — native x402 discovery layer. Keep schemas, prices and payment requirements accurate so compatible discovery clients can index the paid routes.
-2. **Agent402 Marketplace** — current marketplace materials describe free registration, semantic buyer discovery and direct USDC settlement. Listing copy should lead with `vendor-preflight`, not the generic extractor endpoints.
-3. **PayAPI Market** — current materials advertise free API listing, agent search, x402 settlement and settlement-verified listings. Submit after a real mainnet payment test; never claim verification beforehand.
-4. **x402.new** — maintain machine-readable discovery endpoints and monitor indexing.
-5. **x402 List / x402scan / community directories** — submit where permitted. Do not pay a listing or review fee without explicit owner approval.
-6. **Direct discovery** — keep OpenAPI, llms.txt, skill.md and well-known metadata stable so agents can discover the service without a prior integration.
+1. **x402scan** — current public registration page: https://www.x402scan.com/resources/register. Submit the canonical HTTPS API URL after confirming the production 402 challenge is healthy. x402scan currently presents itself as an explorer, analytics dashboard and marketplace for paid APIs and agentic commerce.
+2. **Agentic Market** — current marketplace materials explicitly invite API sellers to list services so agents can discover and pay per request in USDC. Lead with `vendor-preflight`, not the generic extractor endpoints.
+3. **Native x402/Bazaar discovery** — keep route schemas, prices, descriptions and payment requirements accurate. The current x402 Bazaar documentation says listing is free and supports Base mainnet USDC, with HTTP services and MCP tools discoverable through machine-readable metadata.
+4. **Other x402 directories/community indexes** — submit where permitted. Do not pay a listing or review fee without explicit owner approval.
+5. **Direct discovery** — keep OpenAPI, llms.txt, skill.md and well-known metadata stable so agents can discover the service without a prior integration.
 
 ## Listing copy
 **Service name:** EvidenceCheck
@@ -64,6 +63,25 @@ These are offer prices, not guaranteed revenue.
 3. It runs a low-cost or free preview.
 4. It pays for the focused call if the result is useful.
 5. A human buyer can escalate to a defined review or recurring intake.
+
+## Launch gate
+Before external directory submission, confirm:
+- `GET /health` returns 200.
+- `GET /openapi.json` is reachable.
+- `GET /.well-known/x402` and the discovery manifest expose the intended Base mainnet terms.
+- A no-payment request returns a valid HTTP 402 challenge.
+- A small real mainnet payment settles to the configured wallet.
+- The paid route returns the expected JSON after settlement.
+
+The x402 seller documentation recommends testnet first, then Base mainnet with network `eip155:8453`, a real receiving wallet, and small real payments before going live.
+
+## Current implementation state
+- Production API is deployed on Render from `main`.
+- Production receiving address is configured as the user's Base EVM address.
+- Production network is configured as `eip155:8453`.
+- Production facilitator is configured as the CDP x402 facilitator.
+- Buyer-facing static site and human checkout are deployed separately on Render.
+- Auto-deploy is enabled from GitHub `main`.
 
 ## Important constraint
 No directory can truthfully guarantee exposure to every existing agent. Listing improves discoverability; actual calls depend on an agent's discovery method, task fit, budget, trust policy, endpoint availability and reputation.
