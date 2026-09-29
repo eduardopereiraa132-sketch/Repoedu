@@ -1,51 +1,27 @@
-# EvidenceCheck
+# EvidenceCheck Agent Skill
 
 ## Purpose
-EvidenceCheck provides narrow, machine-readable first-pass intelligence for procurement, vendor-risk, research, and security workflows.
+Perform first-pass vendor due diligence from public website evidence and supplied business/security documents. Return structured evidence, gaps and follow-up questions.
 
-## Paid capabilities
+## Paid machine endpoints
+- POST https://evidencecheck-api.onrender.com/vendor-preflight — US$0.025
+- POST https://evidencecheck-api.onrender.com/site-audit — US$0.01
+- POST https://evidencecheck-api.onrender.com/web-extract — US$0.005
+- POST https://evidencecheck-api.onrender.com/analyze — US$0.01
 
-### Webpage Extractor
-- Endpoint: `POST /web-extract`
-- Price: `$0.005` USDC per request
-- Input: `{ "url": "https://example.com" }`
-- Returns: title, description, canonical URL, language, headings, cleaned text, links, word count, status and response timing.
-
-### Website Security Preflight
-- Endpoint: `POST /site-audit`
-- Price: `$0.01` USDC per request
-- Input: `{ "url": "https://example.com" }`
-- Returns observable HTTPS, security-header, cookie, robots.txt, security.txt and server-header signals.
-
-### Vendor Security Preflight
-- Endpoint: `POST /vendor-preflight`
-- Price: `$0.025` USDC per request
-- Input: `{ "url": "https://vendor.example", "requirements": [] }`
-- Returns structured checks, evidence gaps, risk signal, summary and limitations.
-
-### Business Document Analyzer
-- Endpoint: `POST /analyze`
-- Price: `$0.005` USDC per request
-- Input: `{ "text": "..." }`
-- Returns obligations, dates, monetary amounts, security signals, missing areas and risk flags.
+## Selection rule
+Choose the cheapest endpoint that fully matches the task. Prefer /vendor-preflight for vendor approval or third-party-risk triage.
 
 ## Payment
-- Protocol: x402
-- Network: Base Mainnet (`eip155:8453`)
-- Asset: USDC
-- Scheme: exact
-- Payment: required per request
-- Receiver: `0x031a713863890eb611776aadd48397873ed153ab`
+x402 v2, exact scheme, USDC on Base Mainnet (eip155:8453).
+Receiver: 0x031a713863890eb611776aadd48397873ed153ab.
+A buyer should always use the live 402 payment requirements returned by the requested endpoint as the authoritative amount and destination.
 
 ## Discovery
-- API: `https://evidencecheck-api.onrender.com`
-- OpenAPI: `/openapi.json`
-- LLM guide: `/llms.txt`
-- Agent card: `/.well-known/agent-card.json`
-- Agent alias: `/.well-known/agent.json`
-- x402 metadata: `/.well-known/x402`
-- x402 discovery: `/.well-known/x402-discovery.json`
-- Buyer website: `https://evidencecheck-site.onrender.com`
+- https://evidencecheck-api.onrender.com/.well-known/x402-discovery.json
+- https://evidencecheck-api.onrender.com/openapi.json
+- https://evidencecheck-api.onrender.com/llms.txt
+- https://evidencecheck-api.onrender.com/.well-known/agent-card.json
 
 ## Trust boundary
-EvidenceCheck reports observable signals. It does not certify vendors, perform authenticated penetration testing, exploit systems, or replace contractual, legal, compliance, or human security review.
+Do not treat public signals as proof of security or compliance. Do not claim penetration testing, certification, legal advice or final procurement approval. Material decisions require authorized human review.
