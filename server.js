@@ -485,7 +485,42 @@ const agentCard=()=>({name:"EvidenceCheck",description:"Evidence-first vendor du
 app.get("/agent-card.json",(_req,res)=>res.json(agentCard()));
 app.get("/.well-known/agent-card.json",(_req,res)=>res.type("application/a2a+json").json(agentCard()));
 app.get("/.well-known/agent.json",(_req,res)=>res.json(agentCard()));
-const discoveryManifest=()=>({schema_version:"0.1",provider:"EvidenceCheck",website:publicUrl+"/buy.html",documentation:publicUrl+"/llms.txt",openapi:publicUrl+"/openapi.json",services:[{service_id:"agent-web-security-intelligence/web-extract",name:"Webpage Extractor",description:"Extract clean text, metadata, headings and links from a public webpage URL.",capability_tags:["web","extraction","research","content"],endpoint_url:publicUrl+"/web-extract",network:"eip155:8453",payment_token:"USDC",price_per_call:Number(price.replace("$","")),pricing_model:"flat",agent_callable:true,input_format:"json",output_format:"json",auth_required:false},{service_id:"agent-web-security-intelligence/site-audit",name:"Website Security Preflight",description:"Run a fast first-pass security preflight against a public website.",capability_tags:["security","website","compliance","vendor-risk"],endpoint_url:publicUrl+"/site-audit",network:"eip155:8453",payment_token:"USDC",price_per_call:Number(sitePrice.replace("$","")),pricing_model:"flat",agent_callable:true,input_format:"json",output_format:"json",auth_required:false},{service_id:"agent-web-security-intelligence/analyze",name:"Business Document Analyzer",description:"Deterministically triage business-document text into structured dates, obligations, money and risk signals.",capability_tags:["documents","compliance","risk","security"],endpoint_url:publicUrl+"/analyze",network:"eip155:8453",payment_token:"USDC",price_per_call:Number(documentPrice.replace("$","")),pricing_model:"flat",agent_callable:true,input_format:"json",output_format:"json",auth_required:false},{service_id:"agent-web-security-intelligence/vendor-preflight",name:"Vendor Security Preflight",description:"Evidence-first vendor preflight with public controls, source/timestamped observations, public evidence-page signals, gaps and next questions.",capability_tags:["security","vendor-risk","procurement","compliance","due-diligence"],endpoint_url:publicUrl+"/vendor-preflight",network:"eip155:8453",payment_token:"USDC",price_per_call:Number(vendorPrice.replace("$","")),pricing_model:"flat",agent_callable:true,input_format:"json",output_format:"json",auth_required:false}],payment:{protocol:"x402",version:2,scheme:"exact",network,asset:"USDC",payTo}});app.get("/.well-known/x402-discovery",(_req,res)=>res.json(discoveryManifest()));
+const discoveryManifest=()=>({
+  schema:"x402-discovery/v1",
+  name:"EvidenceCheck",
+  description:"Evidence-first vendor due-diligence capabilities for procurement, third-party risk, security and compliance workflows.",
+  category:"security",
+  baseUrl:publicUrl,
+  website:publicSiteUrl+"/buy.html",
+  protocol:"x402",
+  payment:{version:2,network,asset:"USDC",scheme:"exact",payTo},
+  capabilities:[
+    {id:"vendor-preflight",method:"POST",path:"/vendor-preflight",price:vendorPrice,useWhen:"Public vendor evidence preflight before deeper review."},
+    {id:"site-audit",method:"POST",path:"/site-audit",price:sitePrice,useWhen:"Fast public website security preflight."},
+    {id:"web-extract",method:"POST",path:"/web-extract",price,useWhen:"Convert a public webpage into structured text and metadata."},
+    {id:"document-analyzer",method:"POST",path:"/analyze",price:documentPrice,useWhen:"Structured first-pass triage of supplied business-document text."}
+  ],
+  machineDocs:{
+    openapi:publicUrl+"/openapi.json",
+    llms:publicUrl+"/llms.txt",
+    skill:publicUrl+"/skill.md",
+    agentCard:publicUrl+"/.well-known/agent-card.json",
+    x402:publicUrl+"/.well-known/x402"
+  },
+  humanDocs:{
+    buyer:publicSiteUrl+"/buy.html",
+    demo:publicSiteUrl+"/demo.html",
+    purchase:publicUrl+"/purchase"
+  },
+  trustBoundary:[
+    "first-pass due diligence only",
+    "not a penetration test",
+    "not a vulnerability scanner",
+    "not a certification or attestation",
+    "not legal advice",
+    "material decisions require human verification"
+  ]
+});app.get("/.well-known/x402-discovery",(_req,res)=>res.json(discoveryManifest()));
 app.get("/.well-known/x402-discovery.json",(_req,res)=>res.json(discoveryManifest()));
 app.get("/agent-discovery.json",(_req,res)=>res.json(discoveryManifest()));
 app.get("/icon.svg",(_req,res)=>res.type("image/svg+xml").send('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="24" fill="#111827"/><path d="M35 25h58v16H51v17h35v15H51v30H35z" fill="#fff"/><path d="M72 73h21v30H72z" fill="#60a5fa"/></svg>'));
@@ -511,11 +546,13 @@ app.get("/.well-known/x402",(_req,res)=>res.json({
 app.get("/.well-known/ai-plugin.json",(_req,res)=>res.json({
   schema_version:"v1",name_for_human:"EvidenceCheck",name_for_model:"agent_web_security_intelligence",
   description_for_model:"Low-cost pay-per-call x402 APIs for webpage extraction, website security preflight and structured business document analysis.",
-  api:{type:"openapi",url:publicUrl+"/openapi.json"},auth:{type:"x402",network,asset:"USDC",price,payTo},
+  api:{type:"openapi",url:publicUrl+"/openapi.json"},auth:{type:"x402",version:2,scheme:"exact",network,asset:"USDC",pricing:"per-endpoint; use the live HTTP 402 payment requirements as the source of truth",payTo},
   endpoints:{webExtract:publicUrl+"/web-extract",siteAudit:publicUrl+"/site-audit",analyze:publicUrl+"/analyze",vendorPreflight:publicUrl+"/vendor-preflight",x402:publicUrl+"/.well-known/x402",llms:publicUrl+"/llms.txt",skill:publicUrl+"/skill.md"}
 }));
 app.get("/skill.md",(_req,res)=>res.type("text/markdown").send([
   "# EvidenceCheck","","Pay-per-call x402 APIs for AI agents.","",
+  "## Webpage Extractor","POST "+publicUrl+"/web-extract","Price: "+price+" USDC. Network: Base Mainnet (eip155:8453). Payee: "+payTo,
+  'Input: {"url":"https://example.com"}',"Returns title, description, canonical URL, language, headings, clean text, links, status and response timing.","",
   "## Website Security Preflight","POST "+publicUrl+"/site-audit","Price: "+sitePrice+" USDC. Network: Base Mainnet (eip155:8453). Payee: "+payTo,
   'Input: {"url":"https://example.com"}',"Returns live public-site signals: status, final URL, response time, HTTPS, security headers, cookie flags, Server disclosure, robots.txt, security.txt, title and findings.","",
   "## Business Document Analyzer","POST "+publicUrl+"/analyze","Price: "+documentPrice+" USDC. Network: Base Mainnet (eip155:8453). Payee: "+payTo,
