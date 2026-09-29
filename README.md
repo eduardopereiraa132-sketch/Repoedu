@@ -8,20 +8,20 @@ The core product is intentionally narrow: take a public vendor URL or supplied b
 
 ## Buyer entry points
 
-- Product: https://repoedu.onrender.com/buy.html
-- Live demo: https://repoedu.onrender.com/demo
-- Sample report: https://repoedu.onrender.com/sample-report
-- Fixed-scope review: https://repoedu.onrender.com/purchase
-- Commercial overview: https://repoedu.onrender.com/commercial
+- Product: https://evidencecheck-site.onrender.com
+- Live demo: https://evidencecheck-site.onrender.com/demo.html
+- Sample report: https://evidencecheck-site.onrender.com/sample-report.html
+- Fixed-scope review: https://evidencecheck-api.onrender.com/purchase
+- Commercial overview: https://evidencecheck-api.onrender.com/commercial
 
 ## Machine entry points
 
-- API: https://repoedu.onrender.com
-- OpenAPI: https://repoedu.onrender.com/openapi.json
-- LLM instructions: https://repoedu.onrender.com/llms.txt
-- Agent card: https://repoedu.onrender.com/.well-known/agent-card.json
-- x402 discovery: https://repoedu.onrender.com/.well-known/x402-discovery.json
-- Skill: https://repoedu.onrender.com/skill.md
+- API: https://evidencecheck-api.onrender.com
+- OpenAPI: https://evidencecheck-api.onrender.com/openapi.json
+- LLM instructions: https://evidencecheck-api.onrender.com/llms.txt
+- Agent card: https://evidencecheck-api.onrender.com/.well-known/agent-card.json
+- x402 discovery: https://evidencecheck-api.onrender.com/.well-known/x402-discovery.json
+- Skill: https://evidencecheck-api.onrender.com/skill.md
 
 ## Paid capabilities
 
@@ -70,7 +70,7 @@ Current distribution path:
 
 Agent402 currently documents free seller registration with `POST /api/index/register`; buyers pay the seller wallet directly and the marketplace takes 0% from sellers.
 
-A GitHub Actions workflow in this repository performs the live-origin check and registration automatically after a main-branch deployment.
+A GitHub Actions smoke test validates the paid routes and x402 metadata on every main-branch change.
 
 ## Revenue status
 
