@@ -28,7 +28,7 @@ The core product is intentionally narrow: take a public vendor URL or supplied b
 | Endpoint | Purpose | Entry price |
 |---|---|---:|
 | `/web-extract` | Clean webpage text, metadata, headings and links | US$0.005 |
-| `/analyze` | Dates, money, obligations, security signals and gaps from supplied text | US$0.005 |
+| `/analyze` | Dates, money, obligations, security signals and gaps from supplied text | US$0.01 |
 | `/site-audit` | Public website security preflight | US$0.01 |
 | `/vendor-preflight` | Vendor-risk preflight with evidence gaps and supplier questions | US$0.025 |
 
