@@ -2,11 +2,16 @@ name: Register x402 service for agent discovery
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - distribution-status.json
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   register:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Find live API origin
         id: discover
         shell: bash
@@ -47,6 +52,7 @@ jobs:
           grep -qi "payment-required" /tmp/headers.txt
 
       - name: Register origin with Agent402
+        id: register
         env:
           ORIGIN: ${{ steps.discover.outputs.origin }}
         shell: bash
@@ -55,5 +61,26 @@ jobs:
           curl -fsS -X POST "https://agent402.tools/api/index/register" \
             -H "content-type: application/json" \
             --data "{\"origin\":\"$ORIGIN\"}" | tee /tmp/register.json
-          echo
           echo "Registered: $ORIGIN"
+
+      - name: Record distribution status
+        env:
+          ORIGIN: ${{ steps.discover.outputs.origin }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, pathlib, os
+          p = pathlib.Path("/tmp/register.json")
+          data = json.loads(p.read_text())
+          out = {
+            "status": "registered",
+            "origin": os.environ["ORIGIN"],
+            "agent402": data
+          }
+          pathlib.Path("distribution-status.json").write_text(json.dumps(out, indent=2)+"\n")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add distribution-status.json
+          git commit -m "Record x402 distribution registration"
+          git push
