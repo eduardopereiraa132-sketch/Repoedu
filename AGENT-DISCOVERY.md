@@ -22,7 +22,7 @@
 
 ## Paid resources
 
-- `POST /web-extract` — clean webpage text, metadata, headings and links — **US$0.005**
+- `POST /web-extract` — clean webpage text, metadata, headings and links — **US$0.01**
 - `POST /site-audit` — public website security preflight — **US$0.01**
 - `POST /vendor-preflight` — vendor-risk signal, evidence gaps and limitations — **US$0.025**
 - `POST /analyze` — business-document dates, amounts, obligations, security signals and risk flags — **US$0.005**
