@@ -1,0 +1,45 @@
+{
+  "name": "EvidenceCheck",
+  "description": "Evidence-first vendor due-diligence APIs for procurement, security, GRC and AI-agent workflows.",
+  "version": "3.2.0",
+  "website": "https://evidencecheck-site.onrender.com",
+  "api": "https://evidencecheck-api.onrender.com",
+  "payment": {
+    "protocol": "x402",
+    "version": 2,
+    "scheme": "exact",
+    "network": "eip155:8453",
+    "asset": "USDC",
+    "payTo": "0x031a713863890eb611776aadd48397873ed153ab"
+  },
+  "services": [
+    {
+      "name": "Vendor Security Preflight",
+      "method": "POST",
+      "path": "/vendor-preflight",
+      "price": "$0.025",
+      "useWhen": "Public vendor pre-approval evidence scan."
+    },
+    {
+      "name": "Website Security Preflight",
+      "method": "POST",
+      "path": "/site-audit",
+      "price": "$0.01",
+      "useWhen": "Public website security signal scan."
+    },
+    {
+      "name": "Webpage Extractor",
+      "method": "POST",
+      "path": "/web-extract",
+      "price": "$0.005",
+      "useWhen": "Clean public webpage content for downstream reasoning."
+    },
+    {
+      "name": "Business Document Analyzer",
+      "method": "POST",
+      "path": "/analyze",
+      "price": "$0.005",
+      "useWhen": "Structured triage of supplied business-document text."
+    }
+  ]
+}
