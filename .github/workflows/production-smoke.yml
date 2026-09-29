@@ -16,9 +16,9 @@ jobs:
         run: |
           set -e
           for i in {1..30}; do
-            if curl -fsS --max-time 10 https://repoedu.onrender.com/health >/tmp/health.json; then
+            if curl -fsS --max-time 10 https://evidencecheck-api.onrender.com/health >/tmp/health.json; then
               cat /tmp/health.json
-              grep -Fq '"publicUrl":"https://repoedu.onrender.com"' /tmp/health.json
+              grep -Fq '"publicUrl":"https://evidencecheck-api.onrender.com"' /tmp/health.json
               exit 0
             fi
             echo "Waiting for Render API deployment ($i/30)..."
@@ -31,7 +31,7 @@ jobs:
         run: |
           set -e
           for path in /health /.well-known/x402 /openapi.json /skill.md /llms.txt /agent-discovery.json /.well-known/agent-card.json /.well-known/agent.json /.well-known/x402-discovery.json; do
-            code=$(curl -sS --max-time 20 -o /tmp/body -w "%{http_code}" "https://repoedu.onrender.com$path")
+            code=$(curl -sS --max-time 20 -o /tmp/body -w "%{http_code}" "https://evidencecheck-api.onrender.com$path")
             echo "$path HTTP $code"
             test "$code" = "200"
           done
@@ -44,7 +44,7 @@ jobs:
             body="$2"
             name="$3"
             headers="/tmp/headers-$name"
-            code=$(curl -sS --max-time 30 -D "$headers" -o "/tmp/body-$name" -w "%{http_code}" -X POST "https://repoedu.onrender.com$path" -H "Content-Type: application/json" -d "$body")
+            code=$(curl -sS --max-time 30 -D "$headers" -o "/tmp/body-$name" -w "%{http_code}" -X POST "https://evidencecheck-api.onrender.com$path" -H "Content-Type: application/json" -d "$body")
             echo "$path HTTP $code"
             test "$code" = "402"
             value=$(grep -i '^payment-required:' "$headers" | sed 's/^[^:]*:[[:space:]]*//I' | tr -d '\r\n')
@@ -72,7 +72,7 @@ jobs:
       - name: Verify buyer routes on the canonical origin
         run: |
           set -e
-          origin=https://repoedu.onrender.com
+          origin=https://evidencecheck-api.onrender.com
           for path in / /demo /assessment /purchase /commercial /sample-report /buy.html /openapi.json /skill.md /llms.txt /.well-known/agent-card.json /.well-known/x402 /.well-known/x402-discovery.json; do
             code=$(curl -sS --max-time 20 -o /tmp/site-body -w "%{http_code}" "$origin$path")
             echo "$path HTTP $code"
