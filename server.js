@@ -7,6 +7,7 @@ import dns from "node:dns/promises";
 import net from "node:net";
 import { paymentMiddleware } from "@x402/express";
 import { x402ResourceServer, HTTPFacilitatorClient } from "@x402/core/server";
+import { createFacilitatorConfig } from "@coinbase/x402";
 import { ExactEvmScheme } from "@x402/evm/exact/server";
 import { bazaarResourceServerExtension, declareDiscoveryExtension } from "@x402/extensions/bazaar";
 
@@ -49,7 +50,13 @@ const version = "3.3.0";
 const CACHE_TTL_MS = 120000;
 const extractionCache = new Map();
 
-const facilitatorClient = new HTTPFacilitatorClient({ url: facilitatorUrl });
+const cdpCredentialsConfigured = Boolean(process.env.CDP_API_KEY_ID && process.env.CDP_API_KEY_SECRET);
+if (facilitatorUrl.includes("api.cdp.coinbase.com") && !cdpCredentialsConfigured) {
+  console.warn("CDP x402 facilitator credentials are missing; paid routes will not settle until CDP_API_KEY_ID and CDP_API_KEY_SECRET are configured.");
+}
+const facilitatorClient = cdpCredentialsConfigured
+  ? new HTTPFacilitatorClient(createFacilitatorConfig(process.env.CDP_API_KEY_ID, process.env.CDP_API_KEY_SECRET))
+  : new HTTPFacilitatorClient({ url: facilitatorUrl });
 const x402Server = new x402ResourceServer(facilitatorClient)
   .register(network, new ExactEvmScheme())
   .registerExtension(bazaarResourceServerExtension);
@@ -418,7 +425,7 @@ app.use(paymentMiddleware(routes,x402Server));
 
 app.post("/review-purchase",async(req,res)=>{const x=req.body||{};const email=String(x.email||"").trim().toLowerCase();const vendorUrl=String(x.vendorUrl||"").trim();if(!/^\\S+@\\S+\\.\\S+$/.test(email))return res.status(400).json({error:"Valid work email required"});if(!validatePublicUrl(vendorUrl))return res.status(400).json({error:"Provide a public http or https vendor URL"});const lead={receivedAt:new Date().toISOString(),name:String(x.name||"").slice(0,120),company:String(x.company||"").slice(0,160),email,vendorUrl:vendorUrl.slice(0,500),message:String(x.message||"").slice(0,3000),price:pilotPrice};console.log("PAID_VENDOR_REVIEW "+JSON.stringify(lead));let preliminary=null;try{preliminary=await vendorPreflight(vendorUrl,[]);}catch(e){preliminary={error:"Public preflight could not be completed before intake",detail:e?.message||"unknown"}}try{await saveLead({name:lead.name,email:lead.email,company:lead.company,source:"paid-vendor-review",metadata:{vendorUrl:lead.vendorUrl,message:lead.message,price:pilotPrice,preliminary}})}catch(e){console.error("PAID_REVIEW_LEAD_STORAGE_ERROR",e.message)}if(process.env.LEAD_WEBHOOK_URL){fetch(process.env.LEAD_WEBHOOK_URL,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({...lead,preliminary})}).catch(()=>{});}res.json({ok:true,service:"Vendor Security Review",status:"paid",price:pilotPrice,targetTurnaround:"48 hours",scope:"One vendor",preliminaryPublicPreflight:preliminary,nextStep:"Submit any vendor security evidence, questionnaire responses, SOC 2/ISO documentation or other material you want included in the review."})});
 app.post("/web-extract",async(req,res)=>{try{res.json(await extractWebpage(String(req.body?.url||"").trim()));}catch(e){res.status(e?.name==="AbortError"?504:400).json({error:e?.name==="AbortError"?"target timed out":e?.message||"unable to extract webpage"});}});
-const paymentTestPage = () => String.raw`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>x402 Payment Test</title><script src="https://cdn.jsdelivr.net/npm/@base-org/account/dist/base-account.min.js"></script></head><body style="font-family:system-ui,sans-serif;max-width:760px;margin:40px auto;padding:0 22px;color:#111827"><h1>x402 real-payment test</h1><p>This page tests one real <strong>${price} USDC</strong> x402 payment on <strong>Base Mainnet</strong> to the configured payee.</p><p><strong>Your wallet stays in your control.</strong> No seed phrase, private key or password is requested. The Base Account SDK can connect the Base app by QR/deep link on supported devices, while a browser extension can also be used.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button id="connect" style="padding:12px 18px;border:0;border-radius:10px;cursor:pointer">Connect Base Wallet</button><button id="pay" disabled style="padding:12px 18px;border:0;border-radius:10px;cursor:pointer">Pay ${price} and test /web-extract</button></div><p id="status" style="margin-top:18px;font-weight:600"></p><pre id="out" style="white-space:pre-wrap;background:#f3f4f6;padding:16px;border-radius:12px;margin-top:12px"></pre><script type="module">
+const paymentTestConfigNote = "This is a real Base Mainnet test. It requires USDC on Base and an explicit wallet signature.";\nconst paymentTestPage = () => String.raw`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>x402 Payment Test</title><script src="https://cdn.jsdelivr.net/npm/@base-org/account/dist/base-account.min.js"></script></head><body style="font-family:system-ui,sans-serif;max-width:760px;margin:40px auto;padding:0 22px;color:#111827"><h1>x402 real-payment test</h1><p>This page tests one real <strong>${price} USDC</strong> x402 payment on <strong>Base Mainnet</strong> to the configured payee.</p><p><strong>Your wallet stays in your control.</strong> No seed phrase, private key or password is requested. The Base Account SDK can connect the Base app by QR/deep link on supported devices, while a browser extension can also be used.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button id="connect" style="padding:12px 18px;border:0;border-radius:10px;cursor:pointer">Connect Base Wallet</button><button id="pay" disabled style="padding:12px 18px;border:0;border-radius:10px;cursor:pointer">Pay ${price} and test /web-extract</button></div><p id="status" style="margin-top:18px;font-weight:600"></p><pre id="out" style="white-space:pre-wrap;background:#f3f4f6;padding:16px;border-radius:12px;margin-top:12px"></pre><script type="module">
 import { createWalletClient, custom } from "https://esm.sh/viem@2.37.4";
 import { base } from "https://esm.sh/viem@2.37.4/chains";
 import { x402Client, wrapFetchWithPayment } from "https://esm.sh/@x402/fetch@2.27.0";
