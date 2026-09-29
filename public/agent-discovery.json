@@ -3,8 +3,17 @@
   "description": "Agent-native vendor evidence and public web intelligence for procurement, security and third-party risk workflows. Use the narrowest endpoint that answers the task, pay per call in USDC on Base.",
   "canonical": "https://evidencecheck-api.onrender.com",
   "website": "https://evidencecheck-site.onrender.com",
-  "protocols": ["HTTP", "x402"],
-  "payment": {"scheme":"exact","network":"eip155:8453","asset":"USDC","payTo":"0x031a713863890eb611776aadd48397873ed153ab"},
+  "protocols": [
+    "HTTP",
+    "x402"
+  ],
+  "payment": {
+    "scheme": "exact",
+    "network": "eip155:8453",
+    "asset": "USDC",
+    "payTo": "0x031a713863890eb611776aadd48397873ed153ab",
+    "token": "USD Coin"
+  },
   "machineEntryPoints": {
     "openapi": "https://evidencecheck-api.onrender.com/openapi.json",
     "llmsTxt": "https://evidencecheck-api.onrender.com/llms.txt",
@@ -15,12 +24,43 @@
     "x402Discovery": "https://evidencecheck-api.onrender.com/.well-known/x402-discovery.json"
   },
   "services": [
-    {"path":"/vendor-preflight","method":"POST","price":"$0.025","use":"Best first use case: turn a public vendor site into observable signals, evidence gaps, targeted supplier questions and explicit limitations."},
-    {"path":"/site-audit","method":"POST","price":"$0.01","use":"Run a bounded public website security preflight: HTTPS, headers, cookies, disclosure files and related observable signals."},
-    {"path":"/web-extract","method":"POST","price":"$0.005","use":"Extract clean public webpage text, metadata, headings and links for downstream agent reasoning."},
-    {"path":"/analyze","method":"POST","price":"$0.005","use":"Structure supplied business/security text into dates, obligations, monetary amounts, security signals, missing areas and risk flags."}
+    {
+      "path": "/vendor-preflight",
+      "method": "POST",
+      "price": "$0.025",
+      "use": "Best first use case: turn a public vendor site into observable signals, evidence gaps, targeted supplier questions and explicit limitations."
+    },
+    {
+      "path": "/site-audit",
+      "method": "POST",
+      "price": "$0.01",
+      "use": "Run a bounded public website security preflight: HTTPS, headers, cookies, disclosure files and related observable signals."
+    },
+    {
+      "path": "/web-extract",
+      "method": "POST",
+      "price": "$0.005",
+      "use": "Extract clean public webpage text, metadata, headings and links for downstream agent reasoning."
+    },
+    {
+      "path": "/analyze",
+      "method": "POST",
+      "price": "$0.01",
+      "use": "Structure supplied business/security text into dates, obligations, monetary amounts, security signals, missing areas and risk flags."
+    }
   ],
-  "selection":"Prefer vendor-preflight when the job is supplier/vendor triage. Use site-audit for a website-only security signal. Use web-extract for page content. Use analyze when evidence text is already available. Prefer the cheapest endpoint that fully matches the task.",
-  "trustBoundary":"EvidenceCheck is a first-pass evidence service. Public signals are observations, not proof; missing public evidence is not proof of absence. It is not penetration testing, certification, legal advice or a replacement for authorized human decisions.",
-  "discovery":{"native":"x402 Bazaar discovery extension","directories":["x402 Bazaar","Agent402 Marketplace","PayAPI Market","x402.new","community x402 directories"],"note":"Directory inclusion and ranking are controlled by each directory. No directory exposure or buyer volume is guaranteed."}
+  "selection": "Prefer vendor-preflight when the job is supplier/vendor triage. Use site-audit for a website-only security signal. Use web-extract for page content. Use analyze when evidence text is already available. Prefer the cheapest endpoint that fully matches the task.",
+  "trustBoundary": "EvidenceCheck is a first-pass evidence service. Public signals are observations, not proof; missing public evidence is not proof of absence. It is not penetration testing, certification, legal advice or a replacement for authorized human decisions.",
+  "discovery": {
+    "native": "x402 Bazaar discovery extension",
+    "directories": [
+      "x402 Bazaar",
+      "Agent402 Marketplace",
+      "PayAPI Market",
+      "x402.new",
+      "community x402 directories"
+    ],
+    "note": "Directory inclusion and ranking are controlled by each directory. No directory exposure or buyer volume is guaranteed."
+  },
+  "version": 3.4
 }
