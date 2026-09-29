@@ -16,7 +16,7 @@ jobs:
         run: |
           set -e
           for i in {1..30}; do
-            if curl -fsS --max-time 10 https://evidencecheck-api.onrender.com/health >/tmp/health.json; then
+            if curl -fsS --max-time 10 https://repoedu.onrender.com/health >/tmp/health.json; then
               cat /tmp/health.json
               exit 0
             fi
@@ -30,7 +30,7 @@ jobs:
         run: |
           set -e
           for path in /health /.well-known/x402 /openapi.json /skill.md /llms.txt /agent-discovery.json /.well-known/agent-card.json /.well-known/agent.json /.well-known/x402-discovery.json; do
-            code=$(curl -sS --max-time 20 -o /tmp/body -w "%{http_code}" "https://evidencecheck-api.onrender.com$path")
+            code=$(curl -sS --max-time 20 -o /tmp/body -w "%{http_code}" "https://repoedu.onrender.com$path")
             echo "$path HTTP $code"
             test "$code" = "200"
           done
@@ -43,7 +43,7 @@ jobs:
             body="$2"
             name="$3"
             headers="/tmp/headers-$name"
-            code=$(curl -sS --max-time 30 -D "$headers" -o "/tmp/body-$name" -w "%{http_code}" -X POST "https://evidencecheck-api.onrender.com$path" -H "Content-Type: application/json" -d "$body")
+            code=$(curl -sS --max-time 30 -D "$headers" -o "/tmp/body-$name" -w "%{http_code}" -X POST "https://repoedu.onrender.com$path" -H "Content-Type: application/json" -d "$body")
             echo "$path HTTP $code"
             test "$code" = "402"
             value=$(grep -i '^payment-required:' "$headers" | sed 's/^[^:]*:[[:space:]]*//I' | tr -d '\r\n')
@@ -68,21 +68,15 @@ jobs:
           }
           NODE
 
-      - name: Verify buyer-site routes and no placeholder contact links
+      - name: Verify buyer routes on the canonical origin
         run: |
           set -e
-          site=https://evidencecheck-site.onrender.com
-          for path in / /demo/ /offer.html /agent-buy.html /buyer-brief.html /openapi.json /skill.md /llms.txt /agent-discovery.json /.well-known/agent-card.json /.well-known/agent.json /.well-known/x402 /.well-known/x402-discovery.json; do
-            code=$(curl -sS --max-time 20 -o /tmp/site-body -w "%{http_code}" "$site$path")
+          origin=https://repoedu.onrender.com
+          for path in / /demo /assessment /purchase /commercial /sample-report /buy.html /openapi.json /skill.md /llms.txt /.well-known/agent-card.json /.well-known/x402 /.well-known/x402-discovery.json; do
+            code=$(curl -sS --max-time 20 -o /tmp/site-body -w "%{http_code}" "$origin$path")
             echo "$path HTTP $code"
             test "$code" = "200"
           done
-          body=$(curl -fsS --max-time 20 "$site/offer.html")
-          if printf '%s' "$body" | grep -q 'evidencecheck\.example'; then
-            echo 'Placeholder .example contact link found in offer.html'
-            exit 1
-          fi
-          home=$(curl -fsS --max-time 20 "$site/")
-          for href in '/demo' '/offer.html' '/agent-buy.html' '/openapi.json'; do
-            printf '%s' "$home" | grep -Fq "href=\"$href\"" || { echo "Missing home link $href"; exit 1; }
-          done
+          home=$(curl -fsS --max-time 20 "$origin/")
+          printf '%s' "$home" | grep -Fq "/demo"
+          printf '%s' "$home" | grep -Fq "/openapi.json"
