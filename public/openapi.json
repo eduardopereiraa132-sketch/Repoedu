@@ -1,12 +1,184 @@
 {
-  "openapi":"3.1.0",
-  "info":{"title":"EvidenceCheck API","version":"2.6.0","description":"Evidence-first vendor due-diligence and public-web security preflight APIs. Paid routes use x402 USDC on Base Mainnet."},
-  "servers":[{"url":"https://evidencecheck-api.onrender.com"}],
-  "paths":{
-    "/web-extract":{"post":{"summary":"Extract a public webpage","requestBody":{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["url"],"properties":{"url":{"type":"string","format":"uri"}}}}}},"responses":{"402":{"description":"x402 payment required"},"200":{"description":"Structured webpage extraction"}}}},
-    "/site-audit":{"post":{"summary":"Audit observable public website security signals","requestBody":{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["url"],"properties":{"url":{"type":"string","format":"uri"}}}}}},"responses":{"402":{"description":"x402 payment required"},"200":{"description":"Structured security preflight"}}}},
-    "/vendor-preflight":{"post":{"summary":"Run vendor security preflight","requestBody":{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["url"],"properties":{"url":{"type":"string","format":"uri"},"requirements":{"type":"array","items":{"type":"string"}}}}}}},"responses":{"402":{"description":"x402 payment required"},"200":{"description":"Vendor evidence gaps and next questions"}}}},
-    "/analyze":{"post":{"summary":"Analyze business document text","requestBody":{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["text"],"properties":{"text":{"type":"string"}}}}}},"responses":{"402":{"description":"x402 payment required"},"200":{"description":"Structured document findings"}}}}
+  "openapi": "3.1.0",
+  "info": {
+    "title": "EvidenceCheck API",
+    "version": "3.4.0",
+    "description": "Evidence-first vendor due-diligence APIs for procurement, security, GRC and compatible AI-agent workflows. Paid routes use x402 v2 exact USDC on Base Mainnet."
   },
-  "x-evidencecheck":{"payment":{"protocol":"x402","network":"eip155:8453","asset":"USDC","scheme":"exact","payTo":"0x031a713863890eb611776aadd48397873ed153ab"},"pricing":{"web-extract":"$0.005","site-audit":"$0.01","vendor-preflight":"$0.025","analyze":"$0.005"}}
+  "servers": [{"url": "https://evidencecheck-api.onrender.com"}],
+  "paths": {
+    "/vendor-preflight": {
+      "post": {
+        "summary": "Run vendor evidence preflight",
+        "description": "Analyze observable public vendor signals and produce evidence gaps and targeted follow-up questions. This is not a certification or final security decision.",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/VendorPreflightInput"}}}},
+        "responses": {
+          "200": {"description": "Structured vendor evidence preflight", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/VendorPreflightOutput"}}}},
+          "400": {"description": "Invalid public URL or input"},
+          "402": {"description": "x402 payment required"},
+          "504": {"description": "Target timed out"}
+        }
+      }
+    },
+    "/site-audit": {
+      "post": {
+        "summary": "Run public website security preflight",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UrlInput"}}}},
+        "responses": {
+          "200": {"description": "Observable website security signals", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SiteAuditOutput"}}}},
+          "400": {"description": "Invalid URL"},
+          "402": {"description": "x402 payment required"},
+          "504": {"description": "Target timed out"}
+        }
+      }
+    },
+    "/web-extract": {
+      "post": {
+        "summary": "Extract a public webpage",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UrlInput"}}}},
+        "responses": {
+          "200": {"description": "Structured webpage extraction", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/WebExtractOutput"}}}},
+          "400": {"description": "Invalid URL or unsupported content"},
+          "402": {"description": "x402 payment required"},
+          "504": {"description": "Target timed out"}
+        }
+      }
+    },
+    "/analyze": {
+      "post": {
+        "summary": "Triage supplied business-document text",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DocumentInput"}}}},
+        "responses": {
+          "200": {"description": "Structured document triage", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DocumentOutput"}}}},
+          "400": {"description": "Invalid input"},
+          "402": {"description": "x402 payment required"},
+          "413": {"description": "Input too large"}
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UrlInput": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {"url": {"type": "string", "format": "uri", "description": "Public http(s) URL."}}
+      },
+      "DocumentInput": {
+        "type": "object",
+        "required": ["text"],
+        "properties": {"text": {"type": "string", "maxLength": 50000}}
+      },
+      "VendorPreflightInput": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": {"type": "string", "format": "uri", "description": "Public vendor website URL."},
+          "requirements": {"type": "array", "items": {"type": "string"}}
+        }
+      },
+      "DocumentOutput": {
+        "type": "object",
+        "required": ["service","wordCount","characterCount","dates","monetaryAmounts","obligations","securitySignals","missingAreas","riskFlags"],
+        "properties": {
+          "service": {"type":"string"},
+          "wordCount": {"type":"integer"},
+          "characterCount": {"type":"integer"},
+          "dates": {"type":"array","items":{"type":"string"}},
+          "monetaryAmounts": {"type":"array","items":{"type":"string"}},
+          "obligations": {"type":"array","items":{"type":"string"}},
+          "securitySignals": {"type":"array","items":{"type":"string"}},
+          "missingAreas": {"type":"array","items":{"type":"string"}},
+          "riskFlags": {"type":"array","items":{"type":"string"}}
+        }
+      },
+      "VendorPreflightOutput": {
+        "type": "object",
+        "required": ["schemaVersion","service","checkedAt","url","finalUrl","status","https","publicSignalLevel","riskLevel","riskLevelInterpretation","pageTitle","responseTimeMs","checks","coverage","gaps","unverifiableRequirements","disclosureSignals","evidencePages","nextQuestions","summary","limitations"],
+        "properties": {
+          "schemaVersion":{"type":"string"},
+          "service":{"type":"string"},
+          "checkedAt":{"type":"string","format":"date-time"},
+          "url":{"type":"string","format":"uri"},
+          "finalUrl":{"type":"string","format":"uri"},
+          "status":{"type":"integer"},
+          "https":{"type":"boolean"},
+          "publicSignalLevel":{"type":"string"},
+          "riskLevel":{"type":"string","description":"Legacy compatibility field; not a final vendor-risk rating."},
+          "riskLevelInterpretation":{"type":"string"},
+          "pageTitle":{"type":"string"},
+          "responseTimeMs":{"type":"integer"},
+          "checks":{"type":"array","items":{"type":"object"}},
+          "coverage":{"type":"object"},
+          "gaps":{"type":"array","items":{"type":"string"}},
+          "unverifiableRequirements":{"type":"array","items":{"type":"string"}},
+          "disclosureSignals":{"type":"array","items":{"type":"object"}},
+          "evidencePages":{"type":"array","items":{"type":"object"}},
+          "nextQuestions":{"type":"array","items":{"type":"string"}},
+          "summary":{"type":"string"},
+          "limitations":{"type":"array","items":{"type":"string"}}
+        }
+      },
+      "SiteAuditOutput": {
+        "type":"object",
+        "required":["service","url","finalUrl","status","contentType","responseTimeMs","title","https","securityHeaders","cookieSecurity","exposedServerHeader","robotsTxt","securityTxt","findings"],
+        "properties":{
+          "service":{"type":"string"},
+          "url":{"type":"string","format":"uri"},
+          "finalUrl":{"type":"string","format":"uri"},
+          "status":{"type":"integer"},
+          "contentType":{"type":"string"},
+          "responseTimeMs":{"type":"integer"},
+          "title":{"type":"string"},
+          "https":{"type":"boolean"},
+          "securityHeaders":{"type":"object"},
+          "cookieSecurity":{"type":"object"},
+          "exposedServerHeader":{"type":"boolean"},
+          "robotsTxt":{"type":"object"},
+          "securityTxt":{"type":"object"},
+          "findings":{"type":"array","items":{"type":"string"}}
+        }
+      },
+      "WebExtractOutput": {
+        "type":"object",
+        "required":["service","url","finalUrl","status","contentType","title","description","canonical","language","openGraph","headings","text","links","wordCount","truncated","responseTimeMs","cacheHit"],
+        "properties":{
+          "service":{"type":"string"},
+          "url":{"type":"string","format":"uri"},
+          "finalUrl":{"type":"string","format":"uri"},
+          "status":{"type":"integer"},
+          "contentType":{"type":"string"},
+          "title":{"type":"string"},
+          "description":{"type":"string"},
+          "canonical":{"type":"string"},
+          "language":{"type":"string"},
+          "openGraph":{"type":"object"},
+          "headings":{"type":"array","items":{"type":"string"}},
+          "text":{"type":"string"},
+          "links":{"type":"array","items":{"type":"object"}},
+          "wordCount":{"type":"integer"},
+          "truncated":{"type":"boolean"},
+          "responseTimeMs":{"type":"integer"},
+          "cacheHit":{"type":"boolean"}
+        }
+      }
+    }
+  },
+  "x-evidencecheck": {
+    "payment": {
+      "protocol": "x402",
+      "version": 2,
+      "network": "eip155:8453",
+      "asset": "USDC",
+      "scheme": "exact",
+      "payTo": "0x031a713863890eb611776aadd48397873ed153ab"
+    },
+    "pricing": {
+      "vendor-preflight": "$0.025",
+      "site-audit": "$0.01",
+      "web-extract": "$0.005",
+      "analyze": "$0.01"
+    },
+    "authoritativePaymentRule": "Use the live 402 payment requirements returned by the requested endpoint as the source of truth."
+  }
 }
