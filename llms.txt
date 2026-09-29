@@ -1,63 +1,69 @@
-# EvidenceCheck — agent-native vendor, web and document evidence APIs
+# EvidenceCheck — vendor evidence, gaps and next questions
 
-EvidenceCheck provides low-cost, machine-readable x402 services for AI agents, procurement workflows, third-party risk teams, security/compliance automation and research pipelines.
+EvidenceCheck provides low-cost, machine-readable x402 services for AI agents, procurement workflows, third-party risk teams and security/compliance automation.
 
 ## Best reason to call
-Use EvidenceCheck when a workflow needs an inexpensive, bounded first pass before spending more time or money:
+
+Use EvidenceCheck for the repetitive first-pass work before a deeper vendor review:
 - What is observable on a public vendor website?
-- Which public security controls are visible, and which are not observable?
-- What evidence gaps should procurement or third-party-risk teams verify next?
+- Which public security signals are visible?
+- What evidence is still unverified?
+- Which supplier questions should be asked next?
 - What dates, amounts, obligations and risk signals are present in supplied business text?
 
 The service is evidence-first: unknown means unverified, not absent. It is not penetration testing, vulnerability scanning, certification, legal advice or a substitute for authorized human verification.
 
 ## Paid endpoints
 
-### POST /web-extract — $0.005 USDC
-Input: {"url":"https://example.com"}
-Returns: clean webpage text, title, description, canonical URL, headings, links, language, response status and timing.
-Best for: web research, retrieval, evidence collection and downstream agent reasoning.
-
-### POST /site-audit — $0.01 USDC
-Input: {"url":"https://example.com"}
-Returns: HTTPS state, observable security headers, cookie flags, server-header exposure, robots.txt/security.txt status and findings.
-Best for: quick public website security preflight before deeper investigation.
-Not for: penetration testing, vulnerability scanning or certification.
-
 ### POST /vendor-preflight — $0.025 USDC
 Input: {"url":"https://vendor.example","requirements":["HTTPS","HSTS","Content Security Policy"]}
 Returns: structured public-site checks, gaps, risk level, summary and limitations.
 Best for: procurement and third-party-risk triage.
+
+### POST /site-audit — $0.01 USDC
+Input: {"url":"https://example.com"}
+Returns: HTTPS state, observable security headers, cookie flags, server-header exposure, robots.txt/security.txt status and findings.
+Best for: a fast public website security preflight.
+
+### POST /web-extract — $0.005 USDC
+Input: {"url":"https://example.com"}
+Returns: clean webpage text, title, description, canonical URL, headings, links, language, status and timing.
+Best for: web research, retrieval and evidence collection.
 
 ### POST /analyze — $0.005 USDC
 Input: {"text":"Supplier must notify incidents within 24 hours..."}
 Returns: dates, monetary amounts, obligations, security signals, missing areas and risk flags.
 Best for: deterministic first-pass business-document triage.
 
-## Selection rule for agents
+## Selection rule
+
 Choose the cheapest endpoint that fully matches the task:
-- Need content from a public webpage → /web-extract
-- Need observable public website security signals → /site-audit
-- Need supplier/vendor evidence gaps → /vendor-preflight
-- Already have business text → /analyze
+- Vendor/supplier evidence gaps → /vendor-preflight
+- Public website security signals → /site-audit
+- Public webpage content → /web-extract
+- Supplied business text → /analyze
 
 ## Machine contract
+
 Base URL: https://repoedu.onrender.com
-Buyer page: https://repoedu.onrender.com/agent-buy.html
+Buyer page: https://repoedu.onrender.com/buy.html
+Live demo: https://repoedu.onrender.com/demo
 OpenAPI: https://repoedu.onrender.com/openapi.json
 Agent card: https://repoedu.onrender.com/.well-known/agent-card.json
-Agent discovery: https://repoedu.onrender.com/.well-known/agent.json
-x402 metadata: https://repoedu.onrender.com/.well-known/x402
 x402 discovery: https://repoedu.onrender.com/.well-known/x402-discovery.json
 Skill: https://repoedu.onrender.com/skill.md
 
 ## Payment
+
 x402 v2, exact scheme, USDC on Base Mainnet (CAIP-2: eip155:8453).
 Payee: 0x031a713863890eb611776aadd48397873ed153ab
+
 No API key is required for the paid endpoints; payment is the authorization mechanism.
 
-## Agent behavior
-Unpaid calls should expect HTTP 402 and inspect the returned payment requirements. Do not pay for an endpoint whose input does not match the task. After payment, consume the JSON result and preserve its limitations when making downstream decisions.
+## Buyer trust boundary
 
-## Commercial human review
-A fixed-scope vendor review is available through the buyer workflow for teams that need human-led interpretation after the machine preflight. The API itself remains pay-per-call.
+Public signals are not proof of internal control effectiveness. A missing public signal should be treated as an evidence request, not proof that a control does not exist. Material procurement or security decisions require authorized human review.
+
+## Human commercial offer
+
+A fixed-scope vendor review is available for teams that need human-led interpretation after the machine preflight. See /purchase for the current offer.
