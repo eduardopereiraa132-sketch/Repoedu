@@ -62,7 +62,7 @@ jobs:
           curl -fsS --max-time 15 "$ORIGIN/.well-known/x402-discovery.json" -o /tmp/discovery.json
           grep -q "Verify the evidence" /tmp/buy.html
           grep -q "vendor-preflight" /tmp/llms.txt
-          grep -q ""website": "https://repoedu.onrender.com/buy.html"" /tmp/discovery.json
+          grep -Fq '"website":"https://repoedu.onrender.com/buy.html"' /tmp/discovery.json
 
       - name: Register origin with Agent402
         id: register
