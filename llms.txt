@@ -20,7 +20,7 @@ Skill: https://evidencecheck-api.onrender.com/skill.md
 x402 v2 exact
 Network: Base Mainnet (eip155:8453)
 Asset: USDC
-PayTo: 0x031a713863890eb611776aadd48397873ed5b
+PayTo: 0x031a713863890eb611776aadd48397873ed153ab
 
 Authoritative payment rule:
 Always call the selected endpoint first. If it returns HTTP 402, use its live payment requirements as the authoritative amount, recipient, network and asset. Do not infer payment parameters from this document alone.
