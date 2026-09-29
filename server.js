@@ -58,7 +58,7 @@ const siteAuditInputSchema={type:"object",properties:{url:{type:"string",descrip
 const webExtractInputSchema={type:"object",properties:{url:{type:"string",description:"Public http or https webpage URL."}},required:["url"]};
 const webExtractOutputSchema={type:"object",properties:{service:{type:"string"},url:{type:"string"},finalUrl:{type:"string"},status:{type:"integer"},contentType:{type:"string"},title:{type:"string"},description:{type:"string"},canonical:{type:"string"},language:{type:"string"},openGraph:{type:"object"},headings:{type:"array",items:{type:"string"}},text:{type:"string"},links:{type:"array",items:{type:"object"}},wordCount:{type:"integer"},truncated:{type:"boolean"},responseTimeMs:{type:"integer"},cacheHit:{type:"boolean"}},required:["service","url","finalUrl","status","contentType","title","description","canonical","language","openGraph","headings","text","links","wordCount","truncated","responseTimeMs","cacheHit"]};
 const vendorPreflightInputSchema={type:"object",properties:{url:{type:"string",description:"Public vendor website URL."},requirements:{type:"array",items:{type:"string"},description:"Optional security requirements to check against public-site signals."}},required:["url"]};
-const vendorPreflightOutputSchema={type:"object",properties:{service:{type:"string"},url:{type:"string"},status:{type:"integer"},https:{type:"boolean"},riskLevel:{type:"string"},checks:{type:"array",items:{type:"object"}},gaps:{type:"array",items:{type:"string"}},summary:{type:"string"},limitations:{type:"array",items:{type:"string"}}},required:["service","url","status","https","riskLevel","checks","gaps","summary","limitations"]};
+const vendorPreflightOutputSchema={type:"object",properties:{schemaVersion:{type:"string"},service:{type:"string"},checkedAt:{type:"string"},url:{type:"string"},finalUrl:{type:"string"},status:{type:"integer"},https:{type:"boolean"},publicSignalLevel:{type:"string"},riskLevel:{type:"string"},riskLevelInterpretation:{type:"string"},pageTitle:{type:"string"},responseTimeMs:{type:"integer"},checks:{type:"array",items:{type:"object"}},coverage:{type:"object"},gaps:{type:"array",items:{type:"string"}},unverifiableRequirements:{type:"array",items:{type:"string"}},disclosureSignals:{type:"array",items:{type:"object"}},evidencePages:{type:"array",items:{type:"object"}},nextQuestions:{type:"array",items:{type:"string"}},summary:{type:"string"},limitations:{type:"array",items:{type:"string"}}},required:["schemaVersion","service","checkedAt","url","finalUrl","status","https","publicSignalLevel","riskLevel","riskLevelInterpretation","pageTitle","responseTimeMs","checks","coverage","gaps","unverifiableRequirements","disclosureSignals","evidencePages","nextQuestions","summary","limitations"]};
 const siteAuditOutputSchema={
   type:"object",properties:{
     service:{type:"string"},url:{type:"string"},finalUrl:{type:"string"},status:{type:"integer"},
@@ -218,39 +218,150 @@ async function auditSite(raw){
   };
 }
 
-async function vendorPreflight(rawUrl,requirements=[]){
-  const audit=await auditSite(rawUrl);
-  const reqs=Array.isArray(requirements)?requirements.filter(x=>typeof x==="string"&&x.trim()).slice(0,20):[];
-  const checks=[
-    {id:"https",label:"HTTPS",passed:audit.https,detail:audit.https?"HTTPS is enabled":"HTTPS is not enabled"},
-    {id:"hsts",label:"HSTS",passed:audit.securityHeaders.strictTransportSecurity,detail:audit.securityHeaders.strictTransportSecurity?"HSTS observed":"HSTS not observed"},
-    {id:"csp",label:"Content Security Policy",passed:audit.securityHeaders.contentSecurityPolicy,detail:audit.securityHeaders.contentSecurityPolicy?"CSP observed":"CSP not observed"},
-    {id:"xcto",label:"X-Content-Type-Options",passed:audit.securityHeaders.xContentTypeOptions,detail:audit.securityHeaders.xContentTypeOptions?"Header observed":"Header not observed"},
-    {id:"frame",label:"Clickjacking protection",passed:audit.securityHeaders.xFrameOptions,detail:audit.securityHeaders.xFrameOptions?"X-Frame-Options observed":"X-Frame-Options not observed"},
-    {id:"referrer",label:"Referrer Policy",passed:audit.securityHeaders.referrerPolicy,detail:audit.securityHeaders.referrerPolicy?"Header observed":"Header not observed"},
-    {id:"permissions",label:"Permissions Policy",passed:audit.securityHeaders.permissionsPolicy,detail:audit.securityHeaders.permissionsPolicy?"Header observed":"Header not observed"},
-    {id:"securityTxt",label:"security.txt",passed:audit.securityTxt.exists,detail:audit.securityTxt.exists?"security.txt observed":"security.txt not observed"},
-    {id:"robots",label:"robots.txt",passed:audit.robotsTxt.exists,detail:audit.robotsTxt.exists?"robots.txt observed":"robots.txt not observed"},
-    {id:"server",label:"Server disclosure",passed:!audit.exposedServerHeader,detail:!audit.exposedServerHeader?"Server header not exposed":"Server header exposed"}
-  ];
-  for(const req of reqs){
-    const r=req.toLowerCase(); let match=null;
-    if(/https|tls/.test(r)) match=checks.find(x=>x.id==="https");
-    else if(/hsts|strict transport/.test(r)) match=checks.find(x=>x.id==="hsts");
-    else if(/content.?security.?policy|csp/.test(r)) match=checks.find(x=>x.id==="csp");
-    else if(/clickjack|x-frame/.test(r)) match=checks.find(x=>x.id==="frame");
-    else if(/referrer/.test(r)) match=checks.find(x=>x.id==="referrer");
-    else if(/permission/.test(r)) match=checks.find(x=>x.id==="permissions");
-    else if(/security.?txt/.test(r)) match=checks.find(x=>x.id==="securityTxt");
-    if(match) match.requirement=req;
-    else checks.push({id:"requirement",label:req,passed:false,detail:"Requirement cannot be verified by this public-site preflight"});
+
+const DISCLOSURE_SIGNALS = [
+  {id:"security_assurance", label:"independent security assurance", pattern:/soc\s*2|soc2|iso\s*27001|iso\/iec\s*27001|independent audit|assurance report/i},
+  {id:"security_practices", label:"security practices", pattern:/access control|mfa|multi-factor|encryption|vulnerability management|penetration test|security program|security controls/i},
+  {id:"incident_response", label:"incident response", pattern:/incident response|security incident|breach notification|incident notification/i},
+  {id:"privacy", label:"privacy and data protection", pattern:/privacy policy|data protection|personal data|gdpr|dpa|data processing/i},
+  {id:"subprocessors", label:"subprocessor transparency", pattern:/subprocessor|sub-processors|subprocessor list|third[- ]party providers/i},
+  {id:"continuity", label:"continuity and recovery", pattern:/business continuity|disaster recovery|recovery point|recovery time|bc\/?dr/i}
+];
+
+function disclosureSignalsFromText(text,sourceUrl){
+  const out=[];
+  for(const topic of DISCLOSURE_SIGNALS){
+    if(topic.pattern.test(text||"")){
+      out.push({
+        id:topic.id,
+        topic:topic.label,
+        evidenceUrl:sourceUrl,
+        observation:"Related public wording was observed.",
+        note:"This is evidence discovery, not proof that the underlying control or certification is valid."
+      });
+    }
   }
-  const gaps=checks.filter(x=>x.passed===false).map(x=>x.label);
+  return out;
+}
+
+async function vendorPreflight(rawUrl,requirements=[]){
+  const started=Date.now();
+  const audit=await auditSite(rawUrl);
+  let root=null;
+  try{root=await extractWebpage(audit.finalUrl);}catch{}
+
+  const rootSignals=disclosureSignalsFromText(root?.text||"",audit.finalUrl);
+  const pages=[{
+    url:audit.finalUrl,
+    title:root?.title||audit.finalUrl,
+    status:audit.status,
+    signals:rootSignals,
+    topics:rootSignals.map(x=>x.topic)
+  }];
+
+  const candidateLinks=(root?.links||[])
+    .filter(x=>/security|trust|compliance|privacy|subprocessor|soc\s*2|iso\s*27001|incident/i.test((x.text||"")+" "+x.url))
+    .map(x=>x.url)
+    .filter((u,i,a)=>a.indexOf(u)===i && u!==audit.finalUrl)
+    .slice(0,2);
+
+  const extraResults=await Promise.allSettled(candidateLinks.map(u=>extractWebpage(u)));
+  for(let i=0;i<extraResults.length;i++){
+    const r=extraResults[i];
+    if(r.status==="fulfilled"){
+      const signals=disclosureSignalsFromText(r.value.text||"",r.value.finalUrl);
+      pages.push({
+        url:r.value.finalUrl,
+        title:r.value.title||r.value.finalUrl,
+        status:r.value.status,
+        signals,
+        topics:signals.map(x=>x.topic)
+      });
+    }
+  }
+
+  const disclosureSignals=[...new Map(pages.flatMap(p=>p.signals).map(x=>[x.id+"|"+x.evidenceUrl,x])).values()];
+  const observedAt=new Date().toISOString();
+  const baseSource=audit.finalUrl;
+  const checks=[
+    {id:"https",label:"HTTPS",passed:audit.https,status:audit.https?"observed":"not_observed",detail:audit.https?"HTTPS is enabled":"HTTPS is not enabled",source:baseSource,observedAt},
+    {id:"hsts",label:"HSTS",passed:audit.securityHeaders.strictTransportSecurity,status:audit.securityHeaders.strictTransportSecurity?"observed":"not_observed",detail:audit.securityHeaders.strictTransportSecurity?"HSTS observed":"HSTS not observed",source:baseSource,observedAt},
+    {id:"csp",label:"Content Security Policy",passed:audit.securityHeaders.contentSecurityPolicy,status:audit.securityHeaders.contentSecurityPolicy?"observed":"not_observed",detail:audit.securityHeaders.contentSecurityPolicy?"CSP observed":"CSP not observed",source:baseSource,observedAt},
+    {id:"xcto",label:"X-Content-Type-Options",passed:audit.securityHeaders.xContentTypeOptions,status:audit.securityHeaders.xContentTypeOptions?"observed":"not_observed",detail:audit.securityHeaders.xContentTypeOptions?"Header observed":"Header not observed",source:baseSource,observedAt},
+    {id:"frame",label:"Clickjacking protection",passed:audit.securityHeaders.xFrameOptions,status:audit.securityHeaders.xFrameOptions?"observed":"not_observed",detail:audit.securityHeaders.xFrameOptions?"X-Frame-Options observed":"X-Frame-Options not observed",source:baseSource,observedAt},
+    {id:"referrer",label:"Referrer Policy",passed:audit.securityHeaders.referrerPolicy,status:audit.securityHeaders.referrerPolicy?"observed":"not_observed",detail:audit.securityHeaders.referrerPolicy?"Header observed":"Header not observed",source:baseSource,observedAt},
+    {id:"permissions",label:"Permissions Policy",passed:audit.securityHeaders.permissionsPolicy,status:audit.securityHeaders.permissionsPolicy?"observed":"not_observed",detail:audit.securityHeaders.permissionsPolicy?"Permissions Policy observed":"Permissions Policy not observed",source:baseSource,observedAt},
+    {id:"securityTxt",label:"security.txt",passed:audit.securityTxt.exists,status:audit.securityTxt.exists?"observed":"not_observed",detail:audit.securityTxt.exists?"security.txt observed":"security.txt not observed",source:new URL("/.well-known/security.txt",audit.finalUrl).toString(),observedAt},
+    {id:"robots",label:"robots.txt",passed:audit.robotsTxt.exists,status:audit.robotsTxt.exists?"observed":"not_observed",detail:audit.robotsTxt.exists?"robots.txt observed":"robots.txt not observed",source:new URL("/robots.txt",audit.finalUrl).toString(),observedAt},
+    {id:"server",label:"Server disclosure",passed:!audit.exposedServerHeader,status:!audit.exposedServerHeader?"observed":"not_observed",detail:!audit.exposedServerHeader?"Server header not exposed":"Server header exposed",source:baseSource,observedAt}
+  ];
+
+  const reqs=Array.isArray(requirements)?requirements.filter(x=>typeof x==="string"&&x.trim()).slice(0,20):[];
+  const unverifiableRequirements=[];
+  for(const req of reqs){
+    const r=String(req).toLowerCase();
+    let match=null;
+    if(/https|tls/.test(r))match=checks.find(x=>x.id==="https");
+    else if(/hsts|strict transport/.test(r))match=checks.find(x=>x.id==="hsts");
+    else if(/content.?security.?policy|csp/.test(r))match=checks.find(x=>x.id==="csp");
+    else if(/clickjack|x-frame/.test(r))match=checks.find(x=>x.id==="frame");
+    else if(/referrer/.test(r))match=checks.find(x=>x.id==="referrer");
+    else if(/permission/.test(r))match=checks.find(x=>x.id==="permissions");
+    else if(/security.?txt/.test(r))match=checks.find(x=>x.id==="securityTxt");
+    if(match){match.requirement=req;}
+    else{unverifiableRequirements.push(req);}
+  }
+
   const core=checks.filter(x=>["https","hsts","csp","xcto","frame","referrer","permissions"].includes(x.id));
   const failedCore=core.filter(x=>!x.passed).length;
-  const riskLevel=!audit.https||failedCore>=5?"high":failedCore>=3?"medium":failedCore>=1?"low":"informational";
-  const summary=`Public-site preflight found ${gaps.length} unmet or unverifiable checks; this is a first-pass signal, not a penetration test.`;
-  return {service:"Vendor Security Preflight",url:audit.finalUrl,status:audit.status,https:audit.https,riskLevel,checks,gaps:[...new Set(gaps)],summary,limitations:["Only publicly observable HTTP/site signals are checked.","No authenticated testing, source-code review, vulnerability scanning, exploitation, certification or legal opinion.","A missing header or file is a signal, not proof of a vulnerability."]};
+  const publicSignalLevel=!audit.https||failedCore>=5?"high":failedCore>=3?"medium":failedCore>=1?"low":"informational";
+  const gaps=checks.filter(x=>x.passed===false).map(x=>x.label);
+  const coverage={
+    observed:checks.filter(x=>x.status==="observed").length,
+    notObserved:checks.filter(x=>x.status==="not_observed").length,
+    unverifiable:unverifiableRequirements.length,
+    totalChecks:checks.length
+  };
+
+  const nextQuestions=[];
+  if(!disclosureSignals.some(x=>x.id==="security_assurance"))nextQuestions.push("Ask the vendor for current independent security assurance evidence (for example SOC 2 or ISO/IEC 27001) if applicable.");
+  if(!disclosureSignals.some(x=>x.id==="incident_response"))nextQuestions.push("Ask how security incidents are handled and what notification commitment applies to the service.");
+  if(!disclosureSignals.some(x=>x.id==="privacy"))nextQuestions.push("Ask for the applicable privacy/DPA terms and data-retention or deletion commitments.");
+  if(!disclosureSignals.some(x=>x.id==="subprocessors"))nextQuestions.push("Ask for the current subprocessor list and change-notification process.");
+  if(!audit.securityHeaders.strictTransportSecurity)nextQuestions.push("Confirm transport-security controls and supported TLS configuration.");
+  for(const req of unverifiableRequirements)nextQuestions.push("Request evidence for the requirement: "+req);
+
+  const summary=\`Observed \${coverage.observed}/\${coverage.totalChecks} public-site checks. \${gaps.length} checks were not observed; \${unverifiableRequirements.length} requested requirements were not verifiable by this public preflight.\`;
+
+  return {
+    schemaVersion:"2.0",
+    service:"Vendor Security Preflight",
+    checkedAt:observedAt,
+    url:String(rawUrl),
+    finalUrl:audit.finalUrl,
+    status:audit.status,
+    https:audit.https,
+    publicSignalLevel,
+    riskLevel:publicSignalLevel,
+    riskLevelInterpretation:"Legacy compatibility field. This is a public-site signal bucket, not a vendor security or procurement risk rating.",
+    pageTitle:root?.title||"",
+    responseTimeMs:Date.now()-started,
+    checks,
+    coverage,
+    gaps:[...new Set(gaps)],
+    unverifiableRequirements,
+    disclosureSignals,
+    evidencePages:pages.map(p=>({url:p.url,title:p.title,status:p.status,topics:p.topics})),
+    nextQuestions:[...new Set(nextQuestions)].slice(0,12),
+    summary,
+    limitations:[
+      "Only publicly observable HTTP/site signals and publicly reachable pages are checked.",
+      "Public wording or a missing header/file is evidence about the website, not proof about internal controls.",
+      "No authenticated testing, source-code review, vulnerability scanning, exploitation, certification or legal opinion is performed.",
+      "The publicSignalLevel is not a final vendor-risk score and must not be used as an approval/rejection decision.",
+      "Material procurement or security decisions require authorized human review."
+    ]
+  };
 }
 
 const routes={
@@ -268,8 +379,8 @@ const routes={
   "POST /vendor-preflight":{
     accepts:{scheme:"exact",price:vendorPrice,network,payTo},
     resource:{url:publicUrl+"/vendor-preflight",description:"Agent-ready vendor security preflight combining public website controls into a structured procurement/risk signal.",mimeType:"application/json",serviceName:"Vendor Security Preflight",tags:["security","vendor-risk","procurement","compliance","due-diligence"],iconUrl:publicUrl+"/icon.svg"},
-    description:"Paid vendor security preflight. Send JSON {url:string,requirements?:string[]}. Not a penetration test or certification.",mimeType:"application/json",
-    extensions:{...declareDiscoveryExtension({input:{url:"https://example.com",requirements:["HTTPS","HSTS","Content Security Policy"]},inputSchema:vendorPreflightInputSchema,bodyType:"json",output:{example:{service:"Vendor Security Preflight",url:"https://example.com/",status:200,https:true,riskLevel:"low",checks:[{id:"https",label:"HTTPS",passed:true,detail:"HTTPS is enabled"}],gaps:["Content Security Policy"],summary:"Public-site preflight found 1 unmet or unverifiable checks; this is a first-pass signal, not a penetration test.",limitations:["Only publicly observable HTTP/site signals are checked."]},schema:vendorPreflightOutputSchema}})}
+    description:"Paid vendor evidence preflight. Send JSON {url:string,requirements?:string[]}. Returns observable website controls, public evidence-page signals, gaps and targeted follow-up questions. Not a penetration test or certification.",mimeType:"application/json",
+    extensions:{...declareDiscoveryExtension({input:{url:"https://example.com",requirements:["HTTPS","HSTS","Content Security Policy"]},inputSchema:vendorPreflightInputSchema,bodyType:"json",output:{example:{schemaVersion:"2.0",service:"Vendor Security Preflight",checkedAt:"2026-09-28T00:00:00.000Z",url:"https://example.com",finalUrl:"https://example.com/",status:200,https:true,publicSignalLevel:"low",riskLevel:"low",riskLevelInterpretation:"Legacy compatibility field; public-site signal only.",pageTitle:"Example Domain",responseTimeMs:220,checks:[{id:"https",label:"HTTPS",passed:true,status:"observed",detail:"HTTPS is enabled",source:"https://example.com/",observedAt:"2026-09-28T00:00:00.000Z"}],coverage:{observed:7,notObserved:3,unverifiable:0,totalChecks:10},gaps:["Content Security Policy"],unverifiableRequirements:[],disclosureSignals:[{id:"security_assurance",topic:"independent security assurance",evidenceUrl:"https://example.com/security",observation:"Related public wording was observed.",note:"This is evidence discovery, not proof."}],evidencePages:[{url:"https://example.com/",title:"Example Domain",status:200,topics:["independent security assurance"]}],nextQuestions:["Ask the vendor for current independent security assurance evidence if applicable."],summary:"Observed 7/10 public-site checks. 3 checks were not observed; 0 requested requirements were not verifiable by this public preflight.",limitations:["Public signals are not proof of internal controls.","PublicSignalLevel is not a final vendor-risk score."]},schema:vendorPreflightOutputSchema}})}
   },
   "POST /site-audit":{
     accepts:{scheme:"exact",price:sitePrice,network,payTo},
