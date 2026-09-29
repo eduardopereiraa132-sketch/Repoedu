@@ -14,7 +14,7 @@ Perform first-pass vendor due diligence from public website evidence and supplie
 - POST https://repoedu.onrender.com/vendor-preflight — US$0.025
 - POST https://repoedu.onrender.com/site-audit — US$0.01
 - POST https://repoedu.onrender.com/web-extract — US$0.005
-- POST https://repoedu.onrender.com/analyze — US$0.005
+- POST https://repoedu.onrender.com/analyze — US$0.01
 
 Payment: x402 v2, USDC, Base Mainnet (eip155:8453).
 Recipient: 0x031a713863890eb611776aadd48397873ed153ab
