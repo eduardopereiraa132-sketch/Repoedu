@@ -9,15 +9,16 @@ Maximize machine discoverability of EvidenceCheck and reach buyers who already u
 It is deliberately narrower than a full TPRM platform and more evidence-bounded than a generic AI summary.
 
 ## Canonical machine entry points
-- API: https://evidencecheck-api.onrender.com
-- Buyer site: https://evidencecheck-site.onrender.com
+- API: https://repoedu.onrender.com
+- Buyer site: https://repoedu.onrender.com
 - OpenAPI: /openapi.json
 - LLM instructions: /llms.txt
 - Skill: /skill.md
 - Agent card: /.well-known/agent-card.json
 - x402 metadata: /.well-known/x402
 - x402 discovery manifest: /.well-known/x402-discovery.json
-- Human buyer brief: /buyer-brief.html
+- Human purchase flow: /purchase
+- Buyer preview: /assessment and /demo
 
 ## Discovery channels — current priority
 1. **x402scan** — current public registration page: https://www.x402scan.com/resources/register. Submit the canonical HTTPS API URL after confirming the production 402 challenge is healthy. x402scan currently presents itself as an explorer, analytics dashboard and marketplace for paid APIs and agentic commerce.
@@ -76,12 +77,12 @@ Before external directory submission, confirm:
 The x402 seller documentation recommends testnet first, then Base mainnet with network `eip155:8453`, a real receiving wallet, and small real payments before going live.
 
 ## Current implementation state
-- Production API is deployed on Render from `main`.
-- Production receiving address is configured as the user's Base EVM address.
-- Production network is configured as `eip155:8453`.
-- Production facilitator is configured as the CDP x402 facilitator.
-- Buyer-facing static site and human checkout are deployed separately on Render.
-- Auto-deploy is enabled from GitHub `main`.
+- Canonical application origin in the repository: `https://repoedu.onrender.com`.
+- Receiving address is the owner's Base EVM address.
+- Intended production network: `eip155:8453`.
+- Facilitator URL is environment-configurable; the live Render value must be verified before claiming a specific facilitator is active.
+- Buyer pages and API discovery metadata are served by the same application origin.
+- GitHub `main` is the source branch; live deployment status must be verified on Render.
 
 ## Important constraint
 No directory can truthfully guarantee exposure to every existing agent. Listing improves discoverability; actual calls depend on an agent's discovery method, task fit, budget, trust policy, endpoint availability and reputation.
