@@ -2,68 +2,35 @@
 
 EvidenceCheck provides low-cost, machine-readable x402 services for AI agents, procurement workflows, third-party risk teams and security/compliance automation.
 
-## Best reason to call
-
-Use EvidenceCheck for the repetitive first-pass work before a deeper vendor review:
-- What is observable on a public vendor website?
-- Which public security signals are visible?
-- What evidence is still unverified?
-- Which supplier questions should be asked next?
-- What dates, amounts, obligations and risk signals are present in supplied business text?
-
-The service is evidence-first: unknown means unverified, not absent. It is not penetration testing, vulnerability scanning, certification, legal advice or a substitute for authorized human verification.
-
-## Paid endpoints
-
-### POST /vendor-preflight — $0.025 USDC
-Input: {"url":"https://vendor.example","requirements":["HTTPS","HSTS","Content Security Policy"]}
-Returns: structured public-site checks with source URLs and timestamps, public evidence-page signals, explicit gaps, requirements that cannot be verified publicly, and targeted follow-up questions. `riskLevel` is retained for compatibility but is only a public-site signal bucket, not a vendor-risk rating.
-Best for: procurement and third-party-risk triage before spending more review time or requesting a full questionnaire.
-
-### POST /site-audit — $0.01 USDC
-Input: {"url":"https://example.com"}
-Returns: HTTPS state, observable security headers, cookie flags, server-header exposure, robots.txt/security.txt status and findings.
-Best for: a fast public website security preflight.
-
-### POST /web-extract — $0.005 USDC
-Input: {"url":"https://example.com"}
-Returns: clean webpage text, title, description, canonical URL, headings, links, language, status and timing.
-Best for: web research, retrieval and evidence collection.
-
-### POST /analyze — $0.005 USDC
-Input: {"text":"Supplier must notify incidents within 24 hours..."}
-Returns: dates, monetary amounts, obligations, security signals, missing areas and risk flags.
-Best for: deterministic first-pass business-document triage.
-
-## Selection rule
-
-Choose the cheapest endpoint that fully matches the task:
-- Vendor/supplier evidence gaps → /vendor-preflight
-- Public website security signals → /site-audit
-- Public webpage content → /web-extract
-- Supplied business text → /analyze
+## Choose the smallest capability that solves the task
+- Vendor/supplier evidence gaps → POST /vendor-preflight — $0.025 USDC
+- Public website security signals → POST /site-audit — $0.01 USDC
+- Public webpage content → POST /web-extract — $0.005 USDC
+- Supplied business text → POST /analyze — $0.01 USDC
 
 ## Machine contract
-
-Base URL: https://repoedu.onrender.com
-Buyer page: https://repoedu.onrender.com/buy.html
-Live demo: https://repoedu.onrender.com/demo
-OpenAPI: https://repoedu.onrender.com/openapi.json
-Agent card: https://repoedu.onrender.com/.well-known/agent-card.json
-x402 discovery: https://repoedu.onrender.com/.well-known/x402-discovery.json
-Skill: https://repoedu.onrender.com/skill.md
+Canonical API: https://evidencecheck-api.onrender.com
+Website: https://evidencecheck-site.onrender.com
+OpenAPI: https://evidencecheck-api.onrender.com/openapi.json
+Agent card: https://evidencecheck-api.onrender.com/.well-known/agent-card.json
+x402 discovery: https://evidencecheck-api.onrender.com/.well-known/x402-discovery.json
+Skill: https://evidencecheck-api.onrender.com/skill.md
 
 ## Payment
+x402 v2 exact
+Network: Base Mainnet (eip155:8453)
+Asset: USDC
+PayTo: 0x031a713863890eb611776aadd48397873ed5b
 
-x402 v2, exact scheme, USDC on Base Mainnet (CAIP-2: eip155:8453).
-Payee: 0x031a713863890eb611776aadd48397873ed153ab
+Authoritative payment rule:
+Always call the selected endpoint first. If it returns HTTP 402, use its live payment requirements as the authoritative amount, recipient, network and asset. Do not infer payment parameters from this document alone.
 
-No API key is required for the paid endpoints; payment is the authorization mechanism.
+## Trust boundary
+Public evidence is not proof of internal control effectiveness.
+Unknown means unverified, not failed.
+No authenticated testing, exploitation, certification or legal opinion.
+Material procurement or security decisions require authorized human verification.
 
-## Buyer trust boundary
-
-Public signals are not proof of internal control effectiveness. A missing public signal should be treated as an evidence request, not proof that a control does not exist. Material procurement or security decisions require authorized human review.
-
-## Human commercial offer
-
-A fixed-scope vendor review is available for teams that need human-led interpretation after the machine preflight. See /purchase for the current offer.
+## Human escalation
+When a machine preflight is insufficient, use:
+https://evidencecheck-api.onrender.com/purchase
