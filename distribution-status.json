@@ -1,6 +1,9 @@
 {
   "status": "registered",
+  "buyerExperienceVerified": true,
   "origin": "https://repoedu.onrender.com",
+  "commit": "5f94a0f85e95d07a8100bbe67528ccf52da94723",
+  "recordedAt": "2026-09-29T00:44:17.406718Z",
   "agent402": {
     "listed": true,
     "origin": "https://repoedu.onrender.com",
@@ -19,11 +22,11 @@
       "routesProbed": 0,
       "rereadCooldownSeconds": 900,
       "recheckCooldownSeconds": 600,
-      "nextRereadInSeconds": 860,
-      "nextRecheckInSeconds": 560,
+      "nextRereadInSeconds": 891,
+      "nextRecheckInSeconds": 591,
       "recheckAllowancePerHour": 240,
-      "recheckAllowanceLeft": 236,
-      "note": "documents were re-read recently; the next re-read is available in 860s; routes were re-checked recently; the next re-check is available in 560s. The crawler also re-reads every listed origin on its own cycle."
+      "recheckAllowanceLeft": 232,
+      "note": "documents were re-read recently; the next re-read is available in 891s; routes were re-checked recently; the next re-check is available in 591s. The crawler also re-reads every listed origin on its own cycle."
     }
   }
 }
