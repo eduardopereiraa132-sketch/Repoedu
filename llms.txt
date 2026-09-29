@@ -17,8 +17,8 @@ The service is evidence-first: unknown means unverified, not absent. It is not p
 
 ### POST /vendor-preflight — $0.025 USDC
 Input: {"url":"https://vendor.example","requirements":["HTTPS","HSTS","Content Security Policy"]}
-Returns: structured public-site checks, gaps, risk level, summary and limitations.
-Best for: procurement and third-party-risk triage.
+Returns: structured public-site checks with source URLs and timestamps, public evidence-page signals, explicit gaps, requirements that cannot be verified publicly, and targeted follow-up questions. `riskLevel` is retained for compatibility but is only a public-site signal bucket, not a vendor-risk rating.
+Best for: procurement and third-party-risk triage before spending more review time or requesting a full questionnaire.
 
 ### POST /site-audit — $0.01 USDC
 Input: {"url":"https://example.com"}
