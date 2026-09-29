@@ -59,13 +59,13 @@ The key trust rule is: **unknown evidence is reported as unknown, not as proof o
 
 ## Distribution
 
-The service is designed for agent discovery through machine-readable metadata and x402 indexes.
+The service is designed for agent discovery through machine-readable metadata and x402 indexes. The canonical paid origin is `https://evidencecheck-api.onrender.com`; an automated GitHub workflow registers that origin with Agent402 and verifies its live HTTP 402 challenge after main-branch changes.
 
 Current distribution path:
-1. Serve a valid HTTPS x402 challenge on the API.
-2. Publish `/.well-known/x402`, `/.well-known/x402-discovery.json`, OpenAPI and `llms.txt`.
-3. Register the live origin with Agent402's free seller index.
-4. Submit to other x402 directories where available.
+1. Serve a valid HTTPS x402 challenge on the canonical API origin.
+2. Publish `/.well-known/x402`, `/.well-known/x402-discovery.json`, OpenAPI, agent card and `llms.txt`.
+3. Register `https://evidencecheck-api.onrender.com` with Agent402's free seller index through GitHub Actions.
+4. Let public x402 crawlers discover the live origin.
 5. Keep descriptions and pricing narrow so buyer routers can match the service to concrete tasks.
 
 Agent402 currently documents free seller registration with `POST /api/index/register`; buyers pay the seller wallet directly and the marketplace takes 0% from sellers.
@@ -80,6 +80,6 @@ A deployed service, a valid HTTP 402 challenge, or a wallet address is **not** e
 
 ## Revenue status
 
-**No revenue is claimed until an external payer completes a real mainnet transaction.**
+**No revenue is claimed until an external payer completes a real mainnet transaction.** A successful 402 challenge, marketplace listing, deployment or wallet configuration is technical readiness—not revenue.
 
 Technical readiness, directory listing or wallet configuration is not evidence of sales.
