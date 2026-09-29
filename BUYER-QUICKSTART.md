@@ -39,7 +39,7 @@ Use the low-cost x402 endpoints for individual capabilities:
 | Web extraction | `/web-extract` | US$0.005 |
 | Website security preflight | `/site-audit` | US$0.01 |
 | Vendor preflight | `/vendor-preflight` | US$0.025 |
-| Business-document analysis | `/analyze` | US$0.005 |
+| Business-document analysis | `/analyze` | US$0.01 |
 
 Payments use x402 on Base mainnet with USDC.
 
