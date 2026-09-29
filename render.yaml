@@ -29,3 +29,20 @@ services:
         value: https://evidencecheck-api.onrender.com
       - key: PUBLIC_SITE_URL
         value: https://evidencecheck-site.onrender.com
+
+  - type: web
+    name: evidencecheck-buyer-agent
+    runtime: node
+    plan: free
+    region: virginia
+    autoDeployTrigger: commit
+    buildCommand: cd buyer-agent && npm install
+    startCommand: cd buyer-agent && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: SELLER_URL
+        value: https://repoedu.onrender.com
+      - key: ENABLE_LIVE_PAYMENTS
+        value: "false"
+      - key: BUYER_PRIVATE_KEY
+        sync: false
