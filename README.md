@@ -32,7 +32,7 @@ The core product is intentionally narrow: take a public vendor URL or supplied b
 | `/site-audit` | Public website security preflight | US$0.01 |
 | `/vendor-preflight` | Vendor-risk preflight with evidence gaps and supplier questions | US$0.025 |
 
-Payment is x402 v2, exact scheme, USDC on Base Mainnet (`eip155:8453`). The production server uses the PayAI x402 facilitator for ordinary exact payments; its current documentation says these exact payments can use its free tier without merchant API credentials. citeturn683926search0turn683926search2
+Payment is x402 v2, exact scheme, USDC on Base Mainnet (`eip155:8453`). The production server uses the PayAI x402 facilitator for ordinary exact payments; its current documentation says these exact payments can use its free tier without merchant API credentials.
 
 Receiving wallet:
 
