@@ -38,7 +38,7 @@ Output includes a risk signal, observable checks, evidence gaps, supplier questi
 - `/analyze` — business-document dates, amounts, obligations, security signals and gaps — **US$0.005**
 
 ## Why an agent would call it
-Use `vendor-preflight` as a low-cost verification step before requesting a full questionnaire, escalating to a human reviewer or committing more compute/time to a vendor assessment.
+Use `vendor-preflight` as the low-cost verification step before requesting a full questionnaire, escalating to a human reviewer, or spending more compute/time on vendor research. It is designed to answer: “What can I verify from public evidence right now, and what should I ask for next?”
 
 The endpoint is intentionally cheap enough for automated triage and structured enough for downstream workflows.
 
