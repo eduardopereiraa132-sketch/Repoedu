@@ -1,0 +1,29 @@
+{
+  "status": "registered",
+  "origin": "https://repoedu.onrender.com",
+  "agent402": {
+    "listed": true,
+    "origin": "https://repoedu.onrender.com",
+    "seller": {
+      "displayName": "repoedu.onrender.com",
+      "toolCount": 4,
+      "networks": [
+        "eip155:8453"
+      ],
+      "routable": true,
+      "health": 1
+    },
+    "reverify": {
+      "documentsReread": false,
+      "routesRechecked": false,
+      "routesProbed": 0,
+      "rereadCooldownSeconds": 900,
+      "recheckCooldownSeconds": 600,
+      "nextRereadInSeconds": 883,
+      "nextRecheckInSeconds": 583,
+      "recheckAllowancePerHour": 240,
+      "recheckAllowanceLeft": 236,
+      "note": "documents were re-read recently; the next re-read is available in 883s; routes were re-checked recently; the next re-check is available in 583s. The crawler also re-reads every listed origin on its own cycle."
+    }
+  }
+}
