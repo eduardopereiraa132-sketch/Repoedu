@@ -1,4 +1,8 @@
 name: Register x402 service for agent discovery
+concurrency:
+  group: x402-discovery-registration
+  cancel-in-progress: false
+
 on:
   push:
     branches: [main]
@@ -6,7 +10,7 @@ on:
       - distribution-status.json
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 jobs:
   register:
     runs-on: ubuntu-latest
@@ -71,32 +75,37 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl -fsS -X POST "https://agent402.tools/api/index/register" \
+          seller="${ORIGIN#https://}"
+          seller="${seller%/}"
+          existing_code=$(curl -sS --max-time 15 -o /tmp/existing.json -w "%{http_code}" "https://agent402.tools/api/index?seller=${seller}" || true)
+          if [ "$existing_code" = "200" ]; then
+            echo "Origin already present in Agent402 index: $ORIGIN"
+            cp /tmp/existing.json /tmp/register.json
+            exit 0
+          fi
+          code=$(curl -sS --max-time 20 -o /tmp/register.json -w "%{http_code}" \
+            -X POST "https://agent402.tools/api/index/register" \
             -H "content-type: application/json" \
-            --data "{\"origin\":\"$ORIGIN\"}" | tee /tmp/register.json
-          echo "Registered: $ORIGIN"
+            --data "{\"origin\":\"$ORIGIN\"}")
+          echo "Agent402 registration HTTP $code"
+          case "$code" in
+            200|201|202|409)
+              cat /tmp/register.json
+              ;;
+            *)
+              cat /tmp/register.json
+              exit 1
+              ;;
+          esac
 
       - name: Record distribution status
         env:
           ORIGIN: ${{ steps.discover.outputs.origin }}
-        shell: bash
         run: |
-          python - <<'PY'
-          import json, pathlib, os
-          p = pathlib.Path("/tmp/register.json")
-          data = json.loads(p.read_text())
-          out = {
-            "status": "registered",
-            "buyerExperienceVerified": True,
-            "origin": os.environ["ORIGIN"],
-            "commit": os.environ.get("GITHUB_SHA"),
-            "recordedAt": __import__("datetime").datetime.utcnow().isoformat()+"Z",
-            "agent402": data
-          }
-          pathlib.Path("distribution-status.json").write_text(json.dumps(out, indent=2)+"\n")
-          PY
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add distribution-status.json
-          git commit -m "Record x402 distribution registration"
-          git push
+          {
+            echo "## Agent402 distribution"
+            echo ""
+            echo "- Origin: $ORIGIN"
+            echo "- Seller index: registration verified or already present"
+            echo "- Buyer routing: live 402 challenge verified"
+          } >> "$GITHUB_STEP_SUMMARY"
