@@ -28,7 +28,7 @@ Example input:
 {"url":"https://vendor.example","requirements":["access control","incident response","data protection"]}
 ```
 
-Output includes a risk signal, observable checks, evidence gaps, supplier questions, summary and limitations.
+Output includes observable checks with source URLs/timestamps, relevant public evidence-page signals, explicit gaps, requirements that cannot be verified publicly, targeted supplier questions, coverage and limitations. The legacy `riskLevel` field is not a final vendor-risk rating.
 
 **Price:** US$0.025 per request.
 
@@ -61,10 +61,8 @@ USDC on Base mainnet (`eip155:8453`) via x402.
 ## Receiving address
 `0x031a713863890eb611776aadd48397873ed153ab`
 
-## Low-friction human pilot
-`/pilot.html` offers a **US$149 one-vendor pilot** with fixed scope: public-site preflight, supplied-evidence review, evidence-gap register, supplier question set, structured findings and explicit limitations. It is an offer price for validation, not a claim of existing customers or revenue.
-
 ## Human escalation
+
 For buyers that need a defined vendor review rather than an API call, the service offers a fixed-scope review starting at US$495 and recurring intake starting at US$1,250/month. These are offer prices, not claims of existing customer contracts or revenue.
 
 ## Directory submission strategy
