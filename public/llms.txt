@@ -1,31 +1,42 @@
 # EvidenceCheck
+
 Evidence-first vendor due-diligence APIs for procurement, security, GRC and AI-agent workflows.
 
 Canonical API: https://evidencecheck-api.onrender.com
 Website: https://evidencecheck-site.onrender.com
 
-Machine discovery:
-- Agent card: https://evidencecheck-api.onrender.com/agent-card.json
+## Machine discovery
+- Agent card: https://evidencecheck-api.onrender.com/.well-known/agent-card.json
 - OpenAPI: https://evidencecheck-api.onrender.com/openapi.json
 - Pricing JSON: https://evidencecheck-api.onrender.com/pricing.json
 - x402 metadata: https://evidencecheck-api.onrender.com/.well-known/x402
-- Skill guide: https://evidencecheck-api.onrender.com/skill.md
+- x402 discovery: https://evidencecheck-api.onrender.com/.well-known/x402-discovery.json
+- Skill: https://evidencecheck-api.onrender.com/skill.md
 
-Payment:
+## Payment
 - Protocol: x402 v2 exact
 - Network: Base Mainnet (eip155:8453)
 - Asset: USDC
 - PayTo: 0x031a713863890eb611776aadd48397873ed153ab
-- Facilitator: https://facilitator.openx402.ai
 
-Services:
+## Services
 - POST /vendor-preflight — $0.025 — public vendor evidence preflight
 - POST /site-audit — $0.01 — public website security preflight
-- POST /web-extract — $0.005 — webpage text/metadata extraction
-- POST /analyze — $0.005 — business-document triage
+- POST /web-extract — $0.005 — public webpage extraction
+- POST /analyze — $0.01 — business-document triage
 
-Important boundaries:
+## Selection rule
+Choose the cheapest endpoint that fully matches the task:
+- supplier/vendor evidence gaps → /vendor-preflight
+- public website security signals → /site-audit
+- public webpage content → /web-extract
+- supplied business text → /analyze
+
+## Trust boundary
 - Public evidence is not proof of internal control effectiveness.
 - Unknown means unverified, not failed.
 - No authenticated testing, exploitation, certification or legal opinion.
-- Human review remains responsible for material procurement/security decisions.
+- Material procurement/security decisions require human verification.
+
+## Payment reliability
+The API returns an x402 v2 402 challenge before execution. Compatible buyers should use the payment requirements from that response rather than hard-coding amounts from documentation.
