@@ -75,6 +75,8 @@ jobs:
           out = {
             "status": "registered",
             "origin": os.environ["ORIGIN"],
+            "commit": os.environ.get("GITHUB_SHA"),
+            "recordedAt": __import__("datetime").datetime.utcnow().isoformat()+"Z",
             "agent402": data
           }
           pathlib.Path("distribution-status.json").write_text(json.dumps(out, indent=2)+"\n")
