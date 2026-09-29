@@ -623,4 +623,34 @@ app.post("/demo/vendor",async(req,res)=>{try{const url=String(req.body?.url||"")
 app.post("/pilot-request",async(req,res)=>{const x=req.body||{};const lead={receivedAt:new Date().toISOString(),name:String(x.name||"").slice(0,120),company:String(x.company||"").slice(0,160),email:String(x.email||"").slice(0,200),volume:String(x.volume||"").slice(0,80),vendorUrl:String(x.vendorUrl||"").slice(0,500),message:String(x.message||"").slice(0,3000)};console.log("PILOT_REQUEST "+JSON.stringify(lead));try{await saveLead({name:lead.name,email:lead.email,company:lead.company,source:"pilot-request",metadata:{volume:lead.volume,vendorUrl:lead.vendorUrl,message:lead.message}})}catch(e){console.error("PILOT_LEAD_STORAGE_ERROR",e.message)}if(process.env.LEAD_WEBHOOK_URL){fetch(process.env.LEAD_WEBHOOK_URL,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(lead)}).catch(()=>{});}res.type("html").send('<html><body style="font-family:system-ui;max-width:700px;margin:80px auto;padding:24px"><h1>Pilot request received</h1><p>Your request was recorded for follow-up.</p><a href="/commercial">Back to product</a></body></html>')});
 
 const port=Number(process.env.PORT||10000);
-app.listen(port,"0.0.0.0",()=>console.log("x402 service listening on "+port));
+
+async function runStartupSelfTest(){
+  try{
+    const supportedResponse=await fetch(facilitatorUrl+"/supported",{headers:{"accept":"application/json"},signal:AbortSignal.timeout(7000)});
+    const supportedText=await supportedResponse.text();
+    const lowered=supportedText.toLowerCase();
+    const baseExactSupported=lowered.includes("eip155:8453") || (lowered.includes('"network":"base"') && lowered.includes('"scheme":"exact"'));
+    const challenge=await fetch("http://127.0.0.1:"+port+"/web-extract",{
+      method:"POST",
+      headers:{"content-type":"application/json"},
+      body:JSON.stringify({url:"https://example.com"}),
+      signal:AbortSignal.timeout(7000)
+    });
+    const paymentRequired=challenge.headers.get("payment-required");
+    console.log("X402_STARTUP_SELFTEST "+JSON.stringify({
+      facilitator:facilitatorUrl,
+      facilitatorStatus:supportedResponse.status,
+      baseExactSupported,
+      challengeStatus:challenge.status,
+      hasPaymentRequired:Boolean(paymentRequired),
+      passed:supportedResponse.ok && baseExactSupported && challenge.status===402 && Boolean(paymentRequired)
+    }));
+  }catch(error){
+    console.error("X402_STARTUP_SELFTEST_FAILED "+JSON.stringify({message:error?.message||String(error)}));
+  }
+}
+
+app.listen(port,"0.0.0.0",()=>{
+  console.log("x402 service listening on "+port);
+  runStartupSelfTest();
+});
