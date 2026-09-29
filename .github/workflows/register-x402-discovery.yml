@@ -51,6 +51,19 @@ jobs:
           fi
           grep -qi "payment-required" /tmp/headers.txt
 
+      - name: Verify buyer experience and discovery metadata
+        env:
+          ORIGIN: ${{ steps.discover.outputs.origin }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS --max-time 15 "$ORIGIN/buy.html" -o /tmp/buy.html
+          curl -fsS --max-time 15 "$ORIGIN/llms.txt" -o /tmp/llms.txt
+          curl -fsS --max-time 15 "$ORIGIN/.well-known/x402-discovery.json" -o /tmp/discovery.json
+          grep -q "Verify the evidence" /tmp/buy.html
+          grep -q "vendor-preflight" /tmp/llms.txt
+          grep -q ""website": "https://repoedu.onrender.com/buy.html"" /tmp/discovery.json
+
       - name: Register origin with Agent402
         id: register
         env:
@@ -74,6 +87,7 @@ jobs:
           data = json.loads(p.read_text())
           out = {
             "status": "registered",
+            "buyerExperienceVerified": True,
             "origin": os.environ["ORIGIN"],
             "commit": os.environ.get("GITHUB_SHA"),
             "recordedAt": __import__("datetime").datetime.utcnow().isoformat()+"Z",
