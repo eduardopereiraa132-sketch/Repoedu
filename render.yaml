@@ -24,7 +24,7 @@ services:
       - key: PILOT_PRICE
         value: $495
       - key: FACILITATOR_URL
-        value: https://facilitator.payai.network
+        value: https://facilitator.openx402.ai
       - key: PUBLIC_URL
         value: https://evidencecheck-api.onrender.com
       - key: PUBLIC_SITE_URL
