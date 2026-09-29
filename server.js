@@ -15,6 +15,17 @@ app.disable("x-powered-by");
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: false }));
 app.use((req,res,next)=>{
+  const origin=req.headers.origin;
+  if(origin && origin===publicSiteUrl){
+    res.setHeader("Access-Control-Allow-Origin",origin);
+    res.setHeader("Vary","Origin");
+    res.setHeader("Access-Control-Allow-Methods","GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers","content-type,payment-signature,x-payment");
+  }
+  if(req.method==="OPTIONS") return res.sendStatus(204);
+  next();
+});
+app.use((req,res,next)=>{
   res.setHeader("X-Content-Type-Options","nosniff");
   res.setHeader("X-Frame-Options","DENY");
   res.setHeader("Referrer-Policy","no-referrer");
@@ -30,9 +41,10 @@ const sitePrice = process.env.SITE_PRICE || "$0.01";
 const documentPrice = process.env.DOCUMENT_PRICE || price;
 const vendorPrice = process.env.VENDOR_PRICE || "$0.025";
 const pilotPrice = process.env.PILOT_PRICE || "$495";
-const facilitatorUrl = process.env.FACILITATOR_URL || "https://facilitator.payai.network";
-const publicUrl = (process.env.PUBLIC_URL || "https://repoedu.onrender.com").replace(/\/$/, "");
-const version = "3.1.0";
+const facilitatorUrl = process.env.FACILITATOR_URL || "https://facilitator.openx402.ai";
+const publicUrl = (process.env.PUBLIC_URL || "https://evidencecheck-api.onrender.com").replace(/\/$/, "");
+const publicSiteUrl = (process.env.PUBLIC_SITE_URL || "https://evidencecheck-site.onrender.com").replace(/\/$/, "");
+const version = "3.2.0";
 const CACHE_TTL_MS = 120000;
 const extractionCache = new Map();
 
@@ -477,12 +489,13 @@ app.get("/.well-known/x402-discovery.json",(_req,res)=>res.json(discoveryManifes
 app.get("/agent-discovery.json",(_req,res)=>res.json(discoveryManifest()));
 app.get("/icon.svg",(_req,res)=>res.type("image/svg+xml").send('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="24" fill="#111827"/><path d="M35 25h58v16H51v17h35v15H51v30H35z" fill="#fff"/><path d="M72 73h21v30H72z" fill="#60a5fa"/></svg>'));
 
-app.get("/",(_req,res)=>{
-  const html=fs.readFileSync(new URL("./assessment-page.html",import.meta.url),"utf8");
-  res.type("html").send(html);
-});
+app.get("/",(_req,res)=>res.sendFile("index.html",{root:new URL("./public",import.meta.url).pathname}));
 app.get("/buy.html",(_req,res)=>res.type("html").send(fs.readFileSync(new URL("./assessment-page.html",import.meta.url),"utf8")));
-app.get("/health",(_req,res)=>res.json({ok:true,service:"agent-web-security-intelligence",version,network,prices:{webExtract:price,siteAudit:sitePrice,documentAnalyzer:documentPrice,vendorPreflight:vendorPrice},facilitator:facilitatorUrl,cacheEntries:extractionCache.size}));
+app.get("/health",(_req,res)=>res.json({ok:true,service:"agent-web-security-intelligence",version,network,prices:{webExtract:price,siteAudit:sitePrice,documentAnalyzer:documentPrice,vendorPreflight:vendorPrice},facilitator:facilitatorUrl,publicUrl,publicSiteUrl,cacheEntries:extractionCache.size}));
+app.get("/pricing.json",(_req,res)=>res.json({service:"EvidenceCheck",currency:"USD",settlement:"USDC",network:"eip155:8453",facilitator:facilitatorUrl,payTo,machine:[{id:"web-extract",endpoint:"POST /web-extract",price:Number(price.replace("$","")),unit:"request"},{id:"site-audit",endpoint:"POST /site-audit",price:Number(sitePrice.replace("$","")),unit:"request"},{id:"document-analyzer",endpoint:"POST /analyze",price:Number(documentPrice.replace("$","")),unit:"request"},{id:"vendor-preflight",endpoint:"POST /vendor-preflight",price:Number(vendorPrice.replace("$","")),unit:"request"}],human:[{id:"vendor-security-review",endpoint:"POST /review-purchase",price:Number(pilotPrice.replace("$","")),unit:"vendor"}]}));
+let facilitatorHealth={ok:false,checkedAt:0,error:null};
+async function checkFacilitatorHealth(){const now=Date.now();if(now-facilitatorHealth.checkedAt<60000)return facilitatorHealth;try{const r=await fetch(facilitatorUrl+"/supported",{headers:{"accept":"application/json"},signal:AbortSignal.timeout(5000)});const body=await r.text();facilitatorHealth={ok:r.ok,checkedAt:now,error:r.ok?null:"HTTP "+r.status+" "+body.slice(0,180)}}catch(e){facilitatorHealth={ok:false,checkedAt:now,error:e?.message||"facilitator unreachable"}}return facilitatorHealth}
+app.get("/payments/health",async(_req,res)=>{const f=await checkFacilitatorHealth();res.status(f.ok?200:503).json({ok:f.ok,facilitator:facilitatorUrl,checkedAt:new Date(f.checkedAt).toISOString(),error:f.error});});
 app.get("/.well-known/x402",(_req,res)=>res.json({
   x402Version:2,service:"EvidenceCheck",version,
   endpoints:[
