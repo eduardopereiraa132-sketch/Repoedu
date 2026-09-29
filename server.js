@@ -666,7 +666,7 @@ async function runStartupSelfTest(){
     const supportedResponse=await fetch(facilitatorUrl+"/supported",{headers:{"accept":"application/json"},signal:AbortSignal.timeout(7000)});
     const supportedText=await supportedResponse.text();
     const lowered=supportedText.toLowerCase();
-    const baseExactSupported=lowered.includes("eip155:8453") || (lowered.includes('"network":"base"') && lowered.includes('"scheme":"exact"'));
+    const baseExactSupported=lowered.includes("eip155:8453") || (lowered.includes('\"network\":\"base\"') && lowered.includes('\"scheme\":\"exact\"'));
     const challenge=await fetch("http://127.0.0.1:"+port+"/web-extract",{
       method:"POST",
       headers:{"content-type":"application/json"},
@@ -674,13 +674,30 @@ async function runStartupSelfTest(){
       signal:AbortSignal.timeout(7000)
     });
     const paymentRequired=challenge.headers.get("payment-required");
+    let decoded=null;
+    try{ if(paymentRequired) decoded=JSON.parse(Buffer.from(paymentRequired,"base64").toString("utf8")); }catch{}
+    const accepted=decoded?.accepts?.[0]||{};
+    const bazaarInput=decoded?.extensions?.bazaar?.info?.input;
+    const paymentShapeValid =
+      accepted.scheme==="exact" &&
+      accepted.network==="eip155:8453" &&
+      String(accepted.asset||"").toLowerCase()==="0x833589fcD6eDb6e08f4c7c32d4f71b54bda02913".toLowerCase() &&
+      String(accepted.payTo||"").toLowerCase()===(String(payTo||"")).toLowerCase() &&
+      accepted.extra?.name==="USD Coin" &&
+      accepted.extra?.version==="2";
+    const bazaarShapeValid =
+      bazaarInput?.type==="http" &&
+      bazaarInput?.method==="POST" &&
+      bazaarInput?.bodyType==="json";
     console.log("X402_STARTUP_SELFTEST "+JSON.stringify({
       facilitator:facilitatorUrl,
       facilitatorStatus:supportedResponse.status,
       baseExactSupported,
       challengeStatus:challenge.status,
       hasPaymentRequired:Boolean(paymentRequired),
-      passed:supportedResponse.ok && baseExactSupported && challenge.status===402 && Boolean(paymentRequired)
+      paymentShapeValid,
+      bazaarShapeValid,
+      passed:supportedResponse.ok && baseExactSupported && challenge.status===402 && Boolean(paymentRequired) && paymentShapeValid && bazaarShapeValid
     }));
   }catch(error){
     console.error("X402_STARTUP_SELFTEST_FAILED "+JSON.stringify({message:error?.message||String(error)}));
