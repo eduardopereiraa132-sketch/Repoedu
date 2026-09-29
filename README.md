@@ -32,7 +32,7 @@ The core product is intentionally narrow: take a public vendor URL or supplied b
 | `/site-audit` | Public website security preflight | US$0.01 |
 | `/vendor-preflight` | Vendor-risk preflight with evidence gaps and supplier questions | US$0.025 |
 
-Payment is x402 v2, exact scheme, USDC on Base Mainnet (`eip155:8453`).
+Payment is x402 v2, exact scheme, USDC on Base Mainnet (`eip155:8453`). The production server uses the PayAI x402 facilitator for ordinary exact payments; its current documentation says these exact payments can use its free tier without merchant API credentials. citeturn683926search0turn683926search2
 
 Receiving wallet:
 
@@ -71,6 +71,12 @@ Current distribution path:
 Agent402 currently documents free seller registration with `POST /api/index/register`; buyers pay the seller wallet directly and the marketplace takes 0% from sellers.
 
 A GitHub Actions smoke test validates the paid routes and x402 metadata on every main-branch change.
+
+## Live payment verification
+
+The buyer-facing API exposes `/payment-test`, which performs a real US$0.005 x402 payment attempt on Base Mainnet from the buyer's own wallet. The test requires an explicit wallet signature; no seed phrase or private key is requested.
+
+A deployed service, a valid HTTP 402 challenge, or a wallet address is **not** evidence of revenue. Revenue is only recorded after an external payer's mainnet transaction is actually settled to the receiving wallet.
 
 ## Revenue status
 
