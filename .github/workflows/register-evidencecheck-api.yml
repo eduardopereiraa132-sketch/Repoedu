@@ -1,0 +1,75 @@
+name: Register EvidenceCheck API for agent discovery
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - distribution-api-status.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evidencecheck-agent-discovery
+  cancel-in-progress: false
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Register API origin
+        env:
+          ORIGIN: https://evidencecheck-api.onrender.com
+        shell: bash
+        run: |
+          set -euo pipefail
+          seller="${ORIGIN#https://}"
+          seller="${seller%/}"
+
+          existing_code=$(curl -sS --max-time 15 -o /tmp/existing.json -w "%{http_code}"             "https://agent402.tools/api/index?seller=${seller}" || true)
+
+          if [ "$existing_code" = "200" ]; then
+            echo "EvidenceCheck API already present in Agent402 index."
+            cat /tmp/existing.json
+            exit 0
+          fi
+
+          code=$(curl -sS --max-time 20 -o /tmp/register.json -w "%{http_code}"             -X POST "https://agent402.tools/api/index/register"             -H "content-type: application/json"             --data "{\"origin\":\"$ORIGIN\"}")
+
+          echo "Agent402 registration HTTP $code"
+          cat /tmp/register.json
+
+          case "$code" in
+            200|201|202|409) ;;
+            *) exit 1 ;;
+          esac
+
+      - name: Verify live x402 challenge
+        env:
+          ORIGIN: https://evidencecheck-api.onrender.com
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=$(curl -sS --max-time 20 -o /tmp/challenge.json -D /tmp/headers             -w "%{http_code}"             -X POST "$ORIGIN/vendor-preflight"             -H "content-type: application/json"             --data '{"url":"https://example.com"}')
+
+          echo "HTTP status: $status"
+          grep -i '^payment-required:' /tmp/headers || true
+
+          test "$status" = "402"
+
+      - name: Write workflow summary
+        env:
+          ORIGIN: https://evidencecheck-api.onrender.com
+        run: |
+          {
+            echo "## EvidenceCheck agent distribution"
+            echo ""
+            echo "- Origin: $ORIGIN"
+            echo "- x402: HTTP 402 challenge verified"
+            echo "- Network: Base Mainnet (eip155:8453)"
+            echo "- Settlement asset: USDC"
+            echo "- Discovery: Agent402 registration attempted/verified"
+            echo ""
+            echo "A listing or challenge is not revenue. Revenue requires an external payer and a settled mainnet transaction."
+          } >> "$GITHUB_STEP_SUMMARY"
