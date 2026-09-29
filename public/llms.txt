@@ -1,63 +1,31 @@
-# EvidenceCheck — Agent Web & Security Intelligence
+# EvidenceCheck
+Evidence-first vendor due-diligence APIs for procurement, security, GRC and AI-agent workflows.
 
-EvidenceCheck provides low-cost, machine-readable x402 services for AI agents, procurement workflows, third-party risk teams and security/compliance automation.
+Canonical API: https://evidencecheck-api.onrender.com
+Website: https://evidencecheck-site.onrender.com
 
-## Primary machine entry point
+Machine discovery:
+- Agent card: https://evidencecheck-api.onrender.com/agent-card.json
+- OpenAPI: https://evidencecheck-api.onrender.com/openapi.json
+- Pricing JSON: https://evidencecheck-api.onrender.com/pricing.json
+- x402 metadata: https://evidencecheck-api.onrender.com/.well-known/x402
+- Skill guide: https://evidencecheck-api.onrender.com/skill.md
 
-API Base URL: https://evidencecheck-api.onrender.com
-Buyer website: https://evidencecheck-site.onrender.com
-Universal discovery manifest: https://evidencecheck-api.onrender.com/agent-discovery.json
-OpenAPI: https://evidencecheck-api.onrender.com/openapi.json
-Agent card: https://evidencecheck-api.onrender.com/.well-known/agent.json
-x402 discovery: https://evidencecheck-api.onrender.com/.well-known/x402-discovery.json
-Skill: https://evidencecheck-api.onrender.com/skill.md
+Payment:
+- Protocol: x402 v2 exact
+- Network: Base Mainnet (eip155:8453)
+- Asset: USDC
+- PayTo: 0x031a713863890eb611776aadd48397873ed153ab
+- Facilitator: https://facilitator.openx402.ai
 
-## Why an agent should use EvidenceCheck
+Services:
+- POST /vendor-preflight — $0.025 — public vendor evidence preflight
+- POST /site-audit — $0.01 — public website security preflight
+- POST /web-extract — $0.005 — webpage text/metadata extraction
+- POST /analyze — $0.005 — business-document triage
 
-Use EvidenceCheck when a workflow needs an inexpensive first-pass answer to:
-- What is observable on this public website?
-- What security controls are publicly visible or missing?
-- What evidence gaps should a procurement workflow verify next?
-- What obligations, dates, amounts and risk signals are present in business text?
-
-This is first-pass evidence triage, not penetration testing, certification, legal advice or a substitute for an authorized human review.
-
-## Paid endpoints — USDC on Base
-
-### POST /web-extract — $0.005 USDC
-Input: {"url":"https://example.com"}
-Returns: clean webpage text, title, description, canonical URL, headings, links, language, response status and timing.
-
-### POST /site-audit — $0.01 USDC
-Input: {"url":"https://example.com"}
-Returns: HTTPS state, observable security headers, cookie flags, server-header exposure, robots.txt/security.txt status and findings.
-
-### POST /vendor-preflight — $0.025 USDC
-Input: {"url":"https://vendor.example","requirements":["HTTPS","HSTS","Content Security Policy"]}
-Returns: structured public-site checks, gaps, risk level, summary and limitations.
-
-### POST /analyze — $0.005 USDC
-Input: {"text":"Supplier must notify incidents within 24 hours..."}
-Returns: dates, monetary amounts, obligations, security signals, missing areas and risk flags.
-
-## Payment contract
-
-x402 v2, exact scheme, USDC on Base Mainnet (CAIP-2: eip155:8453).
-Payee: 0x031a713863890eb611776aadd48397873ed153ab
-No API key is required for paid endpoints; payment is the authorization mechanism.
-
-## Selection guidance
-
-Choose /web-extract for public webpage content.
-Choose /site-audit for a fast public-site security signal.
-Choose /vendor-preflight for vendor-risk/procurement evidence gaps and follow-up questions.
-Choose /analyze for structured triage of business text.
-Prefer the cheapest endpoint that fully matches the task.
-
-## Discovery
-
-Paid routes declare the x402 Bazaar discovery extension. Compatible agents can also read the OpenAPI contract, agent card, skill and discovery manifest above.
-
-## Trust boundary
-
-EvidenceCheck provides first-pass evidence support. It does not certify vendors, perform authenticated penetration testing, exploit systems, provide legal advice or replace authorized human review.
+Important boundaries:
+- Public evidence is not proof of internal control effectiveness.
+- Unknown means unverified, not failed.
+- No authenticated testing, exploitation, certification or legal opinion.
+- Human review remains responsible for material procurement/security decisions.
