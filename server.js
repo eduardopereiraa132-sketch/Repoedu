@@ -331,7 +331,7 @@ async function vendorPreflight(rawUrl,requirements=[]){
   if(!audit.securityHeaders.strictTransportSecurity)nextQuestions.push("Confirm transport-security controls and supported TLS configuration.");
   for(const req of unverifiableRequirements)nextQuestions.push("Request evidence for the requirement: "+req);
 
-  const summary=\`Observed \${coverage.observed}/\${coverage.totalChecks} public-site checks. \${gaps.length} checks were not observed; \${unverifiableRequirements.length} requested requirements were not verifiable by this public preflight.\`;
+  const summary = "Observed " + coverage.observed + "/" + coverage.totalChecks + " public-site checks. " + gaps.length + " checks were not observed; " + unverifiableRequirements.length + " requested requirements were not verifiable by this public preflight.";
 
   return {
     schemaVersion:"2.0",
