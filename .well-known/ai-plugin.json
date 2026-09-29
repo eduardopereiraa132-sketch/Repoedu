@@ -1,23 +1,26 @@
 {
   "schema_version": "v1",
-  "name_for_human": "Business Document Analyzer",
-  "name_for_model": "business_document_analyzer",
-  "description_for_model": "Paid x402 API that extracts structured business-document signals for AI agents. Send document text and receive dates, monetary amounts, obligations, security signals, missing areas and risk flags.",
+  "name_for_human": "EvidenceCheck",
+  "name_for_model": "evidencecheck",
+  "description_for_model": "Evidence-first vendor due-diligence APIs for AI agents. Use the smallest endpoint that matches the task: vendor evidence preflight, public website security preflight, webpage extraction, or business-document triage.",
   "api": {
     "type": "openapi",
-    "url": "https://repoedu-1.onrender.com/openapi.json"
+    "url": "https://evidencecheck-api.onrender.com/openapi.json"
   },
   "auth": {
     "type": "x402",
+    "version": 2,
+    "scheme": "exact",
     "network": "eip155:8453",
     "asset": "USDC",
-    "price": "0.50",
     "payTo": "0x031a713863890eb611776aadd48397873ed153ab"
   },
   "endpoints": {
-    "paid": "https://repoedu-1.onrender.com/analyze",
-    "x402": "https://repoedu-1.onrender.com/.well-known/x402",
-    "llms": "https://repoedu-1.onrender.com/llms.txt",
-    "skill": "https://repoedu-1.onrender.com/skill.md"
+    "vendor_preflight": "https://evidencecheck-api.onrender.com/vendor-preflight",
+    "site_audit": "https://evidencecheck-api.onrender.com/site-audit",
+    "web_extract": "https://evidencecheck-api.onrender.com/web-extract",
+    "document_analyzer": "https://evidencecheck-api.onrender.com/analyze",
+    "x402_discovery": "https://evidencecheck-api.onrender.com/.well-known/x402-discovery.json",
+    "skill": "https://evidencecheck-api.onrender.com/skill.md"
   }
 }
