@@ -7,7 +7,6 @@ import dns from "node:dns/promises";
 import net from "node:net";
 import { paymentMiddleware } from "@x402/express";
 import { x402ResourceServer, HTTPFacilitatorClient } from "@x402/core/server";
-import { createFacilitatorConfig } from "@coinbase/x402";
 import { ExactEvmScheme } from "@x402/evm/exact/server";
 import { bazaarResourceServerExtension, declareDiscoveryExtension } from "@x402/extensions/bazaar";
 
@@ -50,14 +49,7 @@ const version = "3.3.0";
 const CACHE_TTL_MS = 120000;
 const extractionCache = new Map();
 
-const cdpCredentialsConfigured = Boolean(process.env.CDP_API_KEY_ID && process.env.CDP_API_KEY_SECRET);
-const useCdpFacilitator = facilitatorUrl.includes("api.cdp.coinbase.com");
-if (useCdpFacilitator && !cdpCredentialsConfigured) {
-  console.warn("CDP x402 facilitator credentials are missing; use PayAI for no-key exact payments or configure CDP_API_KEY_ID and CDP_API_KEY_SECRET.");
-}
-const facilitatorClient = useCdpFacilitator && cdpCredentialsConfigured
-  ? new HTTPFacilitatorClient(createFacilitatorConfig(process.env.CDP_API_KEY_ID, process.env.CDP_API_KEY_SECRET))
-  : new HTTPFacilitatorClient({ url: facilitatorUrl });
+const facilitatorClient = new HTTPFacilitatorClient({ url: facilitatorUrl });
 const x402Server = new x402ResourceServer(facilitatorClient)
   .register(network, new ExactEvmScheme())
   .registerExtension(bazaarResourceServerExtension);
