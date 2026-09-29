@@ -19,11 +19,11 @@
       "routesProbed": 0,
       "rereadCooldownSeconds": 900,
       "recheckCooldownSeconds": 600,
-      "nextRereadInSeconds": 883,
-      "nextRecheckInSeconds": 583,
+      "nextRereadInSeconds": 860,
+      "nextRecheckInSeconds": 560,
       "recheckAllowancePerHour": 240,
       "recheckAllowanceLeft": 236,
-      "note": "documents were re-read recently; the next re-read is available in 883s; routes were re-checked recently; the next re-check is available in 583s. The crawler also re-reads every listed origin on its own cycle."
+      "note": "documents were re-read recently; the next re-read is available in 860s; routes were re-checked recently; the next re-check is available in 560s. The crawler also re-reads every listed origin on its own cycle."
     }
   }
 }
